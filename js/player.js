@@ -37,14 +37,22 @@ var Player = (function () {
         this.isPlaying = false;
         this.isFullScreen = false;
         this.target = target;
+        this.createParentDiv();
         this.getSize();
 
         this.title = new TitleBar(titleBarOption, this.width);
         this.controles = new Controles(controlOption, this.width);
 
         var thisObject = this;
+
         target.addEventListener('click', function () {
             thisObject.toggleFullScreen();
+            thisObject.togglePlayPause();
+        }, false);
+
+        target.addEventListener('touch', function () {
+            thisObject.toggleFullScreen();
+            thisObject.togglePlayPause();
         }, false);
 
         this.setInitialVolume(0);
@@ -52,14 +60,25 @@ var Player = (function () {
     Player.prototype.getSize = function () {
         var target = this.target;
         this.width = parseInt(target.style.width.replace('px', ''));
-        if (this.width == 0) {
+        if (!this.width) {
             this.width = parseInt(getComputedStyle(target, '').width.replace('px', ''));
         }
 
         this.height = parseInt(target.style.height.replace('px', ''));
-        if (this.height == 0) {
+        if (!this.height) {
             this.height = parseInt(getComputedStyle(target, '').height.replace('px', ''));
         }
+    };
+
+    Player.prototype.createParentDiv = function () {
+        var target = this.target;
+
+        var parentNode = target.parentNode;
+        var targetParent = document.createElement('div');
+        targetParent.appendChild(target);
+        parentNode.appendChild(targetParent);
+        this.targetParent = targetParent;
+        this.target = target;
     };
 
     Player.prototype.setInitialVolume = function (volume) {
@@ -68,6 +87,7 @@ var Player = (function () {
     };
 
     Player.prototype.toggleFullScreen = function () {
+        var targetParent = this.targetParent;
         var target = this.target;
         if (this.isFullScreen) {
             if (document.exitFullscreen) {
@@ -77,16 +97,19 @@ var Player = (function () {
             } else if (document.webkitCancelFullScreen) {
                 document.webkitCancelFullScreen();
             }
-
+            target.style.width = this.width + "px";
+            target.style.height = this.height + "px";
             this.isFullScreen = false;
         } else {
-            if (target.requestFullscreen) {
-                target.requestFullscreen();
-            } else if (target.mozRequestFullScreen) {
-                target.mozRequestFullScreen();
-            } else if (target.webkitRequestFullScreen) {
-                target.webkitRequestFullScreen();
+            if (targetParent.requestFullscreen) {
+                targetParent.requestFullscreen();
+            } else if (targetParent.mozRequestFullScreen) {
+                targetParent.mozRequestFullScreen();
+            } else if (targetParent.webkitRequestFullScreen) {
+                targetParent.webkitRequestFullScreen();
             }
+            target.style.width = '100%';
+            target.style.height = '100%';
             this.isFullScreen = true;
         }
     };
@@ -96,11 +119,9 @@ var Player = (function () {
         if (this.isPlaying) {
             target.pause();
             this.isPlaying = false;
-            this.toggleFullScreen();
         } else {
             target.play();
             this.isPlaying = true;
-            this.toggleFullScreen();
         }
     };
     return Player;
