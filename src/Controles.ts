@@ -11,9 +11,7 @@ class ControlesOption{
 
 class Controles{
 
-    constructor(options:ControlesOption){
-    }
-    
-    private hoge(){
+    constructor(options:ControlesOption , width:number){
+        
     }
 }
