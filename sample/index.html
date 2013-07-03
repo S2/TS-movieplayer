@@ -1,0 +1,24 @@
+
+<style>
+    div {
+        width   :800px;
+        height  :800px;
+        border  :solid 1px black;
+    }
+
+    video{
+        width   :600px;
+        height  :600px;
+    }
+</style>
+
+<div>
+    <video id="hoge">
+        <source src="sample.webm" type="video/webm">
+        <source src="sample.mp4"  type="video/mp4">
+    </video>
+</div>
+
+<script>
+    document.getElementById('hoge').play();
+</script>
