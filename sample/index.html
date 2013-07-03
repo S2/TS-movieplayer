@@ -7,18 +7,21 @@
     }
 
     video{
-        width   :600px;
-        height  :600px;
+        width   :800px;
     }
 </style>
 
-<div>
-    <video id="hoge">
+<div id="hoge">
+    <video>
         <source src="sample.webm" type="video/webm">
         <source src="sample.mp4"  type="video/mp4">
     </video>
 </div>
 
+<script src="../js/player.js"></script>
+
+<button id="fuga">hogehoge</button>
 <script>
-    document.getElementById('hoge').play();
+    var target = document.getElementById('hoge');
+    new Player(target);
 </script>

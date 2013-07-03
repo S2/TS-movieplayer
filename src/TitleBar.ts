@@ -6,7 +6,7 @@ class TitleBarOption{
 }
 
 class TitleBar{
-    constructor(options:TitleBarOption){
+    constructor(options:TitleBarOption , width:number){
         
     }
 }
