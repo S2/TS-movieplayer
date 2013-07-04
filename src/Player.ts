@@ -30,9 +30,24 @@ class Player{
     targetParent :HTMLDivElement;
     isPlaying    :bool = false;
     isFullScreen :bool = false;
+
+    isIOS       : bool = false;
+    isIPad      : bool = false;
+    isIPod      : bool = false;
+    isIPhone    : bool = false;
+    isAndroid   : bool = false;
+
+    isWebkit    : bool = false;
+    isChorome   : bool = false;
+    isFirefox   : bool = false;
+
+    isPC        : bool = false;
+    canTouch    : bool = false;
+    version     : number ;
     
     constructor(target:HTMLVideoElement ,  createOption:CreateOption , controlOption:ControlesOption ,titleBarOption:TitleBarOption ){
         this.target = target;
+        this.getEnvironment();
         this.createParentDiv();
         this.getSize();
 
@@ -52,6 +67,34 @@ class Player{
         },false);
 
         this.setInitialVolume(0);
+    }
+
+    private getEnvironment(){
+        var userAgent = navigator.userAgent;
+        var matches;
+        if(matches = /Android (\d+\.\d+\.\d+)/.exec(userAgent)){
+            this.isAndroid = true;
+            this.version = matches[0];
+        }
+        if(userAgent.match('iPad')){
+            this.isIOS  = true ;
+            this.isIPad = true;
+        }
+        if(userAgent.match('iPod')){
+            this.isIOS  = true ;
+            this.isIPod = true;
+        }
+        if(userAgent.match('iPhone')){
+            this.isIOS    = true ;
+            this.isIPhone = true;
+        }
+        if(this.isIOS == false && this.isAndroid == false){
+            // Windows Phone and others , not implemented
+            this.isPC = true;
+        }
+        if(document.ontouchstart !== undefined){
+            this.canTouch = true;
+        }
     }
 
     private getSize(){

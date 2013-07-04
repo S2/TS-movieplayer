@@ -36,7 +36,18 @@ var Player = (function () {
     function Player(target, createOption, controlOption, titleBarOption) {
         this.isPlaying = false;
         this.isFullScreen = false;
+        this.isIOS = false;
+        this.isIPad = false;
+        this.isIPod = false;
+        this.isIPhone = false;
+        this.isAndroid = false;
+        this.isWebkit = false;
+        this.isChorome = false;
+        this.isFirefox = false;
+        this.isPC = false;
+        this.canTouch = false;
         this.target = target;
+        this.getEnvironment();
         this.createParentDiv();
         this.getSize();
 
@@ -57,6 +68,33 @@ var Player = (function () {
 
         this.setInitialVolume(0);
     }
+    Player.prototype.getEnvironment = function () {
+        var userAgent = navigator.userAgent;
+        var matches;
+        if (matches = /Android (\d+\.\d+\.\d+)/.exec(userAgent)) {
+            this.isAndroid = true;
+            this.version = matches[0];
+        }
+        if (userAgent.match('iPad')) {
+            this.isIOS = true;
+            this.isIPad = true;
+        }
+        if (userAgent.match('iPod')) {
+            this.isIOS = true;
+            this.isIPod = true;
+        }
+        if (userAgent.match('iPhone')) {
+            this.isIOS = true;
+            this.isIPhone = true;
+        }
+        if (this.isIOS == false && this.isAndroid == false) {
+            this.isPC = true;
+        }
+        if (document.ontouchstart !== undefined) {
+            this.canTouch = true;
+        }
+    };
+
     Player.prototype.getSize = function () {
         var target = this.target;
         this.width = parseInt(target.style.width.replace('px', ''));
