@@ -13,23 +13,26 @@ interface HTMLDocument{
     exitFullscreen();
     mozCancelFullScreen();
     webkitCancelFullScreen();
+    ontouchstart();
 }
 
 class CreateOption{
-    width       : number;
-    height      : number;
-    movieSrcURL : number;
+    width           : number;
+    height          : number;
+    movieSrcURL     : number;
+    imagePath       : string = '../image/';
+    largePlayButton : string = 'largeButton.svg';
 }
-
 class Player{
-    title        :TitleBar;
-    controles    :Controles;
-    width        :number;
-    height       :number;
-    target       :HTMLVideoElement;
-    targetParent :HTMLDivElement;
-    isPlaying    :bool = false;
-    isFullScreen :bool = false;
+    title               :TitleBar;
+    controles           :Controles;
+    width               :number;
+    height              :number;
+    target              :HTMLVideoElement;
+    targetParent        :HTMLDivElement;
+    largePlayButton     :HTMLImageElement
+    isPlaying           :bool = false;
+    isFullScreen        :bool = false;
 
     isIOS       : bool = false;
     isIPad      : bool = false;
@@ -43,25 +46,30 @@ class Player{
 
     isPC        : bool = false;
     canTouch    : bool = false;
-    version     : number ;
-    
+    version     : number;
+    createOption:CreateOption;
+
     constructor(target:HTMLVideoElement ,  createOption:CreateOption , controlOption:ControlesOption ,titleBarOption:TitleBarOption ){
         this.target = target;
+        this.createOption = createOption;
         this.getEnvironment();
-        this.createParentDiv();
         this.getSize();
+
+        this.createParentDiv();
 
         this.title = new TitleBar(titleBarOption , this.width);
         this.controles = new Controles(controlOption , this.width);
 
         var thisObject = this;
         
-        target.addEventListener('click' , function(){
+        var largePlayButton = this.largePlayButton;
+
+        largePlayButton.addEventListener('click' , function(){
             thisObject.toggleFullScreen();
             thisObject.togglePlayPause();
         },false);
 
-        target.addEventListener('touch' , function(){
+        largePlayButton.addEventListener('touch' , function(){
             thisObject.toggleFullScreen();
             thisObject.togglePlayPause();
         },false);
@@ -111,7 +119,9 @@ class Player{
     }
     
     private createParentDiv(){
+
         var target:HTMLVideoElement = this.target;
+        target.style.position = 'absolute';
         
         var parentNode = target.parentNode;
         var targetParent:HTMLDivElement = document.createElement('div');
@@ -119,6 +129,43 @@ class Player{
         parentNode.appendChild(targetParent);
         this.targetParent = targetParent;
         this.target = target;
+
+        // create large play button
+        
+        var createOption:CreateOption = this.createOption;
+        var largePlayButton = document.createElement('img');
+        largePlayButton.style.position = 'absolute';
+        largePlayButton.className = 'largePlayButton';
+        largePlayButton.src = createOption.imagePath + createOption.largePlayButton;
+        
+        this.setCenterElementPosition(largePlayButton , 0.5);
+        targetParent.appendChild(largePlayButton);
+        this.largePlayButton = largePlayButton;
+    }
+    
+    private setCenterElementPosition(element:HTMLElement , ratio:number){
+        element.style.width = this.width * ratio + "px";
+        element.style.height = element.style.width;
+        element.style.left = (this.width  - this.width * ratio) / 2 + "px";
+        element.style.top  = (this.height - this.width * ratio) / 2 + "px";
+    }
+
+    private setFullscreenCenterElementPosition(element:HTMLElement , ratio:number){
+        var targetParent:HTMLElement = this.targetParent;
+        var width = parseInt(targetParent.style.width.replace('px',''));
+        if(!width){
+            width = parseInt(getComputedStyle( targetParent , '').width.replace('px', ''));
+        }
+        
+        var height = parseInt(targetParent.style.height.replace('px',''));
+        if(!height){
+            height = parseInt(getComputedStyle( targetParent , '').height.replace('px', ''));
+        }
+
+        element.style.width = width * ratio + "px";
+        element.style.height = element.style.width;
+        element.style.left = (width  - width * ratio) / 2 + "px";
+        element.style.top  = (height - width * ratio) / 2 + "px";
     }
 
     private setInitialVolume(volume:number){
@@ -129,6 +176,7 @@ class Player{
     private toggleFullScreen(){
         var targetParent:HTMLElement = this.targetParent
         var target:HTMLVideoElement = this.target
+        var largePlayButton = this.largePlayButton;
         if(this.isFullScreen){
             if (document.exitFullscreen) {
                 document.exitFullscreen();
@@ -140,6 +188,7 @@ class Player{
             target.style.width  = this.width + "px";
             target.style.height = this.height + "px";
             this.isFullScreen = false;
+            this.setCenterElementPosition(largePlayButton , 0.5);
         }else{
             if (targetParent.requestFullscreen) {
                 targetParent.requestFullscreen();
@@ -151,6 +200,7 @@ class Player{
             target.style.width  = '100%';
             target.style.height = '100%';
             this.isFullScreen = true;
+            this.setFullscreenCenterElementPosition(largePlayButton , 0.5);
         }
     }
 
@@ -164,5 +214,4 @@ class Player{
             this.isPlaying = true 
         }
     }
-
 }
