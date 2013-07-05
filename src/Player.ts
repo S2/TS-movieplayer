@@ -157,7 +157,7 @@ class Player{
             width = parseInt(getComputedStyle( targetParent , '').width.replace('px', ''));
         }
         
-        var height = parseInt(targetParent.style.height.replace('px',''));
+        var height = screen.height;
         if(!height){
             height = parseInt(getComputedStyle( targetParent , '').height.replace('px', ''));
         }
@@ -213,5 +213,12 @@ class Player{
             target.play()
             this.isPlaying = true 
         }
+        this.toggleElement(this.largePlayButton)
+    }
+
+    private toggleElement(element:HTMLElement){
+        element.style.display = element.style.display == 'none' 
+            ? 'block' 
+            : 'none';
     }
 }

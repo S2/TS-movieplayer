@@ -149,7 +149,7 @@ var Player = (function () {
             width = parseInt(getComputedStyle(targetParent, '').width.replace('px', ''));
         }
 
-        var height = parseInt(targetParent.style.height.replace('px', ''));
+        var height = screen.height;
         if (!height) {
             height = parseInt(getComputedStyle(targetParent, '').height.replace('px', ''));
         }
@@ -205,6 +205,11 @@ var Player = (function () {
             target.play();
             this.isPlaying = true;
         }
+        this.toggleElement(this.largePlayButton);
+    };
+
+    Player.prototype.toggleElement = function (element) {
+        element.style.display = element.style.display == 'none' ? 'block' : 'none';
     };
     return Player;
 })();
