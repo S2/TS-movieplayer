@@ -1,15 +1,14 @@
 /// <reference path="jquery.d.ts" />
-/// <reference path="Bar.ts" />
-/// <reference path="TitleBarOption.ts" />
+/// <reference path="ControlBarOption.ts" />
 
-class TitleBar extends Bar{
-    options : TitleBarOption;
+class ControlBar extends Bar{
+    options : ControlBarOption;
     width: number;
-    constructor(options:TitleBarOption , width:number){
+    constructor(options:ControlBarOption, width:number){
         super();
         this.options = options;
         if(this.options == null){
-            this.options = new TitleBarOption;
+            this.options = new ControlBarOption;
         }
         this.width = width;
     }
@@ -22,7 +21,6 @@ class TitleBar extends Bar{
         newElement.style.zIndex = this.options.zIndex + "";
         newElement.style.position = "absolute";
         newElement.style.opacity = "0.5";
-
         return newElement;
     }
 }

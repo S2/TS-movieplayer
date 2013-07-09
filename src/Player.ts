@@ -1,6 +1,9 @@
 /// <reference path="jquery.d.ts" />
+/// <reference path="Bar.ts" />
 /// <reference path="TitleBar.ts" />
-/// <reference path="Controles.ts" />
+/// <reference path="TitleBarOption.ts" />
+/// <reference path="ControlBar.ts" />
+/// <reference path="ControlBarOption.ts" />
 
 // Add the missing definitions: 
 interface HTMLElement{
@@ -23,9 +26,10 @@ class CreateOption{
     imagePath       : string = '../image/';
     largePlayButton : string = 'largeButton.svg';
 }
+
 class Player{
     title               :TitleBar;
-    controles           :Controles;
+    control             :ControlBar;
     width               :number;
     height              :number;
     target              :HTMLVideoElement;
@@ -49,7 +53,7 @@ class Player{
     version     : number;
     createOption:CreateOption;
 
-    constructor(target:HTMLVideoElement ,  createOption:CreateOption , controlOption:ControlesOption ,titleBarOption:TitleBarOption ){
+    constructor(target:HTMLVideoElement ,  createOption:CreateOption , controlOption:ControlBarOption ,titleBarOption:TitleBarOption ){
         this.target = target;
         this.createOption = createOption;
         this.getEnvironment();
@@ -58,19 +62,22 @@ class Player{
         this.createParentDiv();
 
         this.title = new TitleBar(titleBarOption , this.width);
-        this.controles = new Controles(controlOption , this.width);
+        this.control = new ControlBar(controlOption , this.width);
 
         var thisObject = this;
         
         var largePlayButton = this.largePlayButton;
 
+        this.setUpperBar(this.title);
+        this.setLowerBar(this.control);
+
         largePlayButton.addEventListener('click' , function(){
-            thisObject.toggleFullScreen();
+//            thisObject.toggleFullScreen();
             thisObject.togglePlayPause();
         },false);
 
         largePlayButton.addEventListener('touch' , function(){
-            thisObject.toggleFullScreen();
+//            thisObject.toggleFullScreen();
             thisObject.togglePlayPause();
         },false);
 
@@ -119,7 +126,6 @@ class Player{
     }
     
     private createParentDiv(){
-
         var target:HTMLVideoElement = this.target;
         target.style.position = 'absolute';
         
@@ -128,6 +134,8 @@ class Player{
         targetParent.appendChild(target);
         parentNode.appendChild(targetParent);
         this.targetParent = targetParent;
+
+        target.style.top = "0";
         this.target = target;
 
         // create large play button
@@ -140,6 +148,7 @@ class Player{
         
         this.setCenterElementPosition(largePlayButton , 0.5);
         targetParent.appendChild(largePlayButton);
+
         this.largePlayButton = largePlayButton;
     }
     
@@ -158,9 +167,6 @@ class Player{
         }
         
         var height = screen.height;
-        if(!height){
-            height = parseInt(getComputedStyle( targetParent , '').height.replace('px', ''));
-        }
 
         element.style.width = width * ratio + "px";
         element.style.height = element.style.width;
@@ -220,5 +226,43 @@ class Player{
         element.style.display = element.style.display == 'none' 
             ? 'block' 
             : 'none';
+    }
+
+    private setLowerBar(barObject:Bar){
+        var bar:HTMLElement = barObject.createElement();
+
+        var height = parseInt(bar.style.height.replace('px',''));
+        if(!height){
+            height = parseInt(getComputedStyle( bar , '').height.replace('px', ''));
+        }
+        
+        bar.style.top  = (this.height - height) + "px";
+
+        var target:HTMLVideoElement = this.target;
+        var parentNode = target.parentNode;
+        parentNode.appendChild(bar);
+
+    }
+
+    private setUpperBar(barObject:Bar){
+        var bar:HTMLElement = barObject.createElement();
+        bar.style.top  = "0px";
+
+        var target:HTMLVideoElement = this.target;
+        var parentNode = target.parentNode;
+        parentNode.appendChild(bar);
+    }
+
+    private setFullscreenLowerBar(barObject:Bar){
+        var bar:HTMLElement = barObject.createElement();
+
+        var screenHeight = screen.height;
+
+        var height = parseInt(bar.style.height.replace('px',''));
+        if(!height){
+            height = parseInt(getComputedStyle( bar , '').height.replace('px', ''));
+        }
+
+        bar.style.top  = (screenHeight - height) + "px";
     }
 }

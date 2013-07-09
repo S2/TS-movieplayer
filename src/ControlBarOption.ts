@@ -1,17 +1,11 @@
-/// <reference path="jquery.d.ts" />
-
-class ControlesOption{
+class ControlBarOption{
     displayPlayButton : bool = true;
     displaySeekBar    : bool = true;
     displayVolumeBar  : bool = true;
     displayCurrent    : bool = true;
     displayDuration   : bool = true;
     displayFullScreen : bool = true;
+    height            : number = 40;
+    zIndex            : number = 100;
 }
 
-class Controles{
-
-    constructor(options:ControlesOption , width:number){
-        
-    }
-}
