@@ -1,10 +1,6 @@
 class ControlBarOption{
-    displayPlayButton : bool = true;
-    displaySeekBar    : bool = true;
-    displayVolumeBar  : bool = true;
-    displayCurrent    : bool = true;
-    displayDuration   : bool = true;
-    displayFullScreen : bool = true;
+    displayLeftButtons    : Array = ['play' , 'volume' , 'duration' , 'current' , 'seekbar'];
+    displayRightButtons   : Array = ['fullscreen'];
     height            : number = 40;
     zIndex            : number = 100;
 }

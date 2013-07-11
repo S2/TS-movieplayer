@@ -8,12 +8,8 @@ var Bar = (function () {
 })();
 var ControlBarOption = (function () {
     function ControlBarOption() {
-        this.displayPlayButton = true;
-        this.displaySeekBar = true;
-        this.displayVolumeBar = true;
-        this.displayCurrent = true;
-        this.displayDuration = true;
-        this.displayFullScreen = true;
+        this.displayLeftButtons = ['play', 'volume', 'duration', 'current', 'seekbar'];
+        this.displayRightButtons = ['fullscreen'];
         this.height = 40;
         this.zIndex = 100;
     }
@@ -29,11 +25,13 @@ var ControlBar = (function (_super) {
     __extends(ControlBar, _super);
     function ControlBar(options, width) {
         _super.call(this);
+        this.appendMethods = {};
         this.options = options;
         if (this.options == null) {
             this.options = new ControlBarOption();
         }
         this.width = width;
+        this.thisObject = this;
     }
     ControlBar.prototype.createElement = function () {
         var newElement = document.createElement("div");
@@ -43,7 +41,76 @@ var ControlBar = (function (_super) {
         newElement.style.zIndex = this.options.zIndex + "";
         newElement.style.position = "absolute";
         newElement.style.opacity = "0.5";
+
+        var options = this.options;
+
+        var buttonFunctions = this.getCreateButtonMethods();
+        for (var i = 0; i < options.displayLeftButtons.length; i++) {
+            var functionName = options.displayLeftButtons[i];
+            newElement.appendChild(buttonFunctions[functionName]());
+        }
+
+        for (var i = 0; i < options.displayRightButtons.length; i++) {
+            var functionName = options.displayRightButtons[i];
+            newElement.appendChild(buttonFunctions[functionName]());
+        }
+
         return newElement;
+    };
+
+    ControlBar.prototype.appendCreateButtonMethods = function (buttonName, buttonCreateFunction) {
+    };
+
+    ControlBar.prototype.getCreateButtonMethods = function () {
+        var thisObject = this.thisObject;
+        var createMethods = {
+            'play': function () {
+                var element = document.createElement("img");
+                element.className = "play";
+                element.src = "../image/miniButton.svg";
+                element.style.height = thisObject.options.height + "px";
+                return element;
+            },
+            'volume': function () {
+                var element = document.createElement("img");
+                element.className = "play";
+                element.src = "../image/miniButton.svg";
+                element.style.height = thisObject.options.height + "px";
+                return element;
+            },
+            'duration': function () {
+                var element = document.createElement("img");
+                element.className = "play";
+                element.src = "../image/miniButton.svg";
+                element.style.height = thisObject.options.height + "px";
+                return element;
+            },
+            'current': function () {
+                var element = document.createElement("img");
+                element.className = "play";
+                element.src = "../image/miniButton.svg";
+                element.style.height = thisObject.options.height + "px";
+                return element;
+            },
+            'seekbar': function () {
+                var element = document.createElement("img");
+                element.className = "play";
+                element.src = "../image/miniButton.svg";
+                element.style.height = thisObject.options.height + "px";
+                return element;
+            },
+            'fullscreen': function () {
+                var element = document.createElement("img");
+                element.className = "play";
+                element.src = "../image/miniButton.svg";
+                element.style.height = thisObject.options.height + "px";
+                return element;
+            }
+        };
+        for (var key in this.appendMethods) {
+            createMethods[key] = this.appendMethods[key];
+        }
+        return createMethods;
     };
     return ControlBar;
 })(Bar);
