@@ -12,15 +12,16 @@ var Bar = (function () {
     Bar.prototype.feedOut = function (waitSeconds, feedOutSeconds) {
         var thisObject = this;
         if (this.createdElement) {
+            console.log(thisObject.inFeedOut);
             var element = this.createdElement;
             var currentAlpha = Number(element.style.opacity);
             var unitGradAlpha = currentAlpha / feedOutSeconds;
             var setGradAlpha = function () {
-                currentAlpha -= unitGradAlpha;
-                element.style.opacity = currentAlpha.toString();
                 if (!thisObject.inFeedOut) {
                     return;
                 }
+                currentAlpha -= unitGradAlpha;
+                element.style.opacity = currentAlpha.toString();
                 if (currentAlpha > 0) {
                     setTimeout(setGradAlpha, 1);
                 } else {
@@ -56,13 +57,13 @@ var Bar = (function () {
                     setTimeout(setGradAlpha, 1);
                 } else {
                     element.style.opacity = maxAlpha + "";
-                    thisObject.inFeedOut = true;
                     thisObject.eventEnable = false;
                 }
             };
             this.inFeedOut = false;
             this.inFeedIn = true;
             this.eventEnable = true;
+
             setTimeout(function () {
                 setGradAlpha();
             }, waitSeconds);
@@ -256,6 +257,7 @@ var thisObject;
 var Player = (function () {
     function Player(target, createOption, controlOption, titleBarOption) {
         this.isPlaying = false;
+        this.isPaused = false;
         this.isFullScreen = false;
         this.isIOS = false;
         this.isIPad = false;
@@ -294,6 +296,14 @@ var Player = (function () {
 
         largePlayButton.addEventListener('touch', function () {
             thisObject.togglePlayPause();
+        }, false);
+
+        target.addEventListener('click', function () {
+            thisObject.togglePauseRestart();
+        }, false);
+
+        target.addEventListener('touch', function () {
+            thisObject.togglePauseRestart();
         }, false);
 
         this.setInitialVolume(0);
@@ -448,6 +458,7 @@ var Player = (function () {
         if (thisObject.isPlaying) {
             thisObject.doMethodArray(thisObject.beforePause);
             target.pause();
+            thisObject.isPaused = true;
             thisObject.doMethodArray(thisObject.afterPause);
             thisObject.isPlaying = false;
         } else {
@@ -455,8 +466,28 @@ var Player = (function () {
             target.play();
             thisObject.doMethodArray(thisObject.afterPlay);
             thisObject.isPlaying = true;
+            thisObject.isPaused = false;
         }
         thisObject.toggleElement(thisObject.largePlayButton);
+    };
+
+    Player.prototype.togglePauseRestart = function () {
+        var target = thisObject.target;
+        if (!thisObject.isPlaying && thisObject.isPaused) {
+            thisObject.doMethodArray(thisObject.beforePlay);
+            target.play();
+            thisObject.doMethodArray(thisObject.afterPlay);
+            thisObject.isPlaying = true;
+            thisObject.isPaused = false;
+            thisObject.toggleElement(thisObject.largePlayButton);
+        } else if (thisObject.isPlaying) {
+            thisObject.doMethodArray(thisObject.beforePause);
+            target.pause();
+            thisObject.isPaused = true;
+            thisObject.doMethodArray(thisObject.afterPause);
+            thisObject.isPlaying = false;
+            thisObject.toggleElement(thisObject.largePlayButton);
+        }
     };
 
     Player.prototype.toggleElement = function (element) {

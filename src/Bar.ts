@@ -14,13 +14,14 @@ class Bar{
     public feedOut(waitSeconds:number , feedOutSeconds:number){
         var thisObject:Bar = this;
         if(this.createdElement){
+            console.log(thisObject.inFeedOut);
             var element:HTMLElement = this.createdElement;
             var currentAlpha = Number(element.style.opacity);
             var unitGradAlpha = currentAlpha / feedOutSeconds;
             var setGradAlpha = function(){
+                if(!thisObject.inFeedOut){return;}
                 currentAlpha -= unitGradAlpha;
                 element.style.opacity = currentAlpha.toString();
-                if(!thisObject.inFeedOut){return;}
                 if(currentAlpha > 0){
                     setTimeout(setGradAlpha , 1);
                 }else{
@@ -55,13 +56,13 @@ class Bar{
                     setTimeout(setGradAlpha , 1);
                 }else{
                     element.style.opacity = maxAlpha + "";
-                    thisObject.inFeedOut = true;
                     thisObject.eventEnable = false;
                 }
             };
             this.inFeedOut = false;
             this.inFeedIn = true;
             this.eventEnable = true;
+
             setTimeout(function(){
                 setGradAlpha()
             } , waitSeconds);

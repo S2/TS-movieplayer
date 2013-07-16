@@ -37,6 +37,7 @@ class Player{
     targetParent        :HTMLDivElement;
     largePlayButton     :HTMLImageElement
     isPlaying           :bool = false;
+    isPaused            :bool = false;
     isFullScreen        :bool = false;
 
     isIOS       : bool = false;
@@ -80,6 +81,14 @@ class Player{
         largePlayButton.addEventListener('touch' , function(){
 //            thisObject.toggleFullScreen();
             thisObject.togglePlayPause();
+        },false);
+
+        target.addEventListener('click' , function(){
+            thisObject.togglePauseRestart();
+        },false);
+
+        target.addEventListener('touch' , function(){
+            thisObject.togglePauseRestart();
         },false);
 
         this.setInitialVolume(0);
@@ -210,7 +219,7 @@ class Player{
             thisObject.setFullscreenCenterElementPosition(largePlayButton , 0.5);
         }
     }
-    
+
     beforePlay : Array = [];
     public hookBeforePlay(hookMethod:()=>void){
         this.beforePlay.push(hookMethod);
@@ -242,6 +251,7 @@ class Player{
         if(thisObject.isPlaying){
             thisObject.doMethodArray(thisObject.beforePause)
             target.pause()
+            thisObject.isPaused = true;
             thisObject.doMethodArray(thisObject.afterPause)
             thisObject.isPlaying = false
         }else{
@@ -249,9 +259,31 @@ class Player{
             target.play()
             thisObject.doMethodArray(thisObject.afterPlay)
             thisObject.isPlaying = true 
+            thisObject.isPaused = false
         }
         thisObject.toggleElement(thisObject.largePlayButton)
     }
+
+    public togglePauseRestart(){
+        var target:HTMLVideoElement = thisObject.target;
+        if(!thisObject.isPlaying && thisObject.isPaused){
+            thisObject.doMethodArray(thisObject.beforePlay)
+            target.play()
+            thisObject.doMethodArray(thisObject.afterPlay)
+            thisObject.isPlaying = true 
+            thisObject.isPaused = false
+            thisObject.toggleElement(thisObject.largePlayButton)
+        }else if(thisObject.isPlaying){
+            thisObject.doMethodArray(thisObject.beforePause)
+            target.pause()
+            thisObject.isPaused = true;
+            thisObject.doMethodArray(thisObject.afterPause)
+            thisObject.isPlaying = false
+            thisObject.toggleElement(thisObject.largePlayButton)
+        }
+    }
+
+
 
     private toggleElement(element:HTMLElement){
         element.style.display = element.style.display == 'none' 
