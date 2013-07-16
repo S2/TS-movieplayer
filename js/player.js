@@ -371,6 +371,8 @@ var Player = (function () {
         targetParent.appendChild(largePlayButton);
 
         this.largePlayButton = largePlayButton;
+        this.duration = target.duration;
+        alert(this.duration + "");
     };
 
     Player.prototype.setCenterElementPosition = function (element, ratio) {

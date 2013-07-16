@@ -53,6 +53,7 @@ class Player{
     isPC        : bool = false;
     canTouch    : bool = false;
     version     : number;
+    duration    : number;
     createOption:CreateOption;
 
     constructor(target:HTMLVideoElement ,  createOption:CreateOption , controlOption:ControlBarOption ,titleBarOption:TitleBarOption ){
@@ -160,6 +161,7 @@ class Player{
         targetParent.appendChild(largePlayButton);
 
         this.largePlayButton = largePlayButton;
+        this.duration = target.duration;
     }
     
     private setCenterElementPosition(element:HTMLElement , ratio:number){
@@ -240,6 +242,16 @@ class Player{
         this.afterPause.push(hookMethod);
     }
 
+    beforeRestart : Array = [];
+    public hookBeforeRestart(hookMethod:()=>void){
+        this.beforeRestart.push(hookMethod);
+    }
+
+    afterRestart : Array = [];
+    public hookAfterRestart(hookMethod:()=>void){
+        this.afterRestart.push(hookMethod);
+    }
+
     private doMethodArray(methods:Array){
         for(var i = 0 ; i < methods.length ; i++){
             methods[i]();
@@ -255,9 +267,15 @@ class Player{
             thisObject.doMethodArray(thisObject.afterPause)
             thisObject.isPlaying = false
         }else{
+            if(thisObject.isPaused){
+                thisObject.doMethodArray(thisObject.beforeRestart)
+            }
             thisObject.doMethodArray(thisObject.beforePlay)
             target.play()
             thisObject.doMethodArray(thisObject.afterPlay)
+            if(thisObject.isPaused){
+                thisObject.doMethodArray(thisObject.AfterRestart)
+            }
             thisObject.isPlaying = true 
             thisObject.isPaused = false
         }
@@ -268,8 +286,10 @@ class Player{
         var target:HTMLVideoElement = thisObject.target;
         if(!thisObject.isPlaying && thisObject.isPaused){
             thisObject.doMethodArray(thisObject.beforePlay)
+            thisObject.doMethodArray(thisObject.beforeRestart)
             target.play()
             thisObject.doMethodArray(thisObject.afterPlay)
+            thisObject.doMethodArray(thisObject.afterRestart)
             thisObject.isPlaying = true 
             thisObject.isPaused = false
             thisObject.toggleElement(thisObject.largePlayButton)
@@ -282,8 +302,6 @@ class Player{
             thisObject.toggleElement(thisObject.largePlayButton)
         }
     }
-
-
 
     private toggleElement(element:HTMLElement){
         element.style.display = element.style.display == 'none' 
