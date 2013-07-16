@@ -7,7 +7,6 @@ class ControlBar extends Bar{
     options : ControlBarOption;
     width: number;
     appendMethods : {} = {};
-    thisObject:ControlBar;
     constructor(options:ControlBarOption, width:number){
         super();
         this.options = options;
@@ -42,6 +41,12 @@ class ControlBar extends Bar{
             newElement.appendChild(buttonElement);
         }
         
+        this.createdElement = newElement;
+        var thisObject:ControlBar = <ControlBar>this.thisObject;
+
+        player.hookAfterPlay(function(){thisObject.feedOut(1000 , 50)});
+        player.hookAfterPause(function(){thisObject.feedIn(0 , 50)});
+
         return newElement;
     }
     
@@ -50,7 +55,7 @@ class ControlBar extends Bar{
     }
 
     public getCreateButtonMethods(player:Player):{}{
-        var thisObject:ControlBar = this.thisObject;
+        var thisObject:ControlBar = <ControlBar>this.thisObject;
         var createMethods = {
             'play'        : function() : HTMLElement{
                 var element = document.createElement("img");

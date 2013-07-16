@@ -210,14 +210,44 @@ class Player{
             thisObject.setFullscreenCenterElementPosition(largePlayButton , 0.5);
         }
     }
+    
+    beforePlay : Array = [];
+    public hookBeforePlay(hookMethod:()=>void){
+        this.beforePlay.push(hookMethod);
+    }
+
+    afterPlay : Array = [];
+    public hookAfterPlay(hookMethod:()=>void){
+        this.afterPlay.push(hookMethod);
+    }
+
+    beforePause : Array = [];
+    public hookBeforePause(hookMethod:()=>void){
+        this.beforePause.push(hookMethod);
+    }
+
+    afterPause : Array = [];
+    public hookAfterPause(hookMethod:()=>void){
+        this.afterPause.push(hookMethod);
+    }
+
+    private doMethodArray(methods:Array){
+        for(var i = 0 ; i < methods.length ; i++){
+            methods[i]();
+        }
+    }
 
     public togglePlayPause(){
         var target:HTMLVideoElement = thisObject.target;
         if(thisObject.isPlaying){
+            thisObject.doMethodArray(thisObject.beforePause)
             target.pause()
+            thisObject.doMethodArray(thisObject.afterPause)
             thisObject.isPlaying = false
         }else{
+            thisObject.doMethodArray(thisObject.beforePlay)
             target.play()
+            thisObject.doMethodArray(thisObject.afterPlay)
             thisObject.isPlaying = true 
         }
         thisObject.toggleElement(thisObject.largePlayButton)

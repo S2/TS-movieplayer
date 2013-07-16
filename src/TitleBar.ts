@@ -13,6 +13,7 @@ class TitleBar extends Bar{
             this.options = new TitleBarOption;
         }
         this.width = width;
+        this.thisObject = this;
     }
 
     public createElement(player:Player):HTMLElement{
@@ -23,6 +24,13 @@ class TitleBar extends Bar{
         newElement.style.zIndex = this.options.zIndex + "";
         newElement.style.position = "absolute";
         newElement.style.opacity = "0.5";
+
+        this.createdElement = newElement;
+
+        var thisObject:TitleBar = <TitleBar>this.thisObject;
+
+        player.hookAfterPlay(function(){thisObject.feedOut(1000 , 50)});
+        player.hookAfterPause(function(){thisObject.feedIn(0 , 50)});
 
         return newElement;
     }
