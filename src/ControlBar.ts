@@ -37,7 +37,9 @@ class ControlBar extends Bar{
         
         for(var i = 0 ; i < options.displayRightButtons.length ; i++){
             var functionName = options.displayRightButtons[i];
-            newElement.appendChild(buttonFunctions[functionName]());
+            var buttonElement = buttonFunctions[functionName]();
+            buttonElement.className = buttonElement.className + " controllButtonRight";
+            newElement.appendChild(buttonElement);
         }
         
         return newElement;
@@ -91,6 +93,7 @@ class ControlBar extends Bar{
                 element.className = "fullscreen";
                 element.src = "../image/miniButton.svg";
                 element.style.height = thisObject.options.height + "px";
+                element.addEventListener("click" , player.toggleFullScreen , false);
                 return element;
             },
         }

@@ -82,7 +82,9 @@ var ControlBar = (function (_super) {
 
         for (var i = 0; i < options.displayRightButtons.length; i++) {
             var functionName = options.displayRightButtons[i];
-            newElement.appendChild(buttonFunctions[functionName]());
+            var buttonElement = buttonFunctions[functionName]();
+            buttonElement.className = buttonElement.className + " controllButtonRight";
+            newElement.appendChild(buttonElement);
         }
 
         return newElement;
@@ -136,6 +138,7 @@ var ControlBar = (function (_super) {
                 element.className = "fullscreen";
                 element.src = "../image/miniButton.svg";
                 element.style.height = thisObject.options.height + "px";
+                element.addEventListener("click", player.toggleFullScreen, false);
                 return element;
             }
         };
@@ -289,10 +292,10 @@ var Player = (function () {
     };
 
     Player.prototype.toggleFullScreen = function () {
-        var targetParent = this.targetParent;
-        var target = this.target;
-        var largePlayButton = this.largePlayButton;
-        if (this.isFullScreen) {
+        var targetParent = thisObject.targetParent;
+        var target = thisObject.target;
+        var largePlayButton = thisObject.largePlayButton;
+        if (thisObject.isFullScreen) {
             if (document.exitFullscreen) {
                 document.exitFullscreen();
             } else if (document.mozCancelFullScreen) {
@@ -300,10 +303,10 @@ var Player = (function () {
             } else if (document.webkitCancelFullScreen) {
                 document.webkitCancelFullScreen();
             }
-            target.style.width = this.width + "px";
-            target.style.height = this.height + "px";
-            this.isFullScreen = false;
-            this.setCenterElementPosition(largePlayButton, 0.5);
+            target.style.width = thisObject.width + "px";
+            target.style.height = thisObject.height + "px";
+            thisObject.isFullScreen = false;
+            thisObject.setCenterElementPosition(largePlayButton, 0.5);
         } else {
             if (targetParent.requestFullscreen) {
                 targetParent.requestFullscreen();
@@ -314,8 +317,8 @@ var Player = (function () {
             }
             target.style.width = '100%';
             target.style.height = '100%';
-            this.isFullScreen = true;
-            this.setFullscreenCenterElementPosition(largePlayButton, 0.5);
+            thisObject.isFullScreen = true;
+            thisObject.setFullscreenCenterElementPosition(largePlayButton, 0.5);
         }
     };
 
