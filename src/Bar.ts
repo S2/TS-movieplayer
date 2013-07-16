@@ -5,6 +5,7 @@ class Bar{
     public thisObject:Bar;
     public createdElement:HTMLElement;
     public maxAlpha:number = 0.5;
+    private eventEnable:boolean = true;
     public createElement(player:Player):HTMLElement{
         return document.createElement("div");
     }
@@ -55,14 +56,24 @@ class Bar{
                 }else{
                     element.style.opacity = maxAlpha + "";
                     thisObject.inFeedOut = true;
+                    thisObject.eventEnable = false;
                 }
             };
             this.inFeedOut = false;
             this.inFeedIn = true;
+            this.eventEnable = true;
             setTimeout(function(){
                 setGradAlpha()
             } , waitSeconds);
         }
     }
-
+    
+    public setEvent(element:HTMLElement , eventName:string , eventFunction ){
+        var thisObject:Bar = this;
+        element.addEventListener(eventName , function(){
+            if(thisObject.eventEnable){
+                eventFunction();
+            }
+        } , false);
+    }
 }

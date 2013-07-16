@@ -62,7 +62,7 @@ class ControlBar extends Bar{
                 element.className = "play";
                 element.src = "../image/miniButton.svg";
                 element.style.height = thisObject.options.height + "px";
-                element.addEventListener("click" , player.togglePlayPause , false);
+                thisObject.setEvent(element , "click" , player.togglePlayPause);
                 return element;
             },
             'volume'      : function() : HTMLElement{
@@ -98,7 +98,7 @@ class ControlBar extends Bar{
                 element.className = "fullscreen";
                 element.src = "../image/miniButton.svg";
                 element.style.height = thisObject.options.height + "px";
-                element.addEventListener("click" , player.toggleFullScreen , false);
+                thisObject.setEvent(element , "click" , player.toggleFullScreen);
                 return element;
             },
         }

@@ -1,6 +1,7 @@
 var Bar = (function () {
     function Bar() {
         this.maxAlpha = 0.5;
+        this.eventEnable = true;
         this.inFeedOut = false;
         this.inFeedIn = false;
     }
@@ -38,7 +39,6 @@ var Bar = (function () {
     Bar.prototype.feedIn = function (waitSeconds, feedOutSeconds) {
         var thisObject = this;
         if (this.createdElement) {
-            console.log("FIN");
             var element = this.createdElement;
             var currentAlpha = Number(element.style.opacity);
             var maxAlpha = this.maxAlpha;
@@ -57,14 +57,25 @@ var Bar = (function () {
                 } else {
                     element.style.opacity = maxAlpha + "";
                     thisObject.inFeedOut = true;
+                    thisObject.eventEnable = false;
                 }
             };
             this.inFeedOut = false;
             this.inFeedIn = true;
+            this.eventEnable = true;
             setTimeout(function () {
                 setGradAlpha();
             }, waitSeconds);
         }
+    };
+
+    Bar.prototype.setEvent = function (element, eventName, eventFunction) {
+        var thisObject = this;
+        element.addEventListener(eventName, function () {
+            if (thisObject.eventEnable) {
+                eventFunction();
+            }
+        }, false);
     };
     return Bar;
 })();
@@ -186,7 +197,7 @@ var ControlBar = (function (_super) {
                 element.className = "play";
                 element.src = "../image/miniButton.svg";
                 element.style.height = thisObject.options.height + "px";
-                element.addEventListener("click", player.togglePlayPause, false);
+                thisObject.setEvent(element, "click", player.togglePlayPause);
                 return element;
             },
             'volume': function () {
@@ -222,7 +233,7 @@ var ControlBar = (function (_super) {
                 element.className = "fullscreen";
                 element.src = "../image/miniButton.svg";
                 element.style.height = thisObject.options.height + "px";
-                element.addEventListener("click", player.toggleFullScreen, false);
+                thisObject.setEvent(element, "click", player.toggleFullScreen);
                 return element;
             }
         };
