@@ -1,5 +1,7 @@
 /// <reference path="jquery.d.ts" />
+/// <reference path="Bar.ts" />
 /// <reference path="ControlBarOption.ts" />
+/// <reference path="Player.ts" />
 
 class ControlBar extends Bar{
     options : ControlBarOption;
@@ -16,7 +18,7 @@ class ControlBar extends Bar{
         this.thisObject = this;
     }
     
-    public createElement():HTMLElement{
+    public createElement(player:Player):HTMLElement{
         var newElement = document.createElement("div");
         newElement.style.width = this.width + "px";
         newElement.style.height = this.options.height + "px";
@@ -27,7 +29,7 @@ class ControlBar extends Bar{
 
         var options : ControlBarOption = this.options;
         
-        var buttonFunctions = this.getCreateButtonMethods();
+        var buttonFunctions = this.getCreateButtonMethods(player);
         for(var i = 0 ; i < options.displayLeftButtons.length ; i++){
             var functionName = options.displayLeftButtons[i];
             newElement.appendChild(buttonFunctions[functionName]());
@@ -42,10 +44,10 @@ class ControlBar extends Bar{
     }
     
     public appendCreateButtonMethods(buttonName : string , buttonCreateFunction : ()=> HTMLElement) : void{
-        
+        this.appendMethods[buttonName] = buttonCreateFunction;
     }
 
-    public getCreateButtonMethods():{}{
+    public getCreateButtonMethods(player:Player):{}{
         var thisObject:ControlBar = this.thisObject;
         var createMethods = {
             'play'        : function() : HTMLElement{
@@ -53,39 +55,40 @@ class ControlBar extends Bar{
                 element.className = "play";
                 element.src = "../image/miniButton.svg";
                 element.style.height = thisObject.options.height + "px";
+                element.addEventListener("click" , player.togglePlayPause , false);
                 return element;
             },
             'volume'      : function() : HTMLElement{
                 var element = document.createElement("img");
-                element.className = "play";
+                element.className = "volume";
                 element.src = "../image/miniButton.svg";
                 element.style.height = thisObject.options.height + "px";
                 return element;
             },
             'duration'    : function() : HTMLElement{
                 var element = document.createElement("img");
-                element.className = "play";
+                element.className = "duration";
                 element.src = "../image/miniButton.svg";
                 element.style.height = thisObject.options.height + "px";
                 return element;
             },
             'current'     : function() : HTMLElement{
                 var element = document.createElement("img");
-                element.className = "play";
+                element.className = "current";
                 element.src = "../image/miniButton.svg";
                 element.style.height = thisObject.options.height + "px";
                 return element;
             },
             'seekbar'     : function() : HTMLElement{
                 var element = document.createElement("img");
-                element.className = "play";
+                element.className = "seekbar";
                 element.src = "../image/miniButton.svg";
                 element.style.height = thisObject.options.height + "px";
                 return element;
             },
             'fullscreen'  : function() : HTMLElement{
                 var element = document.createElement("img");
-                element.className = "play";
+                element.className = "fullscreen";
                 element.src = "../image/miniButton.svg";
                 element.style.height = thisObject.options.height + "px";
                 return element;

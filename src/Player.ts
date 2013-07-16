@@ -27,6 +27,7 @@ class CreateOption{
     largePlayButton : string = 'largeButton.svg';
 }
 
+var thisObject;
 class Player{
     title               :TitleBar;
     control             :ControlBar;
@@ -64,7 +65,7 @@ class Player{
         this.title = new TitleBar(titleBarOption , this.width);
         this.control = new ControlBar(controlOption , this.width);
 
-        var thisObject = this;
+        thisObject = this;
         
         var largePlayButton = this.largePlayButton;
 
@@ -179,7 +180,7 @@ class Player{
         target.volume = volume ;
     }
 
-    private toggleFullScreen(){
+    public toggleFullScreen(){
         var targetParent:HTMLElement = this.targetParent
         var target:HTMLVideoElement = this.target
         var largePlayButton = this.largePlayButton;
@@ -210,16 +211,16 @@ class Player{
         }
     }
 
-    private togglePlayPause(){
-        var target:HTMLVideoElement = this.target
-        if(this.isPlaying){
+    public togglePlayPause(){
+        var target:HTMLVideoElement = thisObject.target;
+        if(thisObject.isPlaying){
             target.pause()
-            this.isPlaying = false
+            thisObject.isPlaying = false
         }else{
             target.play()
-            this.isPlaying = true 
+            thisObject.isPlaying = true 
         }
-        this.toggleElement(this.largePlayButton)
+        thisObject.toggleElement(thisObject.largePlayButton)
     }
 
     private toggleElement(element:HTMLElement){
@@ -229,7 +230,7 @@ class Player{
     }
 
     private setLowerBar(barObject:Bar){
-        var bar:HTMLElement = barObject.createElement();
+        var bar:HTMLElement = barObject.createElement(this);
 
         var height = parseInt(bar.style.height.replace('px',''));
         if(!height){
@@ -245,7 +246,7 @@ class Player{
     }
 
     private setUpperBar(barObject:Bar){
-        var bar:HTMLElement = barObject.createElement();
+        var bar:HTMLElement = barObject.createElement(this);
         bar.style.top  = "0px";
 
         var target:HTMLVideoElement = this.target;
@@ -254,7 +255,7 @@ class Player{
     }
 
     private setFullscreenLowerBar(barObject:Bar){
-        var bar:HTMLElement = barObject.createElement();
+        var bar:HTMLElement = barObject.createElement(this);
 
         var screenHeight = screen.height;
 

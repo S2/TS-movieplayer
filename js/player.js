@@ -1,11 +1,47 @@
 var Bar = (function () {
     function Bar() {
     }
-    Bar.prototype.createElement = function () {
+    Bar.prototype.createElement = function (player) {
         return document.createElement("div");
     };
     return Bar;
 })();
+var TitleBarOption = (function () {
+    function TitleBarOption() {
+        this.height = 40;
+        this.zIndex = 100;
+    }
+    return TitleBarOption;
+})();
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var TitleBar = (function (_super) {
+    __extends(TitleBar, _super);
+    function TitleBar(options, width) {
+        _super.call(this);
+        this.options = options;
+        if (this.options == null) {
+            this.options = new TitleBarOption();
+        }
+        this.width = width;
+    }
+    TitleBar.prototype.createElement = function (player) {
+        var newElement = document.createElement("div");
+        newElement.style.width = this.width + "px";
+        newElement.style.height = this.options.height + "px";
+        newElement.style.backgroundColor = "#888888";
+        newElement.style.zIndex = this.options.zIndex + "";
+        newElement.style.position = "absolute";
+        newElement.style.opacity = "0.5";
+
+        return newElement;
+    };
+    return TitleBar;
+})(Bar);
 var ControlBarOption = (function () {
     function ControlBarOption() {
         this.displayLeftButtons = ['play', 'volume', 'duration', 'current', 'seekbar'];
@@ -15,12 +51,6 @@ var ControlBarOption = (function () {
     }
     return ControlBarOption;
 })();
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
 var ControlBar = (function (_super) {
     __extends(ControlBar, _super);
     function ControlBar(options, width) {
@@ -33,7 +63,7 @@ var ControlBar = (function (_super) {
         this.width = width;
         this.thisObject = this;
     }
-    ControlBar.prototype.createElement = function () {
+    ControlBar.prototype.createElement = function (player) {
         var newElement = document.createElement("div");
         newElement.style.width = this.width + "px";
         newElement.style.height = this.options.height + "px";
@@ -44,7 +74,7 @@ var ControlBar = (function (_super) {
 
         var options = this.options;
 
-        var buttonFunctions = this.getCreateButtonMethods();
+        var buttonFunctions = this.getCreateButtonMethods(player);
         for (var i = 0; i < options.displayLeftButtons.length; i++) {
             var functionName = options.displayLeftButtons[i];
             newElement.appendChild(buttonFunctions[functionName]());
@@ -59,9 +89,10 @@ var ControlBar = (function (_super) {
     };
 
     ControlBar.prototype.appendCreateButtonMethods = function (buttonName, buttonCreateFunction) {
+        this.appendMethods[buttonName] = buttonCreateFunction;
     };
 
-    ControlBar.prototype.getCreateButtonMethods = function () {
+    ControlBar.prototype.getCreateButtonMethods = function (player) {
         var thisObject = this.thisObject;
         var createMethods = {
             'play': function () {
@@ -69,39 +100,40 @@ var ControlBar = (function (_super) {
                 element.className = "play";
                 element.src = "../image/miniButton.svg";
                 element.style.height = thisObject.options.height + "px";
+                element.addEventListener("click", player.togglePlayPause, false);
                 return element;
             },
             'volume': function () {
                 var element = document.createElement("img");
-                element.className = "play";
+                element.className = "volume";
                 element.src = "../image/miniButton.svg";
                 element.style.height = thisObject.options.height + "px";
                 return element;
             },
             'duration': function () {
                 var element = document.createElement("img");
-                element.className = "play";
+                element.className = "duration";
                 element.src = "../image/miniButton.svg";
                 element.style.height = thisObject.options.height + "px";
                 return element;
             },
             'current': function () {
                 var element = document.createElement("img");
-                element.className = "play";
+                element.className = "current";
                 element.src = "../image/miniButton.svg";
                 element.style.height = thisObject.options.height + "px";
                 return element;
             },
             'seekbar': function () {
                 var element = document.createElement("img");
-                element.className = "play";
+                element.className = "seekbar";
                 element.src = "../image/miniButton.svg";
                 element.style.height = thisObject.options.height + "px";
                 return element;
             },
             'fullscreen': function () {
                 var element = document.createElement("img");
-                element.className = "play";
+                element.className = "fullscreen";
                 element.src = "../image/miniButton.svg";
                 element.style.height = thisObject.options.height + "px";
                 return element;
@@ -114,36 +146,6 @@ var ControlBar = (function (_super) {
     };
     return ControlBar;
 })(Bar);
-var TitleBarOption = (function () {
-    function TitleBarOption() {
-        this.height = 40;
-        this.zIndex = 100;
-    }
-    return TitleBarOption;
-})();
-var TitleBar = (function (_super) {
-    __extends(TitleBar, _super);
-    function TitleBar(options, width) {
-        _super.call(this);
-        this.options = options;
-        if (this.options == null) {
-            this.options = new TitleBarOption();
-        }
-        this.width = width;
-    }
-    TitleBar.prototype.createElement = function () {
-        var newElement = document.createElement("div");
-        newElement.style.width = this.width + "px";
-        newElement.style.height = this.options.height + "px";
-        newElement.style.backgroundColor = "#888888";
-        newElement.style.zIndex = this.options.zIndex + "";
-        newElement.style.position = "absolute";
-        newElement.style.opacity = "0.5";
-
-        return newElement;
-    };
-    return TitleBar;
-})(Bar);
 var CreateOption = (function () {
     function CreateOption() {
         this.imagePath = '../image/';
@@ -152,6 +154,7 @@ var CreateOption = (function () {
     return CreateOption;
 })();
 
+var thisObject;
 var Player = (function () {
     function Player(target, createOption, controlOption, titleBarOption) {
         this.isPlaying = false;
@@ -176,7 +179,7 @@ var Player = (function () {
         this.title = new TitleBar(titleBarOption, this.width);
         this.control = new ControlBar(controlOption, this.width);
 
-        var thisObject = this;
+        thisObject = this;
 
         var largePlayButton = this.largePlayButton;
 
@@ -317,15 +320,15 @@ var Player = (function () {
     };
 
     Player.prototype.togglePlayPause = function () {
-        var target = this.target;
-        if (this.isPlaying) {
+        var target = thisObject.target;
+        if (thisObject.isPlaying) {
             target.pause();
-            this.isPlaying = false;
+            thisObject.isPlaying = false;
         } else {
             target.play();
-            this.isPlaying = true;
+            thisObject.isPlaying = true;
         }
-        this.toggleElement(this.largePlayButton);
+        thisObject.toggleElement(thisObject.largePlayButton);
     };
 
     Player.prototype.toggleElement = function (element) {
@@ -333,7 +336,7 @@ var Player = (function () {
     };
 
     Player.prototype.setLowerBar = function (barObject) {
-        var bar = barObject.createElement();
+        var bar = barObject.createElement(this);
 
         var height = parseInt(bar.style.height.replace('px', ''));
         if (!height) {
@@ -348,7 +351,7 @@ var Player = (function () {
     };
 
     Player.prototype.setUpperBar = function (barObject) {
-        var bar = barObject.createElement();
+        var bar = barObject.createElement(this);
         bar.style.top = "0px";
 
         var target = this.target;
@@ -357,7 +360,7 @@ var Player = (function () {
     };
 
     Player.prototype.setFullscreenLowerBar = function (barObject) {
-        var bar = barObject.createElement();
+        var bar = barObject.createElement(this);
 
         var screenHeight = screen.height;
 
