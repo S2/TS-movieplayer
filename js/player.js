@@ -27,6 +27,7 @@ var Bar = (function () {
                 } else {
                     element.style.opacity = "0";
                     thisObject.inFeedOut = false;
+                    thisObject.eventEnable = false;
                 }
             };
             this.inFeedOut = true;
@@ -57,7 +58,6 @@ var Bar = (function () {
                     setTimeout(setGradAlpha, 1);
                 } else {
                     element.style.opacity = maxAlpha + "";
-                    thisObject.eventEnable = false;
                 }
             };
             this.inFeedOut = false;

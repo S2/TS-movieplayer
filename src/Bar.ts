@@ -27,6 +27,7 @@ class Bar{
                 }else{
                     element.style.opacity = "0";
                     thisObject.inFeedOut = false;
+                    thisObject.eventEnable = false;
                 }
             };
             this.inFeedOut = true;
@@ -56,7 +57,6 @@ class Bar{
                     setTimeout(setGradAlpha , 1);
                 }else{
                     element.style.opacity = maxAlpha + "";
-                    thisObject.eventEnable = false;
                 }
             };
             this.inFeedOut = false;
