@@ -129,7 +129,7 @@ var TitleBar = (function (_super) {
 })(Bar);
 var ControlBarOption = (function () {
     function ControlBarOption() {
-        this.displayLeftButtons = ['play', 'volume', 'duration', 'current', 'seekbar'];
+        this.displayLeftButtons = ['play', 'volume', 'duration', '::', 'current', 'seekbar'];
         this.displayRightButtons = ['fullscreen'];
         this.height = 40;
         this.zIndex = 100;
@@ -162,7 +162,17 @@ var ControlBar = (function (_super) {
         var buttonFunctions = this.getCreateButtonMethods(player);
         for (var i = 0; i < options.displayLeftButtons.length; i++) {
             var functionName = options.displayLeftButtons[i];
-            newElement.appendChild(buttonFunctions[functionName]());
+            if (buttonFunctions[functionName]) {
+                var functionName = options.displayLeftButtons[i];
+                var buttonElement = buttonFunctions[functionName]();
+                buttonElement.className = buttonElement.className + " controllButtonLeft";
+                newElement.appendChild(buttonElement);
+            } else {
+                var stringObject = document.createElement('div');
+                stringObject.innerHTML = functionName;
+                stringObject.className = buttonElement.className + " controllButtonLeft";
+                newElement.appendChild(stringObject);
+            }
         }
 
         for (var i = 0; i < options.displayRightButtons.length; i++) {
@@ -208,17 +218,23 @@ var ControlBar = (function (_super) {
                 return element;
             },
             'duration': function () {
-                var element = document.createElement("span");
+                var element = document.createElement("div");
                 element.className = "duration";
                 element.style.height = thisObject.options.height + "px";
-                element.innerHTML = player.getDuration() + '';
+                var duration = player.getDuration();
+                duration = Math.floor(duration * 100) / 100;
+                element.innerHTML = duration + '';
                 return element;
             },
             'current': function () {
-                var element = document.createElement("img");
+                var element = document.createElement("div");
                 element.className = "current";
-                element.src = "../image/miniButton.svg";
-                element.style.height = thisObject.options.height + "px";
+                element.innerHTML = '00:00';
+                player.hookTimeUpdate(function (player, video) {
+                    var current = video.currentTime;
+                    current = Math.floor(current * 100) / 100;
+                    element.innerHTML = current + '';
+                });
                 return element;
             },
             'seekbar': function () {
@@ -274,6 +290,8 @@ var Player = (function () {
         this.afterPause = [];
         this.beforeRestart = [];
         this.afterRestart = [];
+        this.timeUpdate = [];
+        this.ended = [];
         this.target = target;
         this.createOption = createOption;
         this.getEnvironment();
@@ -302,11 +320,36 @@ var Player = (function () {
         target.addEventListener('click', function () {
             thisObject.togglePauseRestart();
         }, false);
-
         target.addEventListener('touch', function () {
             thisObject.togglePauseRestart();
         }, false);
 
+        target.addEventListener('timeupdate', function () {
+            thisObject.doMethodArray(thisObject.timeUpdate);
+        }, false);
+
+        target.addEventListener('ended', function () {
+            thisObject.doMethodArray(thisObject.ended);
+        }, false);
+
+        target.addEventListener('mouseenter', function () {
+            if (thisObject.isPlaying) {
+                thisObject.title.feedIn(0, 50);
+                thisObject.control.feedIn(0, 50);
+            }
+        }, false);
+
+        target.addEventListener('mouseout', function () {
+            if (thisObject.isPlaying) {
+                thisObject.title.feedOut(0, 50);
+                thisObject.control.feedOut(0, 50);
+            }
+        }, false);
+
+        this.hookEnded(function (player, video) {
+            thisObject.title.feedIn(0, 50);
+            thisObject.control.feedIn(0, 50);
+        });
         this.setInitialVolume(0);
     }
     Player.prototype.getDuration = function () {
@@ -461,9 +504,17 @@ var Player = (function () {
         this.afterRestart.push(hookMethod);
     };
 
+    Player.prototype.hookTimeUpdate = function (hookMethod) {
+        this.timeUpdate.push(hookMethod);
+    };
+
+    Player.prototype.hookEnded = function (hookMethod) {
+        this.ended.push(hookMethod);
+    };
+
     Player.prototype.doMethodArray = function (methods) {
         for (var i = 0; i < methods.length; i++) {
-            methods[i]();
+            methods[i](this, this.target);
         }
     };
 

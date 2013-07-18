@@ -87,11 +87,36 @@ class Player{
         target.addEventListener('click' , function(){
             thisObject.togglePauseRestart();
         },false);
-
         target.addEventListener('touch' , function(){
             thisObject.togglePauseRestart();
         },false);
+        
+        target.addEventListener('timeupdate' , function(){
+            thisObject.doMethodArray(thisObject.timeUpdate)
+        },false);
 
+        target.addEventListener('ended' , function(){
+            thisObject.doMethodArray(thisObject.ended)
+        },false);
+
+        target.addEventListener('mouseenter' , function(){
+            if(thisObject.isPlaying){
+                thisObject.title.feedIn(0 , 50);
+                thisObject.control.feedIn(0 , 50);
+            }
+        },false);
+
+        target.addEventListener('mouseout' , function(){
+            if(thisObject.isPlaying){
+                thisObject.title.feedOut(0 , 50);
+                thisObject.control.feedOut(0 , 50);
+            }
+        },false);
+
+        this.hookEnded(function(player:Player , video:HTMLVideoElement){
+            thisObject.title.feedIn(0 , 50);
+            thisObject.control.feedIn(0 , 50);
+        });
         this.setInitialVolume(0);
     }
     
@@ -227,41 +252,51 @@ class Player{
     }
 
     beforePlay : Array = [];
-    public hookBeforePlay(hookMethod:()=>void){
+    public hookBeforePlay(hookMethod:(player:Player , video:HTMLVideoElement)=>void){
         this.beforePlay.push(hookMethod);
     }
 
     afterPlay : Array = [];
-    public hookAfterPlay(hookMethod:()=>void){
+    public hookAfterPlay(hookMethod:(player:Player , video:HTMLVideoElement)=>void){
         this.afterPlay.push(hookMethod);
     }
 
     beforePause : Array = [];
-    public hookBeforePause(hookMethod:()=>void){
+    public hookBeforePause(hookMethod:(player:Player , video:HTMLVideoElement)=>void){
         this.beforePause.push(hookMethod);
     }
 
     afterPause : Array = [];
-    public hookAfterPause(hookMethod:()=>void){
+    public hookAfterPause(hookMethod:(player:Player , video:HTMLVideoElement)=>void){
         this.afterPause.push(hookMethod);
     }
 
     beforeRestart : Array = [];
-    public hookBeforeRestart(hookMethod:()=>void){
+    public hookBeforeRestart(hookMethod:(player:Player , video:HTMLVideoElement)=>void){
         this.beforeRestart.push(hookMethod);
     }
 
     afterRestart : Array = [];
-    public hookAfterRestart(hookMethod:()=>void){
+    public hookAfterRestart(hookMethod:(player:Player , video:HTMLVideoElement)=>void){
         this.afterRestart.push(hookMethod);
+    }
+
+    timeUpdate: Array = [];
+    public hookTimeUpdate(hookMethod:(player:Player , video:HTMLVideoElement)=>void){
+        this.timeUpdate.push(hookMethod);
+    }
+
+    ended : Array = [];
+    public hookEnded(hookMethod:(player:Player , video:HTMLVideoElement)=>void){
+        this.ended.push(hookMethod);
     }
 
     private doMethodArray(methods:Array){
         for(var i = 0 ; i < methods.length ; i++){
-            methods[i]();
+            methods[i](this, this.target);
         }
     }
-
+    
     public togglePlayPause(){
         var target:HTMLVideoElement = thisObject.target;
         if(thisObject.isPlaying){

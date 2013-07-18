@@ -31,7 +31,17 @@ class ControlBar extends Bar{
         var buttonFunctions = this.getCreateButtonMethods(player);
         for(var i = 0 ; i < options.displayLeftButtons.length ; i++){
             var functionName = options.displayLeftButtons[i];
-            newElement.appendChild(buttonFunctions[functionName]());
+            if(buttonFunctions[functionName]){
+                var functionName = options.displayLeftButtons[i];
+                var buttonElement = buttonFunctions[functionName]();
+                buttonElement.className = buttonElement.className + " controllButtonLeft";
+                newElement.appendChild(buttonElement);
+            }else{
+                var stringObject = document.createElement('div')
+                stringObject.innerHTML = functionName
+                stringObject.className = buttonElement.className + " controllButtonLeft";
+                newElement.appendChild(stringObject);
+            }
         }
         
         for(var i = 0 ; i < options.displayRightButtons.length ; i++){
@@ -73,17 +83,23 @@ class ControlBar extends Bar{
                 return element;
             },
             'duration'    : function() : HTMLElement{
-                var element = document.createElement("span");
+                var element = document.createElement("div");
                 element.className = "duration";
                 element.style.height = thisObject.options.height + "px";
-                element.innerHTML = player.getDuration() + '';
+                var duration = player.getDuration();
+                duration = Math.floor(duration * 100) / 100;
+                element.innerHTML = duration + '';
                 return element;
             },
             'current'     : function() : HTMLElement{
-                var element = document.createElement("img");
+                var element = document.createElement("div");
                 element.className = "current";
-                element.src = "../image/miniButton.svg";
-                element.style.height = thisObject.options.height + "px";
+                element.innerHTML = '00:00';
+                player.hookTimeUpdate(function(player:Player , video:HTMLVideoElement){
+                    var current:number = video.currentTime;
+                    current = Math.floor(current * 100) / 100;
+                    element.innerHTML = current + '';
+                });
                 return element;
             },
             'seekbar'     : function() : HTMLElement{
