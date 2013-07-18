@@ -105,7 +105,6 @@ class Player{
                 thisObject.control.feedIn(0 , 50);
             }
         },false);
-
         target.addEventListener('mouseout' , function(){
             if(thisObject.isPlaying){
                 thisObject.title.feedOut(0 , 50);

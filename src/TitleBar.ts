@@ -32,6 +32,19 @@ class TitleBar extends Bar{
         player.hookAfterPlay(function(){thisObject.feedOut(1000 , 50)});
         player.hookAfterPause(function(){thisObject.feedIn(0 , 50)});
 
+        newElement.addEventListener('mouseenter' , function(){
+            if(player.isPlaying){
+                player.title.feedIn(0 , 50);
+                player.control.feedIn(0 , 50);
+            }
+        },false);
+        newElement.addEventListener('mouseout' , function(){
+            if(player.isPlaying){
+                player.title.feedOut(0 , 50);
+                player.control.feedOut(0 , 50);
+            }
+        },false);
+
         return newElement;
     }
 }
