@@ -38,6 +38,7 @@ var Bar = (function () {
     };
 
     Bar.prototype.feedIn = function (waitSeconds, feedOutSeconds) {
+        console.log("start");
         var thisObject = this;
         if (this.createdElement) {
             var element = this.createdElement;
@@ -127,18 +128,95 @@ var TitleBar = (function (_super) {
             if (player.isPlaying) {
                 player.title.feedIn(0, 50);
                 player.control.feedIn(0, 50);
+                player.seekbar.feedIn(0, 50);
             }
         }, false);
         newElement.addEventListener('mouseout', function () {
             if (player.isPlaying) {
                 player.title.feedOut(0, 50);
                 player.control.feedOut(0, 50);
+                player.seekbar.feedOut(0, 50);
             }
         }, false);
 
         return newElement;
     };
     return TitleBar;
+})(Bar);
+var SeekBarOption = (function () {
+    function SeekBarOption() {
+        this.height = 20;
+        this.zIndex = 100;
+    }
+    return SeekBarOption;
+})();
+var SeekBar = (function (_super) {
+    __extends(SeekBar, _super);
+    function SeekBar(options, width) {
+        _super.call(this);
+        this.appendMethods = {};
+        this.options = options;
+        if (this.options == null) {
+            this.options = new SeekBarOption();
+        }
+        this.width = width;
+        this.thisObject = this;
+    }
+    SeekBar.prototype.createElement = function (player) {
+        var newElement = document.createElement("div");
+        newElement.style.width = this.width + "px";
+        newElement.style.height = this.options.height + "px";
+        newElement.style.backgroundColor = "#888888";
+        newElement.style.zIndex = this.options.zIndex + "";
+        newElement.style.position = "absolute";
+        newElement.style.opacity = "0.5";
+
+        var options = this.options;
+
+        this.createdElement = newElement;
+        var thisObject = this.thisObject;
+
+        player.hookAfterPlay(function () {
+            thisObject.feedOut(1000, 50);
+        });
+        player.hookAfterPause(function () {
+            thisObject.feedIn(0, 50);
+        });
+
+        newElement.addEventListener('mouseenter', function () {
+            if (player.isPlaying) {
+                player.title.feedIn(0, 50);
+                player.control.feedIn(0, 50);
+                player.seekbar.feedIn(0, 50);
+            }
+        }, false);
+        newElement.addEventListener('mouseout', function () {
+            if (player.isPlaying) {
+                player.title.feedOut(0, 50);
+                player.control.feedOut(0, 50);
+                player.seekbar.feedOut(0, 50);
+            }
+        }, false);
+
+        var seekbar = document.createElement("canvas");
+        var width = this.width;
+        seekbar.style.height = this.options.height + "px";
+        seekbar.style.width = width + "px";
+        var ctx = seekbar.getContext('2d');
+
+        ctx.fillStyle = "rgb(200, 0, 0)";
+        player.hookTimeUpdate(function (player, video) {
+            var current = video.currentTime;
+            var duration = player.getDuration();
+            var percent = current / duration;
+
+            var filledWidth = width * percent;
+            ctx.fillRect(0, 0, filledWidth, 1000);
+        });
+        newElement.appendChild(seekbar);
+        return newElement;
+    };
+    return SeekBar;
 })(Bar);
 var ControlBarOption = (function () {
     function ControlBarOption() {
@@ -209,12 +287,14 @@ var ControlBar = (function (_super) {
             if (player.isPlaying) {
                 player.title.feedIn(0, 50);
                 player.control.feedIn(0, 50);
+                player.seekbar.feedIn(0, 50);
             }
         }, false);
         newElement.addEventListener('mouseout', function () {
             if (player.isPlaying) {
                 player.title.feedOut(0, 50);
                 player.control.feedOut(0, 50);
+                player.seekbar.feedOut(0, 50);
             }
         }, false);
 
@@ -263,23 +343,6 @@ var ControlBar = (function (_super) {
                 });
                 return element;
             },
-            'seekbar': function () {
-                var element = document.createElement("canvas");
-                element.className = "seekbar";
-                element.style.height = thisObject.options.height + "px";
-                var ctx = element.getContext('2d');
-                var width = 300;
-
-                player.hookTimeUpdate(function (player, video) {
-                    var current = video.currentTime;
-                    var duration = player.getDuration();
-                    var percent = current / duration;
-
-                    var filledWidth = Math.floor(width * percent);
-                    ctx.fillRect(10, 50, filledWidth, 50);
-                });
-                return element;
-            },
             'fullscreen': function () {
                 var element = document.createElement("img");
                 element.className = "fullscreen";
@@ -306,7 +369,8 @@ var CreateOption = (function () {
 
 var thisObject;
 var Player = (function () {
-    function Player(target, createOption, controlOption, titleBarOption) {
+    function Player(target, createOption, controlOption, titleBarOption, seekBarOption) {
+        this.setHeight = 0;
         this.isPlaying = false;
         this.isPaused = false;
         this.isFullScreen = false;
@@ -337,6 +401,7 @@ var Player = (function () {
 
         this.title = new TitleBar(titleBarOption, this.width);
         this.control = new ControlBar(controlOption, this.width);
+        this.seekbar = new SeekBar(seekBarOption, this.width);
 
         thisObject = this;
 
@@ -344,6 +409,7 @@ var Player = (function () {
 
         this.setUpperBar(this.title);
         this.setLowerBar(this.control);
+        this.setLowerBar(this.seekbar);
 
         largePlayButton.addEventListener('click', function () {
             thisObject.togglePlayPause();
@@ -372,18 +438,21 @@ var Player = (function () {
             if (thisObject.isPlaying) {
                 thisObject.title.feedIn(0, 50);
                 thisObject.control.feedIn(0, 50);
+                thisObject.seekbar.feedIn(0, 50);
             }
         }, false);
         target.addEventListener('mouseout', function () {
             if (thisObject.isPlaying) {
                 thisObject.title.feedOut(0, 50);
                 thisObject.control.feedOut(0, 50);
+                thisObject.seekbar.feedOut(0, 50);
             }
         }, false);
 
         this.hookEnded(function (player, video) {
             thisObject.title.feedIn(0, 50);
             thisObject.control.feedIn(0, 50);
+            thisObject.seekbar.feedIn(0, 50);
         });
         this.setInitialVolume(0);
     }
@@ -606,11 +675,13 @@ var Player = (function () {
         var bar = barObject.createElement(this);
 
         var height = parseInt(bar.style.height.replace('px', ''));
+        var setHeight = this.setHeight;
         if (!height) {
             height = parseInt(getComputedStyle(bar, '').height.replace('px', ''));
         }
 
-        bar.style.top = (this.height - height) + "px";
+        bar.style.top = (this.height - height - setHeight) + "px";
+        this.setHeight += (height);
 
         var target = this.target;
         var parentNode = target.parentNode;

@@ -61,12 +61,14 @@ class ControlBar extends Bar{
             if(player.isPlaying){
                 player.title.feedIn(0 , 50);
                 player.control.feedIn(0 , 50);
+                player.seekbar.feedIn(0 , 50);
             }
         },false);
         newElement.addEventListener('mouseout' , function(){
             if(player.isPlaying){
                 player.title.feedOut(0 , 50);
                 player.control.feedOut(0 , 50);
+                player.seekbar.feedOut(0 , 50);
             }
         },false);
 
@@ -112,23 +114,6 @@ class ControlBar extends Bar{
                     var current:number = video.currentTime;
                     current = Math.floor(current * 100) / 100;
                     element.innerHTML = current + '';
-                });
-                return element;
-            },
-            'seekbar'     : function() : HTMLElement{
-                var element = document.createElement("canvas");
-                element.className = "seekbar";
-                element.style.height = thisObject.options.height + "px";
-                var ctx = element.getContext('2d');
-                var width = 300;
-                //ctx.fillRect(10 , 50 , width , 50);
-                player.hookTimeUpdate(function(player:Player , video:HTMLVideoElement){
-                    var current:number = video.currentTime;
-                    var duration:number = player.getDuration();
-                    var percent = current / duration;
-
-                    var filledWidth = Math.floor(width * percent);
-                    ctx.fillRect(10 , 50 , filledWidth , 50);
                 });
                 return element;
             },

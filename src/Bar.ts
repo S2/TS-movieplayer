@@ -39,6 +39,7 @@ class Bar{
 
     private inFeedIn : boolean = false;
     public feedIn(waitSeconds:number , feedOutSeconds:number){
+        console.log("start");
         var thisObject:Bar = this;
         if(this.createdElement){
             var element:HTMLElement = this.createdElement;

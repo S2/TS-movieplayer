@@ -2,6 +2,8 @@
 /// <reference path="Bar.ts" />
 /// <reference path="TitleBar.ts" />
 /// <reference path="TitleBarOption.ts" />
+/// <reference path="SeekBar.ts" />
+/// <reference path="SeekBarOption.ts" />
 /// <reference path="ControlBar.ts" />
 /// <reference path="ControlBarOption.ts" />
 
@@ -31,8 +33,10 @@ var thisObject;
 class Player{
     title               :TitleBar;
     control             :ControlBar;
+    seekbar             :SeekBar;
     width               :number;
     height              :number;
+    setHeight           :number = 0;
     target              :HTMLVideoElement;
     targetParent        :HTMLDivElement;
     largePlayButton     :HTMLImageElement
@@ -56,7 +60,7 @@ class Player{
     duration    : number;
     createOption:CreateOption;
 
-    constructor(target:HTMLVideoElement ,  createOption:CreateOption , controlOption:ControlBarOption ,titleBarOption:TitleBarOption ){
+    constructor(target:HTMLVideoElement ,  createOption:CreateOption , controlOption:ControlBarOption ,titleBarOption:TitleBarOption  ,seekBarOption:SeekBarOption){
         this.target = target;
         this.createOption = createOption;
         this.getEnvironment();
@@ -66,6 +70,7 @@ class Player{
 
         this.title = new TitleBar(titleBarOption , this.width);
         this.control = new ControlBar(controlOption , this.width);
+        this.seekbar = new SeekBar(seekBarOption , this.width);
 
         thisObject = this;
         
@@ -73,6 +78,7 @@ class Player{
 
         this.setUpperBar(this.title);
         this.setLowerBar(this.control);
+        this.setLowerBar(this.seekbar);
 
         largePlayButton.addEventListener('click' , function(){
 //            thisObject.toggleFullScreen();
@@ -103,18 +109,21 @@ class Player{
             if(thisObject.isPlaying){
                 thisObject.title.feedIn(0 , 50);
                 thisObject.control.feedIn(0 , 50);
+                thisObject.seekbar.feedIn(0 , 50);
             }
         },false);
         target.addEventListener('mouseout' , function(){
             if(thisObject.isPlaying){
                 thisObject.title.feedOut(0 , 50);
                 thisObject.control.feedOut(0 , 50);
+                thisObject.seekbar.feedOut(0 , 50);
             }
         },false);
 
         this.hookEnded(function(player:Player , video:HTMLVideoElement){
             thisObject.title.feedIn(0 , 50);
             thisObject.control.feedIn(0 , 50);
+            thisObject.seekbar.feedIn(0 , 50);
         });
         this.setInitialVolume(0);
     }
@@ -351,11 +360,13 @@ class Player{
         var bar:HTMLElement = barObject.createElement(this);
 
         var height = parseInt(bar.style.height.replace('px',''));
+        var setHeight = this.setHeight;
         if(!height){
             height = parseInt(getComputedStyle( bar , '').height.replace('px', ''));
         }
         
-        bar.style.top  = (this.height - height) + "px";
+        bar.style.top  = (this.height - height - setHeight) + "px";
+        this.setHeight += (height);
 
         var target:HTMLVideoElement = this.target;
         var parentNode = target.parentNode;

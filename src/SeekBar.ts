@@ -1,21 +1,22 @@
 /// <reference path="jquery.d.ts" />
 /// <reference path="Bar.ts" />
-/// <reference path="TitleBarOption.ts" />
+/// <reference path="SeekBarOption.ts" />
 /// <reference path="Player.ts" />
 
-class TitleBar extends Bar{
-    options : TitleBarOption;
+class SeekBar extends Bar{
+    options : SeekBarOption;
     width: number;
-    constructor(options:TitleBarOption , width:number){
+    appendMethods : {} = {};
+    constructor(options:SeekBarOption, width:number){
         super();
         this.options = options;
         if(this.options == null){
-            this.options = new TitleBarOption;
+            this.options = new SeekBarOption;
         }
         this.width = width;
         this.thisObject = this;
     }
-
+    
     public createElement(player:Player):HTMLElement{
         var newElement = document.createElement("div");
         newElement.style.width = this.width + "px";
@@ -25,9 +26,10 @@ class TitleBar extends Bar{
         newElement.style.position = "absolute";
         newElement.style.opacity = "0.5";
 
-        this.createdElement = newElement;
+        var options : SeekBarOption = this.options;
 
-        var thisObject:TitleBar = <TitleBar>this.thisObject;
+        this.createdElement = newElement;
+        var thisObject:SeekBar = <SeekBar>this.thisObject;
 
         player.hookAfterPlay(function(){thisObject.feedOut(1000 , 50)});
         player.hookAfterPause(function(){thisObject.feedIn(0 , 50)});
@@ -47,6 +49,23 @@ class TitleBar extends Bar{
             }
         },false);
 
+        var seekbar =  document.createElement("canvas");
+        var width = this.width;
+        seekbar.style.height = this.options.height + "px";
+        seekbar.style.width = width + "px";
+        var ctx = seekbar.getContext('2d');
+
+        ctx.fillStyle = "rgb(200, 0, 0)";
+        player.hookTimeUpdate(function(player:Player , video:HTMLVideoElement){
+            var current:number = video.currentTime;
+            var duration:number = player.getDuration();
+            var percent = current / duration;
+
+            var filledWidth = width * percent;
+            ctx.fillRect(0 , 0 , filledWidth , 1000);
+        });
+        newElement.appendChild(seekbar);
         return newElement;
     }
+    
 }
