@@ -1,0 +1,11 @@
+<svg height="300" id="largePlayButton" width="300" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <circle cx="20" cy="20" r="10" stroke="gray" />
+  <circle cx="120" cy="20" r="10" stroke="gray" />
+  <line stroke="gray" x1="20" x2="120" y1="30" y2="30" />
+  <line stroke="gray" x1="20" x2="120" y1="10" y2="10" />
+  <!-- 
+	Generated using the Perl SVG Module V2.59
+	by Ronan Oger
+	Info: http://www.roitsystems.com/
+ -->
+</svg>

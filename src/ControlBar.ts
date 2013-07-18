@@ -116,10 +116,20 @@ class ControlBar extends Bar{
                 return element;
             },
             'seekbar'     : function() : HTMLElement{
-                var element = document.createElement("svg");
+                var element = document.createElement("canvas");
                 element.className = "seekbar";
-                element.src = "../image/miniButton.svg";
                 element.style.height = thisObject.options.height + "px";
+                var ctx = element.getContext('2d');
+                var width = 300;
+                //ctx.fillRect(10 , 50 , width , 50);
+                player.hookTimeUpdate(function(player:Player , video:HTMLVideoElement){
+                    var current:number = video.currentTime;
+                    var duration:number = player.getDuration();
+                    var percent = current / duration;
+
+                    var filledWidth = Math.floor(width * percent);
+                    ctx.fillRect(10 , 50 , filledWidth , 50);
+                });
                 return element;
             },
             'fullscreen'  : function() : HTMLElement{

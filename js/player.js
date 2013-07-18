@@ -264,10 +264,20 @@ var ControlBar = (function (_super) {
                 return element;
             },
             'seekbar': function () {
-                var element = document.createElement("img");
+                var element = document.createElement("canvas");
                 element.className = "seekbar";
-                element.src = "../image/miniButton.svg";
                 element.style.height = thisObject.options.height + "px";
+                var ctx = element.getContext('2d');
+                var width = 300;
+
+                player.hookTimeUpdate(function (player, video) {
+                    var current = video.currentTime;
+                    var duration = player.getDuration();
+                    var percent = current / duration;
+
+                    var filledWidth = Math.floor(width * percent);
+                    ctx.fillRect(10, 50, filledWidth, 50);
+                });
                 return element;
             },
             'fullscreen': function () {
