@@ -94,6 +94,10 @@ class Player{
 
         this.setInitialVolume(0);
     }
+    
+    public getDuration():number{
+        return this.duration;
+    }
 
     private getEnvironment(){
         var userAgent = navigator.userAgent;
@@ -274,7 +278,7 @@ class Player{
             target.play()
             thisObject.doMethodArray(thisObject.afterPlay)
             if(thisObject.isPaused){
-                thisObject.doMethodArray(thisObject.AfterRestart)
+                thisObject.doMethodArray(thisObject.afterRestart)
             }
             thisObject.isPlaying = true 
             thisObject.isPaused = false

@@ -73,10 +73,10 @@ class ControlBar extends Bar{
                 return element;
             },
             'duration'    : function() : HTMLElement{
-                var element = document.createElement("img");
+                var element = document.createElement("span");
                 element.className = "duration";
-                element.src = "../image/miniButton.svg";
                 element.style.height = thisObject.options.height + "px";
+                element.innerHTML = player.getDuration() + '';
                 return element;
             },
             'current'     : function() : HTMLElement{

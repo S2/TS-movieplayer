@@ -14,7 +14,6 @@ class Bar{
     public feedOut(waitSeconds:number , feedOutSeconds:number){
         var thisObject:Bar = this;
         if(this.createdElement){
-            console.log(thisObject.inFeedOut);
             var element:HTMLElement = this.createdElement;
             var currentAlpha = Number(element.style.opacity);
             var unitGradAlpha = currentAlpha / feedOutSeconds;

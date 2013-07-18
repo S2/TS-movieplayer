@@ -12,7 +12,6 @@ var Bar = (function () {
     Bar.prototype.feedOut = function (waitSeconds, feedOutSeconds) {
         var thisObject = this;
         if (this.createdElement) {
-            console.log(thisObject.inFeedOut);
             var element = this.createdElement;
             var currentAlpha = Number(element.style.opacity);
             var unitGradAlpha = currentAlpha / feedOutSeconds;
@@ -209,10 +208,10 @@ var ControlBar = (function (_super) {
                 return element;
             },
             'duration': function () {
-                var element = document.createElement("img");
+                var element = document.createElement("span");
                 element.className = "duration";
-                element.src = "../image/miniButton.svg";
                 element.style.height = thisObject.options.height + "px";
+                element.innerHTML = player.getDuration() + '';
                 return element;
             },
             'current': function () {
@@ -273,6 +272,8 @@ var Player = (function () {
         this.afterPlay = [];
         this.beforePause = [];
         this.afterPause = [];
+        this.beforeRestart = [];
+        this.afterRestart = [];
         this.target = target;
         this.createOption = createOption;
         this.getEnvironment();
@@ -308,6 +309,10 @@ var Player = (function () {
 
         this.setInitialVolume(0);
     }
+    Player.prototype.getDuration = function () {
+        return this.duration;
+    };
+
     Player.prototype.getEnvironment = function () {
         var userAgent = navigator.userAgent;
         var matches;
@@ -372,7 +377,6 @@ var Player = (function () {
 
         this.largePlayButton = largePlayButton;
         this.duration = target.duration;
-        alert(this.duration + "");
     };
 
     Player.prototype.setCenterElementPosition = function (element, ratio) {
@@ -449,6 +453,14 @@ var Player = (function () {
         this.afterPause.push(hookMethod);
     };
 
+    Player.prototype.hookBeforeRestart = function (hookMethod) {
+        this.beforeRestart.push(hookMethod);
+    };
+
+    Player.prototype.hookAfterRestart = function (hookMethod) {
+        this.afterRestart.push(hookMethod);
+    };
+
     Player.prototype.doMethodArray = function (methods) {
         for (var i = 0; i < methods.length; i++) {
             methods[i]();
@@ -464,9 +476,15 @@ var Player = (function () {
             thisObject.doMethodArray(thisObject.afterPause);
             thisObject.isPlaying = false;
         } else {
+            if (thisObject.isPaused) {
+                thisObject.doMethodArray(thisObject.beforeRestart);
+            }
             thisObject.doMethodArray(thisObject.beforePlay);
             target.play();
             thisObject.doMethodArray(thisObject.afterPlay);
+            if (thisObject.isPaused) {
+                thisObject.doMethodArray(thisObject.afterRestart);
+            }
             thisObject.isPlaying = true;
             thisObject.isPaused = false;
         }
@@ -477,8 +495,10 @@ var Player = (function () {
         var target = thisObject.target;
         if (!thisObject.isPlaying && thisObject.isPaused) {
             thisObject.doMethodArray(thisObject.beforePlay);
+            thisObject.doMethodArray(thisObject.beforeRestart);
             target.play();
             thisObject.doMethodArray(thisObject.afterPlay);
+            thisObject.doMethodArray(thisObject.afterRestart);
             thisObject.isPlaying = true;
             thisObject.isPaused = false;
             thisObject.toggleElement(thisObject.largePlayButton);
