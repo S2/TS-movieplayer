@@ -51,8 +51,8 @@ class SeekBar extends Bar{
 
         var seekbar =  document.createElement("canvas");
         var width = this.width;
-        seekbar.style.height = this.options.height + "px";
-        seekbar.style.width = width + "px";
+        seekbar.setAttribute('height' , this.options.height + "");
+        seekbar.setAttribute('width' , width + "");
         var ctx = seekbar.getContext('2d');
 
         ctx.fillStyle = "rgb(200, 0, 0)";
