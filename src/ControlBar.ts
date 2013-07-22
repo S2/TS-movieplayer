@@ -102,8 +102,16 @@ class ControlBar extends Bar{
                 element.className = "duration";
                 element.style.height = thisObject.options.height + "px";
                 var duration = player.getDuration();
-                duration = Math.floor(duration * 100) / 100;
-                element.innerHTML = duration + '';
+                if(duration){
+                    duration = Math.floor(duration * 100) / 100;
+                    element.innerHTML = duration + '';
+                }else{
+                    player.target.addEventListener('loadedmetadata' , function(){
+                        var duration = player.getDuration();
+                        duration = Math.floor(duration * 100) / 100;
+                        element.innerHTML = duration + '';
+                    } , false);
+                }
                 return element;
             },
             'current'     : function() : HTMLElement{

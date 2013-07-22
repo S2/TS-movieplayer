@@ -328,8 +328,16 @@ var ControlBar = (function (_super) {
                 element.className = "duration";
                 element.style.height = thisObject.options.height + "px";
                 var duration = player.getDuration();
-                duration = Math.floor(duration * 100) / 100;
-                element.innerHTML = duration + '';
+                if (duration) {
+                    duration = Math.floor(duration * 100) / 100;
+                    element.innerHTML = duration + '';
+                } else {
+                    player.target.addEventListener('loadedmetadata', function () {
+                        var duration = player.getDuration();
+                        duration = Math.floor(duration * 100) / 100;
+                        element.innerHTML = duration + '';
+                    }, false);
+                }
                 return element;
             },
             'current': function () {
@@ -434,7 +442,7 @@ var Player = (function () {
             thisObject.doMethodArray(thisObject.ended);
         }, false);
 
-        target.addEventListener('mouseenter', function () {
+        target.addEventListener('mouseover', function () {
             if (thisObject.isPlaying) {
                 thisObject.title.feedIn(0, 50);
                 thisObject.control.feedIn(0, 50);
@@ -457,6 +465,9 @@ var Player = (function () {
         this.setInitialVolume(0);
     }
     Player.prototype.getDuration = function () {
+        if (!this.duration) {
+            this.duration = this.target.duration;
+        }
         return this.duration;
     };
 
@@ -502,6 +513,7 @@ var Player = (function () {
 
     Player.prototype.createParentDiv = function () {
         var target = this.target;
+
         target.style.position = 'absolute';
 
         var parentNode = target.parentNode;

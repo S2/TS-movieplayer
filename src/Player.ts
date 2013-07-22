@@ -81,12 +81,10 @@ class Player{
         this.setLowerBar(this.seekbar);
 
         largePlayButton.addEventListener('click' , function(){
-//            thisObject.toggleFullScreen();
             thisObject.togglePlayPause();
         },false);
 
         largePlayButton.addEventListener('touch' , function(){
-//            thisObject.toggleFullScreen();
             thisObject.togglePlayPause();
         },false);
 
@@ -105,7 +103,7 @@ class Player{
             thisObject.doMethodArray(thisObject.ended)
         },false);
 
-        target.addEventListener('mouseenter' , function(){
+        target.addEventListener('mouseover' , function(){
             if(thisObject.isPlaying){
                 thisObject.title.feedIn(0 , 50);
                 thisObject.control.feedIn(0 , 50);
@@ -129,6 +127,9 @@ class Player{
     }
     
     public getDuration():number{
+        if(!this.duration){
+            this.duration = this.target.duration;
+        }
         return this.duration;
     }
 
@@ -175,6 +176,7 @@ class Player{
     
     private createParentDiv(){
         var target:HTMLVideoElement = this.target;
+
         target.style.position = 'absolute';
         
         var parentNode = target.parentNode;
