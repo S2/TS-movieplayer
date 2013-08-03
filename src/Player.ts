@@ -101,6 +101,9 @@ class Player{
 
         target.addEventListener('ended' , function(){
             thisObject.doMethodArray(thisObject.ended)
+            thisObject.isPlaying = false;
+            thisObject.isPaused = false
+            thisObject.toggleElement(thisObject.largePlayButton)
         },false);
 
         target.addEventListener('mouseover' , function(){
