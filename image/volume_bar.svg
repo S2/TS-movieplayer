@@ -1,0 +1,9 @@
+<svg height="300" id="largePlayButton" width="300" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <rect height="20" style="fill: black; fill-opacity: 1; stroke: black" width="5" x="0" y="10" />
+  <rect height="18" style="fill: white; fill-opacity: 1; stroke: white" width="3" x="1" y="11" />
+  <!-- 
+	Generated using the Perl SVG Module V2.59
+	by Ronan Oger
+	Info: http://www.roitsystems.com/
+ -->
+</svg>

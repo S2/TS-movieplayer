@@ -19,8 +19,24 @@ my $svg = SVG->new(
         height      => 300,
 );
 
-$svg->circle(cx => 20 , cy => 20 , r => 10 , stroke => 'gray');
-$svg->circle(cx => 120 , cy => 20 , r => 10 , stroke => 'gray');
-$svg->line(x1 => 20 , x2 => 120 ,  y1 => 30 , y2 => 30 , stroke => 'gray');
-$svg->line(x1 => 20 , x2 => 120 ,  y1 => 10 , y2 => 10 , stroke => 'gray');
+$svg->rectangle(
+    x => 0, y => 10,
+    width=> 5, height=> 20,
+    style=>{
+        'fill-opacity' => 1,
+        'fill'   => 'black',
+        'stroke' => 'black'
+    }
+);
+
+$svg->rectangle(
+    x => 1, y => 11,
+    width=> 3, height=> 18,
+    style=>{
+        'fill-opacity' => 1,
+        'fill'   => 'white',
+        'stroke' => 'white'
+    }
+);
+
 say $svg->xmlify
