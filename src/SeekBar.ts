@@ -48,21 +48,31 @@ class SeekBar extends Bar{
                 player.seekbar.feedOut(0 , 50);
             }
         },false);
-
-        var seekbar =  document.createElement("canvas");
+        
         var width = this.width;
-        seekbar.setAttribute('height' , this.options.height + "");
-        seekbar.setAttribute('width' , width + "");
-        var ctx = seekbar.getContext('2d');
+        var seekbar =  document.createElement("div");
+        seekbar.style.height = this.options.height + "px";
+        seekbar.style.width = width + "px";
 
-        ctx.fillStyle = "rgb(200, 0, 0)";
+        var seekbarInner =  document.createElement("div");
+        seekbarInner.style.height = this.options.height + "px";
+        seekbarInner.style.width = "0px";
+        seekbarInner.style.position = "absolute";
+        seekbarInner.style.backgroundColor= "#ff0000";
+        seekbar.appendChild(seekbarInner);
+
+        seekbar.addEventListener("click" , function(e){
+            var clickedX = e.pageX;
+            var moveToSec = player.getDuration() * clickedX / width;
+            player.setCurrentTime(moveToSec);
+        } , false);
+
         player.hookTimeUpdate(function(player:Player , video:HTMLVideoElement){
             var current:number = video.currentTime;
             var duration:number = player.getDuration();
             var percent = current / duration;
-
             var filledWidth = width * percent;
-            ctx.fillRect(0 , 0 , filledWidth , 1000);
+            seekbarInner.style.width = filledWidth + "px";
         });
         newElement.appendChild(seekbar);
         return newElement;

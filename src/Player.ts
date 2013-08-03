@@ -126,6 +126,13 @@ class Player{
         this.setInitialVolume(0);
     }
     
+    public setCurrentTime(moveToSec:number){
+        var target = this.target;
+        target.currentTime = moveToSec;
+        target.play();
+    }
+
+
     public getDuration():number{
         if(!this.duration){
             this.duration = this.target.duration;
