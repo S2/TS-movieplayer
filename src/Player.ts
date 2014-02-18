@@ -1,4 +1,5 @@
 /// <reference path="jquery.d.ts" />
+/// <reference path="Controls.ts" />
 /// <reference path="Bar.ts" />
 /// <reference path="TitleBar.ts" />
 /// <reference path="TitleBarOption.ts" />
