@@ -1,32 +1,3 @@
-var Controls = (function () {
-    function Controls(player) {
-        this.player = player;
-    }
-    Controls.prototype.setCenterPlayButton = function (src, top, left) {
-    };
-
-    Controls.prototype.setPlayButton = function (src, top, left) {
-    };
-
-    Controls.prototype.setPauseButton = function (src, top, left) {
-    };
-
-    Controls.prototype.setFullscreenButton = function (src, top, left) {
-    };
-
-    Controls.prototype.setVolumeButton = function (src, top, left) {
-    };
-
-    Controls.prototype.setVolumeBar = function (src, top, left) {
-    };
-
-    Controls.prototype.setVolumeBackground = function (src, top, left) {
-    };
-
-    Controls.prototype.setControlBackground = function (src, top, left) {
-    };
-    return Controls;
-})();
 var Bar = (function () {
     function Bar() {
         this.maxAlpha = 0.5;
@@ -150,6 +121,36 @@ var Bar = (function () {
         return parseInt(element.style.height.replace("px", ""));
     };
     return Bar;
+})();
+var Controls = (function () {
+    function Controls(player, controlBar) {
+        this.player = player;
+        this.controlBar = controlBar;
+    }
+    Controls.prototype.setCenterPlayButton = function (src, top, left) {
+    };
+
+    Controls.prototype.setPlayButton = function (src, top, left) {
+    };
+
+    Controls.prototype.setPauseButton = function (src, top, left) {
+    };
+
+    Controls.prototype.setFullscreenButton = function (src, top, left) {
+    };
+
+    Controls.prototype.setVolumeButton = function (src, top, left) {
+    };
+
+    Controls.prototype.setVolumeBar = function (src, top, left) {
+    };
+
+    Controls.prototype.setVolumeBackground = function (src, top, left) {
+    };
+
+    Controls.prototype.setControlBackground = function (src, top, left) {
+    };
+    return Controls;
 })();
 var TitleBarOption = (function () {
     function TitleBarOption() {

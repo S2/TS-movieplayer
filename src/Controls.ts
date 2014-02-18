@@ -1,13 +1,16 @@
 /// <reference path="jquery.d.ts" />
 /// <reference path="Player.ts" />
+/// <reference path="Bar.ts" />
 
 interface ControlsOption{
 }
 
 class Controls{
     player : Player;
-    constructor(player : Player){
+    controlBar : Bar;
+    constructor(player : Player , controlBar : Bar){
         this.player = player;
+        this.controlBar = controlBar;
     }
     
     /**
