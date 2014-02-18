@@ -20,11 +20,16 @@ class SeekBar extends Bar{
     public createElement(player:Player):HTMLElement{
         var newElement = document.createElement("div");
         newElement.style.width = this.width + "px";
-        newElement.style.height = this.options.height + "px";
-        newElement.style.backgroundColor = "#888888";
-        newElement.style.zIndex = this.options.zIndex + "";
-        newElement.style.position = "absolute";
-        newElement.style.opacity = "0.5";
+        newElement.className = this.options.class
+        if(this.options.height){
+            newElement.style.height = this.options.height + "px";
+        }
+        if(this.options.zIndex){
+            newElement.style.zIndex = this.options.zIndex + "";
+        }
+        if(this.options.railColor){
+            newElement.style.backgroundColor = this.options.railColor
+        }
 
         var options : SeekBarOption = this.options;
 
@@ -50,15 +55,23 @@ class SeekBar extends Bar{
         },false);
         
         var width = this.width;
+
         var seekbar =  document.createElement("div");
-        seekbar.style.height = this.options.height + "px";
+        if(this.options.height){
+            seekbar.style.height = this.options.height + "px";
+        }
         seekbar.style.width = width + "px";
 
         var seekbarInner =  document.createElement("div");
-        seekbarInner.style.height = this.options.height + "px";
+        if(this.options.height){
+            seekbarInner.style.height = this.options.height + "px";
+        }
         seekbarInner.style.width = "0px";
         seekbarInner.style.position = "absolute";
-        seekbarInner.style.backgroundColor= "#ff0000";
+        if(this.options.filledColor){
+            seekbarInner.style.backgroundColor= this.options.filledColor;
+        }
+
         seekbar.appendChild(seekbarInner);
 
         seekbar.addEventListener("click" , function(e){

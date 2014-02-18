@@ -14,6 +14,10 @@
 }
 
 .seekbar{
-    width: 70%;
+    height : 20px;
+    zIndex : 100;
+    background-color : #888888;
+    position : absolute;
+    opacity : 0.5;
 }
 
