@@ -14,7 +14,6 @@ class ControlBar extends Bar{
             this.options = new ControlBarOption;
         }
         this.width = width;
-        this.thisObject = this;
     }
     
     public createElement(player:Player):HTMLElement{
@@ -52,25 +51,6 @@ class ControlBar extends Bar{
         }
         
         this.createdElement = newElement;
-        var thisObject:ControlBar = <ControlBar>this.thisObject;
-
-        player.hookAfterPlay(function(){thisObject.feedOut(1000 , 50)});
-        player.hookAfterPause(function(){thisObject.feedIn(0 , 50)});
-        
-        newElement.addEventListener('mouseenter' , function(){
-            if(player.isPlaying){
-                player.title.feedIn(0 , 50);
-                player.control.feedIn(0 , 50);
-                player.seekbar.feedIn(0 , 50);
-            }
-        },false);
-        newElement.addEventListener('mouseout' , function(){
-            if(player.isPlaying){
-                player.title.feedOut(0 , 50);
-                player.control.feedOut(0 , 50);
-                player.seekbar.feedOut(0 , 50);
-            }
-        },false);
 
         return newElement;
     }
@@ -80,33 +60,32 @@ class ControlBar extends Bar{
     }
 
     public getCreateButtonMethods(player:Player):{}{
-        var thisObject:ControlBar = <ControlBar>this.thisObject;
         var createMethods = {
-            'play'        : function() : HTMLElement{
+            'play'        : () : HTMLElement => {
                 var element = document.createElement("img");
                 element.className = "play";
                 element.src = "../image/miniButton.svg";
-                element.style.height = thisObject.options.height + "px";
-                thisObject.setEvent(element , "click" , player.togglePlayPause);
+                element.style.height = this.options.height + "px";
+                this.setEvent(element , "click" , player.togglePlayPause);
                 return element;
             },
-            'volume'      : function() : HTMLElement{
+            'volume'      : () : HTMLElement => {
                 var element = document.createElement("img");
                 element.className = "volume";
                 element.src = "../image/miniButton.svg";
-                element.style.height = thisObject.options.height + "px";
+                element.style.height = this.options.height + "px";
                 return element;
             },
-            'duration'    : function() : HTMLElement{
+            'duration'    : () : HTMLElement => {
                 var element = document.createElement("div");
                 element.className = "duration";
-                element.style.height = thisObject.options.height + "px";
+                element.style.height = this.options.height + "px";
                 var duration = player.getDuration();
                 if(duration){
                     duration = Math.floor(duration * 100) / 100;
                     element.innerHTML = duration + '';
                 }else{
-                    player.target.addEventListener('loadedmetadata' , function(){
+                    player.target.addEventListener('loadedmetadata' , () => {
                         var duration = player.getDuration();
                         duration = Math.floor(duration * 100) / 100;
                         element.innerHTML = duration + '';
@@ -114,7 +93,7 @@ class ControlBar extends Bar{
                 }
                 return element;
             },
-            'current'     : function() : HTMLElement{
+            'current'     : () : HTMLElement => {
                 var element = document.createElement("div");
                 element.className = "current";
                 element.innerHTML = '00:00';
@@ -125,12 +104,12 @@ class ControlBar extends Bar{
                 });
                 return element;
             },
-            'fullscreen'  : function() : HTMLElement{
+            'fullscreen'  : () : HTMLElement => {
                 var element = document.createElement("img");
                 element.className = "fullscreen";
                 element.src = "../image/miniButton.svg";
-                element.style.height = thisObject.options.height + "px";
-                thisObject.setEvent(element , "click" , player.toggleFullScreen);
+                element.style.height = this.options.height + "px";
+                this.setEvent(element , "click" , player.toggleFullScreen);
                 return element;
             },
         }

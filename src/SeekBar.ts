@@ -5,6 +5,7 @@
 
 class SeekBar extends Bar{
     options : SeekBarOption;
+    seekbar : HTMLElement;
     width: number;
     appendMethods : {} = {};
     constructor(options:SeekBarOption, width:number){
@@ -14,7 +15,6 @@ class SeekBar extends Bar{
             this.options = new SeekBarOption;
         }
         this.width = width;
-        this.thisObject = this;
     }
     
     public createElement(player:Player):HTMLElement{
@@ -34,26 +34,7 @@ class SeekBar extends Bar{
         var options : SeekBarOption = this.options;
 
         this.createdElement = newElement;
-        var thisObject:SeekBar = <SeekBar>this.thisObject;
 
-        player.hookAfterPlay(function(){thisObject.feedOut(1000 , 50)});
-        player.hookAfterPause(function(){thisObject.feedIn(0 , 50)});
-
-        newElement.addEventListener('mouseenter' , function(){
-            if(player.isPlaying){
-                player.title.feedIn(0 , 50);
-                player.control.feedIn(0 , 50);
-                player.seekbar.feedIn(0 , 50);
-            }
-        },false);
-        newElement.addEventListener('mouseout' , function(){
-            if(player.isPlaying){
-                player.title.feedOut(0 , 50);
-                player.control.feedOut(0 , 50);
-                player.seekbar.feedOut(0 , 50);
-            }
-        },false);
-        
         var width = this.width;
 
         var seekbar =  document.createElement("div");
@@ -74,13 +55,13 @@ class SeekBar extends Bar{
 
         seekbar.appendChild(seekbarInner);
 
-        seekbar.addEventListener("click" , function(e){
+        seekbar.addEventListener("click" , (e) => {
             var clickedX = e.pageX;
             var moveToSec = player.getDuration() * clickedX / width;
             player.setCurrentTime(moveToSec);
         } , false);
 
-        player.hookTimeUpdate(function(player:Player , video:HTMLVideoElement){
+        player.hookTimeUpdate((player:Player , video:HTMLVideoElement) => {
             var current:number = video.currentTime;
             var duration:number = player.getDuration();
             var percent = current / duration;
@@ -88,7 +69,7 @@ class SeekBar extends Bar{
             seekbarInner.style.width = filledWidth + "px";
         });
         newElement.appendChild(seekbar);
+        this.seekbar = seekbar;
         return newElement;
     }
-    
 }

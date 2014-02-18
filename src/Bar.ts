@@ -2,7 +2,6 @@
 /// <reference path="Player.ts" />
 
 class Bar{
-    public thisObject:Bar;
     public createdElement:HTMLElement;
     public maxAlpha:number = 0.5;
     private eventEnable:boolean = true;
@@ -12,26 +11,35 @@ class Bar{
     
     private inFeedOut : boolean = false;
     public feedOut(waitSeconds:number , feedOutSeconds:number){
-        var thisObject:Bar = this;
         if(this.createdElement){
             var element:HTMLElement = this.createdElement;
             var currentAlpha = Number(element.style.opacity);
             var unitGradAlpha = currentAlpha / feedOutSeconds;
-            var setGradAlpha = function(){
-                if(!thisObject.inFeedOut){return;}
+            var setGradAlpha = () => {
+                if(!this.inFeedOut){return;}
                 currentAlpha -= unitGradAlpha;
                 element.style.opacity = currentAlpha.toString();
                 if(currentAlpha > 0){
                     setTimeout(setGradAlpha , 1);
                 }else{
                     element.style.opacity = "0";
-                    thisObject.inFeedOut = false;
-                    thisObject.eventEnable = false;
+                    this.inFeedOut = false;
+                    this.eventEnable = false;
+                    element.style.opacity = "0";
+                    for( var i = 0 , arrayLength = this.feedOutHook.length ; i < arrayLength ; i++){
+                        var method = this.feedOutHook[i];
+                        method();
+                    }
+                    for( var i = 0 , arrayLength = this.feedOutHookOnce.length ; i < arrayLength ; i++){
+                        var method = this.feedOutHookOnce[i];
+                        method();
+                    }
+                    this.feedOutHookOnce = [];
                 }
             };
             this.inFeedOut = true;
             this.inFeedIn = false;
-            setTimeout(function(){
+            setTimeout(() => {
                 setGradAlpha()
             } , waitSeconds);
         }
@@ -39,8 +47,6 @@ class Bar{
 
     private inFeedIn : boolean = false;
     public feedIn(waitSeconds:number , feedOutSeconds:number){
-        console.log("start");
-        var thisObject:Bar = this;
         if(this.createdElement){
             var element:HTMLElement = this.createdElement;
             var currentAlpha = Number(element.style.opacity);
@@ -49,32 +55,85 @@ class Bar{
                 return;
             }
             var unitGradAlpha = maxAlpha - currentAlpha / feedOutSeconds;
-            var setGradAlpha = function(){
+            var setGradAlpha = () => {
                 currentAlpha += unitGradAlpha;
                 element.style.opacity = currentAlpha.toString();
-                if(!thisObject.inFeedIn){return}
+                if(!this.inFeedIn){return}
                 if(currentAlpha < maxAlpha){
                     setTimeout(setGradAlpha , 1);
                 }else{
                     element.style.opacity = maxAlpha + "";
+                    for( var i = 0 , arrayLength = this.feedInHook.length ; i < arrayLength ; i++){
+                        var method = this.feedInHook[i];
+                        method();
+                    }
+                    for( var i = 0 , arrayLength = this.feedInHookOnce.length ; i < arrayLength ; i++){
+                        var method = this.feedInHookOnce[i];
+                        method();
+                    }
                 }
             };
             this.inFeedOut = false;
             this.inFeedIn = true;
             this.eventEnable = true;
 
-            setTimeout(function(){
+            setTimeout(() => {
                 setGradAlpha()
             } , waitSeconds);
         }
     }
-    
+
+    /**
+        <br>
+        
+        @method setFeedInHook 
+        @param {} 
+        @return void
+    */
+    private feedInHook : Array = [];
+    public setFeedInHook(hookMethod:()=>void):void{
+        this.feedInHook.push(hookMethod)
+    }
+
+    private feedInHookOnce : Array = [];
+    public setFeedInHookOnce(hookMethod:()=>void):void{
+        this.feedInHookOnce.push(hookMethod)
+    }
+
+    /**
+        <br>
+        
+        @method setFeedOutHook 
+        @param {} 
+        @return void
+    */
+    private feedOutHook : Array = [];
+    public setFeedOutHook(hookMethod:()=>void):void{
+        this.feedOutHook.push(hookMethod)
+    }
+
+    private feedOutHookOnce : Array = [];
+    public setFeedOutHookOnce(hookMethod:()=>void):void{
+        this.feedOutHookOnce.push(hookMethod)
+    }
+   
     public setEvent(element:HTMLElement , eventName:string , eventFunction ){
-        var thisObject:Bar = this;
-        element.addEventListener(eventName , function(){
-            if(thisObject.eventEnable){
+        element.addEventListener(eventName , () => {
+            if(this.eventEnable){
                 eventFunction();
             }
         } , false);
+    }
+
+    /**
+        <br>
+        
+        @method getHeight 
+        @param {} 
+        @return number
+    */
+    public getHeight():number{
+        var element:HTMLElement = this.createdElement;
+        return parseInt(element.style.height.replace("px" , ""))
     }
 }

@@ -22,14 +22,17 @@ interface HTMLDocument{
 }
 
 class CreateOption{
-    width           : number;
-    height          : number;
-    movieSrcURL     : number;
-    imagePath       : string = '../image/';
+    width                : number;
+    height               : number;
+    movieSrcURL          : number;
+    imagePath            : string = '../image/';
+    viewControllBar      : Boolean = true;
+    viewTitleBar         : Boolean = true;
+    viewSeekBar          : Boolean = true;
+    displayAlwaysSeekBar : Boolean = true;
     largePlayButton : string = 'largeButton.svg';
 }
 
-var thisObject;
 class Player{
     title               :TitleBar;
     control             :ControlBar;
@@ -72,59 +75,81 @@ class Player{
         this.control = new ControlBar(controlOption , this.width);
         this.seekbar = new SeekBar(seekBarOption , this.width);
 
-        thisObject = this;
-        
         var largePlayButton = this.largePlayButton;
+        
+        if(createOption.viewControllBar){
+            this.setLowerBar(this.control);
+        }
+        if(createOption.viewTitleBar){
+            this.setUpperBar(this.title);
+        }
+        var seekbar
+        if(createOption.viewSeekBar){
+            seekbar = this.setLowerBar(this.seekbar);
+        }
 
-        this.setUpperBar(this.title);
-        this.setLowerBar(this.control);
-        this.setLowerBar(this.seekbar);
-
-        largePlayButton.addEventListener('click' , function(){
-            thisObject.togglePlayPause();
+        largePlayButton.addEventListener('click' , () => {
+            this.togglePlayPause();
         },false);
 
-        largePlayButton.addEventListener('touch' , function(){
-            thisObject.togglePlayPause();
+        largePlayButton.addEventListener('touch' , () => {
+            this.togglePlayPause();
         },false);
 
-        target.addEventListener('click' , function(){
-            thisObject.togglePauseRestart();
+        target.addEventListener('click' , () => {
+            this.togglePauseRestart();
         },false);
-        target.addEventListener('touch' , function(){
-            thisObject.togglePauseRestart();
+        target.addEventListener('touch' , () => {
+            this.togglePauseRestart();
         },false);
         
-        target.addEventListener('timeupdate' , function(){
-            thisObject.doMethodArray(thisObject.timeUpdate)
+        target.addEventListener('timeupdate' , () => {
+            this.doMethodArray(this.timeUpdate)
         },false);
 
-        target.addEventListener('ended' , function(){
-            thisObject.doMethodArray(thisObject.ended)
-            thisObject.isPlaying = false;
-            thisObject.isPaused = false
-            thisObject.toggleElement(thisObject.largePlayButton)
+        target.addEventListener('ended' , () => {
+            this.doMethodArray(this.ended)
+            this.isPlaying = false;
+            this.isPaused = false
+            this.toggleElement(this.largePlayButton)
         },false);
-
-        target.addEventListener('mouseover' , function(){
-            if(thisObject.isPlaying){
-                thisObject.title.feedIn(0 , 50);
-                thisObject.control.feedIn(0 , 50);
-                thisObject.seekbar.feedIn(0 , 50);
+        
+        var displayControll = true;
+        target.addEventListener('mouseover' , () => {
+            if(this.isPlaying){
+                this.title.feedIn(0 , 50);
+                this.control.feedIn(0 , 50);
+                if(!this.createOption.displayAlwaysSeekBar){
+                    this.seekbar.feedIn(0 , 50);
+                }else{
+                    if(!displayControll){
+                        seekbar.style.top = parseInt(seekbar.style.top.replace("px" , "")) - this.control.getHeight() + "px";
+                    }
+                }
+                displayControll  = true;
             }
         },false);
-        target.addEventListener('mouseout' , function(){
-            if(thisObject.isPlaying){
-                thisObject.title.feedOut(0 , 50);
-                thisObject.control.feedOut(0 , 50);
-                thisObject.seekbar.feedOut(0 , 50);
+        target.addEventListener('mouseout' , () => {
+            if(this.isPlaying){
+                this.title.feedOut(0 , 50);
+                this.control.feedOut(0 , 50);
+                if(!this.createOption.displayAlwaysSeekBar){
+                    this.seekbar.feedOut(0 , 50);
+                }else{
+                    if(displayControll){
+                        this.control.setFeedOutHookOnce( () => {
+                            seekbar.style.top = parseInt(seekbar.style.top.replace("px" , "")) + this.control.getHeight() + "px";
+                        })
+                    }
+                }
+                displayControll  = false;
             }
         },false);
 
-        this.hookEnded(function(player:Player , video:HTMLVideoElement){
-            thisObject.title.feedIn(0 , 50);
-            thisObject.control.feedIn(0 , 50);
-            thisObject.seekbar.feedIn(0 , 50);
+        this.hookEnded((player:Player , video:HTMLVideoElement) => {
+            this.title.feedIn(0 , 50);
+            this.control.feedIn(0 , 50);
+            this.seekbar.feedIn(0 , 50);
         });
         this.setInitialVolume(0);
     }
@@ -134,7 +159,6 @@ class Player{
         target.currentTime = moveToSec;
         target.play();
     }
-
 
     public getDuration():number{
         if(!this.duration){
@@ -241,10 +265,10 @@ class Player{
     }
 
     public toggleFullScreen(){
-        var targetParent:HTMLElement = thisObject.targetParent
-        var target:HTMLVideoElement = thisObject.target
-        var largePlayButton = thisObject.largePlayButton;
-        if(thisObject.isFullScreen){
+        var targetParent:HTMLElement = this.targetParent
+        var target:HTMLVideoElement = this.target
+        var largePlayButton = this.largePlayButton;
+        if(this.isFullScreen){
             if (document.exitFullscreen) {
                 document.exitFullscreen();
             } else if (document.mozCancelFullScreen) {
@@ -252,10 +276,10 @@ class Player{
             } else if (document.webkitCancelFullScreen) {
                 document.webkitCancelFullScreen();
             }
-            target.style.width  = thisObject.width + "px";
-            target.style.height = thisObject.height + "px";
-            thisObject.isFullScreen = false;
-            thisObject.setCenterElementPosition(largePlayButton , 0.5);
+            target.style.width  = this.width + "px";
+            target.style.height = this.height + "px";
+            this.isFullScreen = false;
+            this.setCenterElementPosition(largePlayButton , 0.5);
         }else{
             if (targetParent.requestFullscreen) {
                 targetParent.requestFullscreen();
@@ -266,8 +290,8 @@ class Player{
             }
             target.style.width  = '100%';
             target.style.height = '100%';
-            thisObject.isFullScreen = true;
-            thisObject.setFullscreenCenterElementPosition(largePlayButton , 0.5);
+            this.isFullScreen = true;
+            this.setFullscreenCenterElementPosition(largePlayButton , 0.5);
         }
     }
 
@@ -318,47 +342,47 @@ class Player{
     }
     
     public togglePlayPause(){
-        var target:HTMLVideoElement = thisObject.target;
-        if(thisObject.isPlaying){
-            thisObject.doMethodArray(thisObject.beforePause)
+        var target:HTMLVideoElement = this.target;
+        if(this.isPlaying){
+            this.doMethodArray(this.beforePause)
             target.pause()
-            thisObject.isPaused = true;
-            thisObject.doMethodArray(thisObject.afterPause)
-            thisObject.isPlaying = false
+            this.isPaused = true;
+            this.doMethodArray(this.afterPause)
+            this.isPlaying = false
         }else{
-            if(thisObject.isPaused){
-                thisObject.doMethodArray(thisObject.beforeRestart)
+            if(this.isPaused){
+                this.doMethodArray(this.beforeRestart)
             }
-            thisObject.doMethodArray(thisObject.beforePlay)
+            this.doMethodArray(this.beforePlay)
             target.play()
-            thisObject.doMethodArray(thisObject.afterPlay)
-            if(thisObject.isPaused){
-                thisObject.doMethodArray(thisObject.afterRestart)
+            this.doMethodArray(this.afterPlay)
+            if(this.isPaused){
+                this.doMethodArray(this.afterRestart)
             }
-            thisObject.isPlaying = true 
-            thisObject.isPaused = false
+            this.isPlaying = true 
+            this.isPaused = false
         }
-        thisObject.toggleElement(thisObject.largePlayButton)
+        this.toggleElement(this.largePlayButton)
     }
 
     public togglePauseRestart(){
-        var target:HTMLVideoElement = thisObject.target;
-        if(!thisObject.isPlaying && thisObject.isPaused){
-            thisObject.doMethodArray(thisObject.beforePlay)
-            thisObject.doMethodArray(thisObject.beforeRestart)
+        var target:HTMLVideoElement = this.target;
+        if(!this.isPlaying && this.isPaused){
+            this.doMethodArray(this.beforePlay)
+            this.doMethodArray(this.beforeRestart)
             target.play()
-            thisObject.doMethodArray(thisObject.afterPlay)
-            thisObject.doMethodArray(thisObject.afterRestart)
-            thisObject.isPlaying = true 
-            thisObject.isPaused = false
-            thisObject.toggleElement(thisObject.largePlayButton)
-        }else if(thisObject.isPlaying){
-            thisObject.doMethodArray(thisObject.beforePause)
+            this.doMethodArray(this.afterPlay)
+            this.doMethodArray(this.afterRestart)
+            this.isPlaying = true 
+            this.isPaused = false
+            this.toggleElement(this.largePlayButton)
+        }else if(this.isPlaying){
+            this.doMethodArray(this.beforePause)
             target.pause()
-            thisObject.isPaused = true;
-            thisObject.doMethodArray(thisObject.afterPause)
-            thisObject.isPlaying = false
-            thisObject.toggleElement(thisObject.largePlayButton)
+            this.isPaused = true;
+            this.doMethodArray(this.afterPause)
+            this.isPlaying = false
+            this.toggleElement(this.largePlayButton)
         }
     }
 
@@ -368,7 +392,7 @@ class Player{
             : 'none';
     }
 
-    private setLowerBar(barObject:Bar){
+    private setLowerBar(barObject:Bar) : HTMLElement{
         var bar:HTMLElement = barObject.createElement(this);
 
         var height = parseInt(bar.style.height.replace('px',''));
@@ -383,16 +407,17 @@ class Player{
         var target:HTMLVideoElement = this.target;
         var parentNode = target.parentNode;
         parentNode.appendChild(bar);
-
+        return bar;
     }
 
-    private setUpperBar(barObject:Bar){
+    private setUpperBar(barObject:Bar) : HTMLElement{
         var bar:HTMLElement = barObject.createElement(this);
         bar.style.top  = "0px";
 
         var target:HTMLVideoElement = this.target;
         var parentNode = target.parentNode;
         parentNode.appendChild(bar);
+        return bar;
     }
 
     private setFullscreenLowerBar(barObject:Bar){
