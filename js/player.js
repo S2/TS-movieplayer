@@ -485,7 +485,14 @@ var Player = (function () {
         this.hookEnded(function (player, video) {
             _this.title.feedIn(0, 50);
             _this.control.feedIn(0, 50);
-            _this.seekbar.feedIn(0, 50);
+            if (!_this.createOption.displayAlwaysSeekBar) {
+                _this.seekbar.feedIn(0, 50);
+            } else {
+                if (!displayControll) {
+                    seekbar.style.top = parseInt(seekbar.style.top.replace("px", "")) - _this.control.getHeight() + "px";
+                }
+            }
+            displayControll = true;
         });
         this.setInitialVolume(0);
     }

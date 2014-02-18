@@ -149,7 +149,14 @@ class Player{
         this.hookEnded((player:Player , video:HTMLVideoElement) => {
             this.title.feedIn(0 , 50);
             this.control.feedIn(0 , 50);
-            this.seekbar.feedIn(0 , 50);
+            if(!this.createOption.displayAlwaysSeekBar){
+                this.seekbar.feedIn(0 , 50);
+            }else{
+                if(!displayControll){
+                    seekbar.style.top = parseInt(seekbar.style.top.replace("px" , "")) - this.control.getHeight() + "px";
+                }
+            }
+            displayControll  = true;
         });
         this.setInitialVolume(0);
     }
