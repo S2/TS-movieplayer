@@ -26,7 +26,7 @@ class ControlBar extends Bar{
         newElement.style.opacity = "0.5";
 
         var options : ControlBarOption = this.options;
-        
+
         var buttonFunctions = this.getCreateButtonMethods(player);
         for(var i = 0 ; i < options.displayLeftButtons.length ; i++){
             var functionName = options.displayLeftButtons[i];
@@ -66,7 +66,7 @@ class ControlBar extends Bar{
                 element.className = "play";
                 element.src = "../image/miniButton.svg";
                 element.style.height = this.options.height + "px";
-                this.setEvent(element , "click" , player.togglePlayPause);
+                this.setEvent(element , "click" , ()=> {player.togglePlayPause()});
                 return element;
             },
             'volume'      : () : HTMLElement => {

@@ -31,19 +31,18 @@ class CreateOption{
     viewTitleBar         : Boolean = true;
     viewSeekBar          : Boolean = true;
     displayAlwaysSeekBar : Boolean = true;
-    largePlayButton : string = 'largeButton.svg';
 }
 
 class Player{
     title               :TitleBar;
     control             :ControlBar;
     seekbar             :SeekBar;
+    controls            :Controls;
     width               :number;
     height              :number;
     setHeight           :number = 0;
     target              :HTMLVideoElement;
     targetParent        :HTMLDivElement;
-    largePlayButton     :HTMLImageElement
     isPlaying           :bool = false;
     isPaused            :bool = false;
     isFullScreen        :bool = false;
@@ -75,9 +74,10 @@ class Player{
         this.title = new TitleBar(titleBarOption , this.width);
         this.control = new ControlBar(controlOption , this.width);
         this.seekbar = new SeekBar(seekBarOption , this.width);
-
-        var largePlayButton = this.largePlayButton;
         
+        this.controls = new Controls(this , this.control);
+        this.controls.setCenterPlayButton('../image/largeButton.svg' , 0 , 0);
+
         if(createOption.viewControllBar){
             this.setLowerBar(this.control);
         }
@@ -88,14 +88,6 @@ class Player{
         if(createOption.viewSeekBar){
             seekbar = this.setLowerBar(this.seekbar);
         }
-
-        largePlayButton.addEventListener('click' , () => {
-            this.togglePlayPause();
-        },false);
-
-        largePlayButton.addEventListener('touch' , () => {
-            this.togglePlayPause();
-        },false);
 
         target.addEventListener('click' , () => {
             this.togglePauseRestart();
@@ -112,7 +104,6 @@ class Player{
             this.doMethodArray(this.ended)
             this.isPlaying = false;
             this.isPaused = false
-            this.toggleElement(this.largePlayButton)
         },false);
         
         var displayControll = true;
@@ -230,28 +221,9 @@ class Player{
         target.style.top = "0";
         this.target = target;
 
-        // create large play button
-        
-        var createOption:CreateOption = this.createOption;
-        var largePlayButton = document.createElement('img');
-        largePlayButton.style.position = 'absolute';
-        largePlayButton.className = 'largePlayButton';
-        largePlayButton.src = createOption.imagePath + createOption.largePlayButton;
-        
-        this.setCenterElementPosition(largePlayButton , 0.5);
-        targetParent.appendChild(largePlayButton);
-
-        this.largePlayButton = largePlayButton;
         this.duration = target.duration;
     }
     
-    private setCenterElementPosition(element:HTMLElement , ratio:number){
-        element.style.width = this.width * ratio + "px";
-        element.style.height = element.style.width;
-        element.style.left = (this.width  - this.width * ratio) / 2 + "px";
-        element.style.top  = (this.height - this.width * ratio) / 2 + "px";
-    }
-
     private setFullscreenCenterElementPosition(element:HTMLElement , ratio:number){
         var targetParent:HTMLElement = this.targetParent;
         var width = parseInt(targetParent.style.width.replace('px',''));
@@ -275,7 +247,6 @@ class Player{
     public toggleFullScreen(){
         var targetParent:HTMLElement = this.targetParent
         var target:HTMLVideoElement = this.target
-        var largePlayButton = this.largePlayButton;
         if(this.isFullScreen){
             if (document.exitFullscreen) {
                 document.exitFullscreen();
@@ -287,7 +258,6 @@ class Player{
             target.style.width  = this.width + "px";
             target.style.height = this.height + "px";
             this.isFullScreen = false;
-            this.setCenterElementPosition(largePlayButton , 0.5);
         }else{
             if (targetParent.requestFullscreen) {
                 targetParent.requestFullscreen();
@@ -299,48 +269,57 @@ class Player{
             target.style.width  = '100%';
             target.style.height = '100%';
             this.isFullScreen = true;
-            this.setFullscreenCenterElementPosition(largePlayButton , 0.5);
         }
     }
 
-    beforePlay : Array = [];
+    private beforePlay : Array = [];
     public hookBeforePlay(hookMethod:(player:Player , video:HTMLVideoElement)=>void){
         this.beforePlay.push(hookMethod);
     }
 
-    afterPlay : Array = [];
+    private afterPlay : Array = [];
     public hookAfterPlay(hookMethod:(player:Player , video:HTMLVideoElement)=>void){
         this.afterPlay.push(hookMethod);
     }
 
-    beforePause : Array = [];
+    private beforePause : Array = [];
     public hookBeforePause(hookMethod:(player:Player , video:HTMLVideoElement)=>void){
         this.beforePause.push(hookMethod);
     }
 
-    afterPause : Array = [];
+    private afterPause : Array = [];
     public hookAfterPause(hookMethod:(player:Player , video:HTMLVideoElement)=>void){
         this.afterPause.push(hookMethod);
     }
 
-    beforeRestart : Array = [];
+    private beforeRestart : Array = [];
     public hookBeforeRestart(hookMethod:(player:Player , video:HTMLVideoElement)=>void){
         this.beforeRestart.push(hookMethod);
     }
 
-    afterRestart : Array = [];
+    private afterRestart : Array = [];
     public hookAfterRestart(hookMethod:(player:Player , video:HTMLVideoElement)=>void){
         this.afterRestart.push(hookMethod);
     }
 
-    timeUpdate: Array = [];
+    private timeUpdate: Array = [];
     public hookTimeUpdate(hookMethod:(player:Player , video:HTMLVideoElement)=>void){
         this.timeUpdate.push(hookMethod);
     }
 
-    ended : Array = [];
+    private ended : Array = [];
     public hookEnded(hookMethod:(player:Player , video:HTMLVideoElement)=>void){
         this.ended.push(hookMethod);
+    }
+
+    private fullscreenEnter : Array = [];
+    public hookFullscreenEnter(hookMethod:(player:Player , video:HTMLVideoElement)=>void){
+        this.fullscreenEnter.push(hookMethod);
+    }
+
+    private fullscreenExit : Array = [];
+    public hookFullscreenExit(hookMethod:(player:Player , video:HTMLVideoElement)=>void){
+        this.fullscreenExit.push(hookMethod);
     }
 
     private doMethodArray(methods:Array){
@@ -370,7 +349,6 @@ class Player{
             this.isPlaying = true 
             this.isPaused = false
         }
-        this.toggleElement(this.largePlayButton)
     }
 
     public togglePauseRestart(){
@@ -383,14 +361,12 @@ class Player{
             this.doMethodArray(this.afterRestart)
             this.isPlaying = true 
             this.isPaused = false
-            this.toggleElement(this.largePlayButton)
         }else if(this.isPlaying){
             this.doMethodArray(this.beforePause)
             target.pause()
             this.isPaused = true;
             this.doMethodArray(this.afterPause)
             this.isPlaying = false
-            this.toggleElement(this.largePlayButton)
         }
     }
 

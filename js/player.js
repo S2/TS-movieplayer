@@ -127,7 +127,65 @@ var Controls = (function () {
         this.player = player;
         this.controlBar = controlBar;
     }
+    Controls.prototype.setButtonImage = function (src, top, left) {
+    };
+
+    Controls.prototype.setCenterElementPosition = function (element, ratio) {
+        element.style.width = this.player.width * ratio + "px";
+        element.style.height = element.style.width;
+        element.style.left = (this.player.width - this.player.width * ratio) / 2 + "px";
+        element.style.top = (this.player.height - this.player.width * ratio) / 2 + "px";
+        element.style.zIndex = "10000";
+    };
+
     Controls.prototype.setCenterPlayButton = function (src, top, left) {
+        var _this = this;
+        var centerPlayButton = document.createElement('img');
+        centerPlayButton.style.position = 'absolute';
+        centerPlayButton.className = 'centerPlayButton';
+        centerPlayButton.src = src;
+
+        this.setCenterElementPosition(centerPlayButton, 0.5);
+        var targetParent = this.player.targetParent;
+        targetParent.appendChild(centerPlayButton);
+
+        this.centerPlayButton = centerPlayButton;
+
+        centerPlayButton.addEventListener('click', function () {
+            _this.player.togglePlayPause();
+        }, false);
+
+        centerPlayButton.addEventListener('touch', function () {
+            _this.player.togglePlayPause();
+        }, false);
+
+        this.player.hookFullscreenEnter(function () {
+            _this.setCenterElementPosition(centerPlayButton, 0.5);
+        });
+
+        this.player.hookFullscreenExit(function () {
+            _this.setCenterElementPosition(centerPlayButton, 0.5);
+        });
+
+        var style = this.centerPlayButton.style;
+
+        this.player.hookAfterRestart(function () {
+            style.visibility = "hidden";
+            style.display = "none";
+        });
+        this.player.hookAfterPlay(function () {
+            style.visibility = "hidden";
+            style.display = "none";
+        });
+
+        this.player.hookAfterPause(function () {
+            style.visibility = "visible";
+            style.display = "block";
+        });
+        this.player.hookEnded(function () {
+            style.visibility = "visible";
+            style.display = "block";
+        });
     };
 
     Controls.prototype.setPlayButton = function (src, top, left) {
@@ -339,7 +397,9 @@ var ControlBar = (function (_super) {
                 element.className = "play";
                 element.src = "../image/miniButton.svg";
                 element.style.height = _this.options.height + "px";
-                _this.setEvent(element, "click", player.togglePlayPause);
+                _this.setEvent(element, "click", function () {
+                    player.togglePlayPause();
+                });
                 return element;
             },
             'volume': function () {
@@ -400,7 +460,6 @@ var CreateOption = (function () {
         this.viewTitleBar = true;
         this.viewSeekBar = true;
         this.displayAlwaysSeekBar = true;
-        this.largePlayButton = 'largeButton.svg';
     }
     return CreateOption;
 })();
@@ -430,6 +489,8 @@ var Player = (function () {
         this.afterRestart = [];
         this.timeUpdate = [];
         this.ended = [];
+        this.fullscreenEnter = [];
+        this.fullscreenExit = [];
         this.target = target;
         this.createOption = createOption;
         this.getEnvironment();
@@ -441,7 +502,8 @@ var Player = (function () {
         this.control = new ControlBar(controlOption, this.width);
         this.seekbar = new SeekBar(seekBarOption, this.width);
 
-        var largePlayButton = this.largePlayButton;
+        this.controls = new Controls(this, this.control);
+        this.controls.setCenterPlayButton('../image/largeButton.svg', 0, 0);
 
         if (createOption.viewControllBar) {
             this.setLowerBar(this.control);
@@ -453,14 +515,6 @@ var Player = (function () {
         if (createOption.viewSeekBar) {
             seekbar = this.setLowerBar(this.seekbar);
         }
-
-        largePlayButton.addEventListener('click', function () {
-            _this.togglePlayPause();
-        }, false);
-
-        largePlayButton.addEventListener('touch', function () {
-            _this.togglePlayPause();
-        }, false);
 
         target.addEventListener('click', function () {
             _this.togglePauseRestart();
@@ -477,7 +531,6 @@ var Player = (function () {
             _this.doMethodArray(_this.ended);
             _this.isPlaying = false;
             _this.isPaused = false;
-            _this.toggleElement(_this.largePlayButton);
         }, false);
 
         var displayControll = true;
@@ -593,24 +646,7 @@ var Player = (function () {
         target.style.top = "0";
         this.target = target;
 
-        var createOption = this.createOption;
-        var largePlayButton = document.createElement('img');
-        largePlayButton.style.position = 'absolute';
-        largePlayButton.className = 'largePlayButton';
-        largePlayButton.src = createOption.imagePath + createOption.largePlayButton;
-
-        this.setCenterElementPosition(largePlayButton, 0.5);
-        targetParent.appendChild(largePlayButton);
-
-        this.largePlayButton = largePlayButton;
         this.duration = target.duration;
-    };
-
-    Player.prototype.setCenterElementPosition = function (element, ratio) {
-        element.style.width = this.width * ratio + "px";
-        element.style.height = element.style.width;
-        element.style.left = (this.width - this.width * ratio) / 2 + "px";
-        element.style.top = (this.height - this.width * ratio) / 2 + "px";
     };
 
     Player.prototype.setFullscreenCenterElementPosition = function (element, ratio) {
@@ -636,7 +672,6 @@ var Player = (function () {
     Player.prototype.toggleFullScreen = function () {
         var targetParent = this.targetParent;
         var target = this.target;
-        var largePlayButton = this.largePlayButton;
         if (this.isFullScreen) {
             if (document.exitFullscreen) {
                 document.exitFullscreen();
@@ -648,7 +683,6 @@ var Player = (function () {
             target.style.width = this.width + "px";
             target.style.height = this.height + "px";
             this.isFullScreen = false;
-            this.setCenterElementPosition(largePlayButton, 0.5);
         } else {
             if (targetParent.requestFullscreen) {
                 targetParent.requestFullscreen();
@@ -660,7 +694,6 @@ var Player = (function () {
             target.style.width = '100%';
             target.style.height = '100%';
             this.isFullScreen = true;
-            this.setFullscreenCenterElementPosition(largePlayButton, 0.5);
         }
     };
 
@@ -696,6 +729,14 @@ var Player = (function () {
         this.ended.push(hookMethod);
     };
 
+    Player.prototype.hookFullscreenEnter = function (hookMethod) {
+        this.fullscreenEnter.push(hookMethod);
+    };
+
+    Player.prototype.hookFullscreenExit = function (hookMethod) {
+        this.fullscreenExit.push(hookMethod);
+    };
+
     Player.prototype.doMethodArray = function (methods) {
         for (var i = 0; i < methods.length; i++) {
             methods[i](this, this.target);
@@ -723,7 +764,6 @@ var Player = (function () {
             this.isPlaying = true;
             this.isPaused = false;
         }
-        this.toggleElement(this.largePlayButton);
     };
 
     Player.prototype.togglePauseRestart = function () {
@@ -736,14 +776,12 @@ var Player = (function () {
             this.doMethodArray(this.afterRestart);
             this.isPlaying = true;
             this.isPaused = false;
-            this.toggleElement(this.largePlayButton);
         } else if (this.isPlaying) {
             this.doMethodArray(this.beforePause);
             target.pause();
             this.isPaused = true;
             this.doMethodArray(this.afterPause);
             this.isPlaying = false;
-            this.toggleElement(this.largePlayButton);
         }
     };
 
