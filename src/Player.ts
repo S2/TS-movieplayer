@@ -23,14 +23,14 @@ interface HTMLDocument{
 }
 
 class CreateOption{
-    width                : number;
-    height               : number;
-    movieSrcURL          : number;
-    imagePath            : string = '../image/';
-    viewControllBar      : Boolean = true;
-    viewTitleBar         : Boolean = true;
-    viewSeekBar          : Boolean = true;
-    displayAlwaysSeekBar : Boolean = true;
+    width                :  number;
+    height               :  number;
+    movieSrcURL          :  number;
+    imagePath            :  string = '../image/';
+    viewControllBar      :  Boolean = true;
+    viewTitleBar         :  Boolean = true;
+    viewSeekBar          :  Boolean = true;
+    displayAlwaysSeekBar :  Boolean = true;
 }
 
 class Player{
@@ -86,9 +86,16 @@ class Player{
             seekbar = this.setLowerBar(this.seekbar);
         }
         this.controls = new Controls(this , this.control);
-        this.controls.setCenterPlayButton('../image/largeButton.svg' , 240 , 240 , 30 , 30 , 80 , 80);
-        this.controls.setPlayButton('../image/miniButton.svg' , '../image/miniButtonPause.svg' , 30 , 30 , 100 , 100, 0 , 0 , 0 , 0);
-        this.controls.setFullscreenButton('../image/miniButtonPause.svg' , 30 , 30 , 0 , 0 , 100 , 100);
+
+        var centerButtonOption = new ButtonOption('../image/largeButton.svg' , 240 , 240 , 30 , 30 , 80 , 80);
+        this.controls.setCenterPlayButton(centerButtonOption);
+
+        var playButtonOption = new ButtonOption('../image/miniButton.svg'      , 30 , 30 , 0 , 0 , 100 , 100);
+        var pauseButtonOption = new ButtonOption('../image/miniButtonPause.svg' , 30 , 30 , 0 , 0 , 100 , 100);
+        this.controls.setPlayButton(playButtonOption , pauseButtonOption );
+
+        var fullscreenButtonOption = new ButtonOption('../image/miniButtonPause.svg' , 30 , 30 , 0 , 0 , 100 , 100);
+        this.controls.setFullscreenButton(fullscreenButtonOption);
 
         target.addEventListener('click' , () => {
             this.togglePauseRestart();

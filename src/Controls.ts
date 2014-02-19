@@ -2,6 +2,25 @@
 /// <reference path="Player.ts" />
 /// <reference path="Bar.ts" />
 
+class ButtonOption{
+    src         :  string;
+    width       :  number;
+    height      :  number;
+    top         :  number;
+    left        :  number;
+    scaleWidth  :  number;
+    scaleHeight :  number;
+    constructor(src , width , height , top , left , scaleWidth , scaleHeight){
+        this.src         = src
+        this.width       = width
+        this.height      = height
+        this.top         = top
+        this.left        = left
+        this.scaleWidth  = scaleWidth
+        this.scaleHeight = scaleHeight
+    }
+}
+
 class Controls{
     player : Player;
     controlBar : Bar;
@@ -11,15 +30,15 @@ class Controls{
         this.controlBar = controlBar;
     }
     
-    private createButton(src : string , width : number , height : number , top : number , left : number , scaleWidth : number , scaleHeight : number):HTMLDivElement{
+    private createButton(buttonOption : ButtonOption):HTMLDivElement{
         var button: HTMLDivElement = document.createElement('div');
         var style = button.style;
-        style.width               = width + "px";
-        style.height              = height + "px";
-        style.backgroundImage     = "url('" + src + "')";
+        style.width               = buttonOption.width + "px";
+        style.height              = buttonOption.height + "px";
+        style.backgroundImage     = "url('" + buttonOption.src + "')";
         style.backgroundRepeat    =  "no-repeat";
-        style.backgroundPosition  = top + "px " + left + "px";
-        style.backgroundSize      = scaleWidth + "% " + scaleHeight + "%";
+        style.backgroundPosition  = buttonOption.top + "px " + buttonOption.left + "px";
+        style.backgroundSize      = buttonOption.scaleWidth + "% " + buttonOption.scaleHeight + "%";
         style.zIndex              = (<ControlBar>this.controlBar).getZIndex() + 1 + "";
         return button;
     }
@@ -36,13 +55,13 @@ class Controls{
         @param scaleHeight  {number} background image view ratio
         @return void
     */
-    public setCenterPlayButton(src : string , width : number , height : number , top : number , left : number , scaleWidth : number , scaleHeight : number):void{
-        var centerPlayButton : HTMLDivElement = this.createButton(src , width , height , top , left , scaleWidth , scaleHeight )
+    public setCenterPlayButton(buttonOption : ButtonOption):void{
+        var centerPlayButton : HTMLDivElement = this.createButton(buttonOption)
         centerPlayButton.className = 'centerPlayButton';
         var style = centerPlayButton.style;
         style.position = 'absolute';
-        style.left = (this.player.width  - width) / 2 + "px";
-        style.top  = (this.player.height - height) / 2 + "px";
+        style.left = (this.player.width  - buttonOption.width) / 2 + "px";
+        style.top  = (this.player.height - buttonOption.height) / 2 + "px";
         
         var targetParent:HTMLDivElement = this.player.targetParent;
         targetParent.appendChild(centerPlayButton);
@@ -78,14 +97,14 @@ class Controls{
         });
     }
  
-    private modifyButton(button:HTMLDivElement , src : string , width : number , height : number , top : number , left : number , scaleWidth : number , scaleHeight : number):void{
+    private modifyButton(button:HTMLDivElement , buttonOption : ButtonOption):void{
         var style = button.style;
-        style.width               = width + "px";
-        style.height              = height + "px";
-        style.backgroundImage     = "url('" + src + "')";
+        style.width               = buttonOption.width + "px";
+        style.height              = buttonOption.height + "px";
+        style.backgroundImage     = "url('" + buttonOption.src + "')";
         style.backgroundRepeat    =  "no-repeat";
-        style.backgroundPosition  = top + "px " + left + "px";
-        style.backgroundSize      = scaleWidth + "% " + scaleHeight + "%";
+        style.backgroundPosition  = buttonOption.top + "px " + buttonOption.left + "px";
+        style.backgroundSize      = buttonOption.scaleWidth + "% " + buttonOption.scaleHeight + "%";
     }
 
     /**
@@ -95,30 +114,27 @@ class Controls{
         @param {} 
         @return void
     */
-    public setPlayButton(
-            playSrc : string , 
-            pauseSrc : string , 
-            width : number , height : number , scaleWidth : number , scaleHeight : number , playTop : number , playLeft : number , pauseTop : number , pauseLeft : number):void{
-
-        var playPauseButton  : HTMLDivElement = this.createButton(pauseSrc  , width , height , pauseTop  , pauseLeft  , scaleWidth , scaleHeight )
+    public setPlayButton(playButtonOption : ButtonOption , pauseButtonOption : ButtonOption){
+        var playPauseButton  : HTMLDivElement = this.createButton(pauseButtonOption)
         playPauseButton.className = 'controllButtonLeft playPauseButton';
         this.controlBar.getElement().appendChild(playPauseButton);
         
         // play
         this.player.hookAfterRestart(() => {
-            this.modifyButton(playPauseButton , playSrc  , width , height , playTop  , playLeft  , scaleWidth , scaleHeight)
+            this.modifyButton(playPauseButton , pauseButtonOption)
         });
         this.player.hookAfterPlay(() => {
-            this.modifyButton(playPauseButton , playSrc  , width , height , playTop  , playLeft  , scaleWidth , scaleHeight)
+            this.modifyButton(playPauseButton , pauseButtonOption)
         });
 
         // pause/end 
         this.player.hookAfterPause(() => {
-            this.modifyButton(playPauseButton , pauseSrc  , width , height , pauseTop  , pauseLeft  , scaleWidth , scaleHeight)
+            this.modifyButton(playPauseButton , playButtonOption)
         });
         this.player.hookEnded(() => {
-            this.modifyButton(playPauseButton , pauseSrc  , width , height , pauseTop  , pauseLeft  , scaleWidth , scaleHeight)
+            this.modifyButton(playPauseButton , playButtonOption)
         });
+
         playPauseButton.addEventListener('click' , () => {
             this.player.togglePlayPause();
         },false);
@@ -134,8 +150,8 @@ class Controls{
         @param {} 
         @return void
     */
-    public setFullscreenButton(src : string , width : number , height : number , top : number , left : number , scaleWidth : number , scaleHeight : number):void{
-        var fullscreenButton  : HTMLDivElement = this.createButton(src  , width , height , top  , left  , scaleWidth , scaleHeight )
+    public setFullscreenButton(buttonOption : ButtonOption):void{
+        var fullscreenButton  : HTMLDivElement = this.createButton(buttonOption)
         fullscreenButton.className = 'controllButtonRight playPauseButton';
         this.controlBar.getElement().appendChild(fullscreenButton);
     }
