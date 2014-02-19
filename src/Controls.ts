@@ -76,7 +76,17 @@ class Controls{
             style.display    = "block";
         });
     }
-    
+ 
+    private modifyButton(button:HTMLDivElement , src : string , width : number , height : number , top : number , left : number , scaleWidth : number , scaleHeight : number):void{
+        var style = button.style;
+        style.width               = width + "px";
+        style.height              = height + "px";
+        style.backgroundImage     = "url('" + src + "')";
+        style.backgroundRepeat    =  "no-repeat";
+        style.backgroundPosition  = top + "px " + left + "px";
+        style.backgroundSize      = scaleWidth + "% " + scaleHeight + "%";
+    }
+
     /**
         <br>
         
@@ -84,11 +94,31 @@ class Controls{
         @param {} 
         @return void
     */
-    public setPlayButton(src : string , width : number , height : number , top : number , left : number , scaleWidth : number , scaleHeight : number):void{
-        var playButton : HTMLDivElement = this.createButton(src , width , height , top , left , scaleWidth , scaleHeight )
-        playButton .className = 'playButton';
-        var style = playButton.style;
-        this.controlBar.getElement().appendChild(playButton);
+    public setPlayButton(
+            playSrc : string , 
+            pauseSrc : string , 
+            width : number , height : number , scaleWidth : number , scaleHeight : number , playTop : number , playLeft : number , pauseTop : number , pauseLeft : number):void{
+
+        var playPauseButton  : HTMLDivElement = this.createButton(pauseSrc  , width , height , pauseTop  , pauseLeft  , scaleWidth , scaleHeight )
+        playPauseButton .className = 'playPauseButton';
+        var style = playPauseButton.style;
+        this.controlBar.getElement().appendChild(playPauseButton);
+        
+        // play
+        this.player.hookAfterRestart(() => {
+            this.modifyButton(playPauseButton , playSrc  , width , height , playTop  , playLeft  , scaleWidth , scaleHeight)
+        });
+        this.player.hookAfterPlay(() => {
+            this.modifyButton(playPauseButton , playSrc  , width , height , playTop  , playLeft  , scaleWidth , scaleHeight)
+        });
+
+        // pause/end 
+        this.player.hookAfterPause(() => {
+            this.modifyButton(playPauseButton , pauseSrc  , width , height , pauseTop  , pauseLeft  , scaleWidth , scaleHeight)
+        });
+        this.player.hookEnded(() => {
+            this.modifyButton(playPauseButton , pauseSrc  , width , height , pauseTop  , pauseLeft  , scaleWidth , scaleHeight)
+        });
     }
 
     /**

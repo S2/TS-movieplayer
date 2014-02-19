@@ -126,94 +126,6 @@ var Bar = (function () {
     };
     return Bar;
 })();
-var Controls = (function () {
-    function Controls(player, controlBar) {
-        this.player = player;
-        this.controlBar = controlBar;
-    }
-    Controls.prototype.createButton = function (src, width, height, top, left, scaleWidth, scaleHeight) {
-        var button = document.createElement('div');
-        var style = button.style;
-        style.width = width + "px";
-        style.height = height + "px";
-        style.backgroundImage = "url('" + src + "')";
-        style.backgroundRepeat = "no-repeat";
-        style.backgroundPosition = top + "px " + left + "px";
-        style.backgroundSize = scaleWidth + "% " + scaleHeight + "%";
-        return button;
-    };
-
-    Controls.prototype.setCenterPlayButton = function (src, width, height, top, left, scaleWidth, scaleHeight) {
-        var _this = this;
-        var centerPlayButton = this.createButton(src, width, height, top, left, scaleWidth, scaleHeight);
-        centerPlayButton.className = 'centerPlayButton';
-        var style = centerPlayButton.style;
-        style.position = 'absolute';
-        style.left = (this.player.width - width) / 2 + "px";
-        style.top = (this.player.height - height) / 2 + "px";
-
-        var targetParent = this.player.targetParent;
-        targetParent.appendChild(centerPlayButton);
-
-        this.centerPlayButton = centerPlayButton;
-
-        centerPlayButton.addEventListener('click', function () {
-            _this.player.togglePlayPause();
-        }, false);
-
-        centerPlayButton.addEventListener('touch', function () {
-            _this.player.togglePlayPause();
-        }, false);
-
-        this.player.hookAfterRestart(function () {
-            style.visibility = "hidden";
-            style.display = "none";
-        });
-        this.player.hookAfterPlay(function () {
-            style.visibility = "hidden";
-            style.display = "none";
-        });
-
-        this.player.hookAfterPause(function () {
-            style.visibility = "visible";
-            style.display = "block";
-        });
-        this.player.hookEnded(function () {
-            style.visibility = "visible";
-            style.display = "block";
-        });
-    };
-
-    Controls.prototype.setPlayButton = function (src, width, height, top, left, scaleWidth, scaleHeight) {
-        var playButton = this.createButton(src, width, height, top, left, scaleWidth, scaleHeight);
-        playButton.className = 'playButton';
-        var style = playButton.style;
-        this.controlBar.getElement().appendChild(playButton);
-    };
-
-    Controls.prototype.setPauseButton = function (src, width, height, top, left, scaleWidth, scaleHeight) {
-        var pauseButton = this.createButton(src, width, height, top, left, scaleWidth, scaleHeight);
-        pauseButton.className = 'pauseButton';
-        var style = pauseButton.style;
-        this.controlBar.getElement().appendChild(pauseButton);
-    };
-
-    Controls.prototype.setFullscreenButton = function (src, width, height, top, left, scaleWidth, scaleHeight) {
-    };
-
-    Controls.prototype.setVolumeButton = function (src, width, height, top, left, scaleWidth, scaleHeight) {
-    };
-
-    Controls.prototype.setVolumeBar = function (src, width, height, top, left, scaleWidth, scaleHeight) {
-    };
-
-    Controls.prototype.setVolumeBackground = function (src, width, height, top, left, scaleWidth, scaleHeight) {
-    };
-
-    Controls.prototype.setControlBackground = function (src, width, height, top, left, scaleWidth, scaleHeight) {
-    };
-    return Controls;
-})();
 var TitleBarOption = (function () {
     function TitleBarOption() {
         this.height = 40;
@@ -432,7 +344,7 @@ var Player = (function () {
         }
         this.controls = new Controls(this, this.control);
         this.controls.setCenterPlayButton('../image/largeButton.svg', 240, 240, 30, 30, 80, 80);
-        this.controls.setPlayButton('../image/miniButton.svg', 50, 50, 0, 0, 100, 100);
+        this.controls.setPlayButton('../image/miniButton.svg', '../image/miniButtonPause.svg', 50, 50, 100, 100, 0, 0, 0, 0);
 
         target.addEventListener('click', function () {
             _this.togglePauseRestart();
@@ -748,4 +660,117 @@ var Player = (function () {
         bar.style.top = (screenHeight - height) + "px";
     };
     return Player;
+})();
+var Controls = (function () {
+    function Controls(player, controlBar) {
+        this.player = player;
+        this.controlBar = controlBar;
+    }
+    Controls.prototype.createButton = function (src, width, height, top, left, scaleWidth, scaleHeight) {
+        var button = document.createElement('div');
+        var style = button.style;
+        style.width = width + "px";
+        style.height = height + "px";
+        style.backgroundImage = "url('" + src + "')";
+        style.backgroundRepeat = "no-repeat";
+        style.backgroundPosition = top + "px " + left + "px";
+        style.backgroundSize = scaleWidth + "% " + scaleHeight + "%";
+        return button;
+    };
+
+    Controls.prototype.setCenterPlayButton = function (src, width, height, top, left, scaleWidth, scaleHeight) {
+        var _this = this;
+        var centerPlayButton = this.createButton(src, width, height, top, left, scaleWidth, scaleHeight);
+        centerPlayButton.className = 'centerPlayButton';
+        var style = centerPlayButton.style;
+        style.position = 'absolute';
+        style.left = (this.player.width - width) / 2 + "px";
+        style.top = (this.player.height - height) / 2 + "px";
+
+        var targetParent = this.player.targetParent;
+        targetParent.appendChild(centerPlayButton);
+
+        this.centerPlayButton = centerPlayButton;
+
+        centerPlayButton.addEventListener('click', function () {
+            _this.player.togglePlayPause();
+        }, false);
+
+        centerPlayButton.addEventListener('touch', function () {
+            _this.player.togglePlayPause();
+        }, false);
+
+        this.player.hookAfterRestart(function () {
+            style.visibility = "hidden";
+            style.display = "none";
+        });
+        this.player.hookAfterPlay(function () {
+            style.visibility = "hidden";
+            style.display = "none";
+        });
+
+        this.player.hookAfterPause(function () {
+            style.visibility = "visible";
+            style.display = "block";
+        });
+        this.player.hookEnded(function () {
+            style.visibility = "visible";
+            style.display = "block";
+        });
+    };
+
+    Controls.prototype.modifyButton = function (button, src, width, height, top, left, scaleWidth, scaleHeight) {
+        var style = button.style;
+        style.width = width + "px";
+        style.height = height + "px";
+        style.backgroundImage = "url('" + src + "')";
+        style.backgroundRepeat = "no-repeat";
+        style.backgroundPosition = top + "px " + left + "px";
+        style.backgroundSize = scaleWidth + "% " + scaleHeight + "%";
+    };
+
+    Controls.prototype.setPlayButton = function (playSrc, pauseSrc, width, height, scaleWidth, scaleHeight, playTop, playLeft, pauseTop, pauseLeft) {
+        var _this = this;
+        var playPauseButton = this.createButton(pauseSrc, width, height, pauseTop, pauseLeft, scaleWidth, scaleHeight);
+        playPauseButton.className = 'playPauseButton';
+        var style = playPauseButton.style;
+        this.controlBar.getElement().appendChild(playPauseButton);
+
+        this.player.hookAfterRestart(function () {
+            _this.modifyButton(playPauseButton, playSrc, width, height, playTop, playLeft, scaleWidth, scaleHeight);
+        });
+        this.player.hookAfterPlay(function () {
+            _this.modifyButton(playPauseButton, playSrc, width, height, playTop, playLeft, scaleWidth, scaleHeight);
+        });
+
+        this.player.hookAfterPause(function () {
+            _this.modifyButton(playPauseButton, pauseSrc, width, height, pauseTop, pauseLeft, scaleWidth, scaleHeight);
+        });
+        this.player.hookEnded(function () {
+            _this.modifyButton(playPauseButton, pauseSrc, width, height, pauseTop, pauseLeft, scaleWidth, scaleHeight);
+        });
+    };
+
+    Controls.prototype.setPauseButton = function (src, width, height, top, left, scaleWidth, scaleHeight) {
+        var pauseButton = this.createButton(src, width, height, top, left, scaleWidth, scaleHeight);
+        pauseButton.className = 'pauseButton';
+        var style = pauseButton.style;
+        this.controlBar.getElement().appendChild(pauseButton);
+    };
+
+    Controls.prototype.setFullscreenButton = function (src, width, height, top, left, scaleWidth, scaleHeight) {
+    };
+
+    Controls.prototype.setVolumeButton = function (src, width, height, top, left, scaleWidth, scaleHeight) {
+    };
+
+    Controls.prototype.setVolumeBar = function (src, width, height, top, left, scaleWidth, scaleHeight) {
+    };
+
+    Controls.prototype.setVolumeBackground = function (src, width, height, top, left, scaleWidth, scaleHeight) {
+    };
+
+    Controls.prototype.setControlBackground = function (src, width, height, top, left, scaleWidth, scaleHeight) {
+    };
+    return Controls;
 })();

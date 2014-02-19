@@ -87,7 +87,7 @@ class Player{
         }
         this.controls = new Controls(this , this.control);
         this.controls.setCenterPlayButton('../image/largeButton.svg' , 240 , 240 , 30 , 30 , 80 , 80);
-        this.controls.setPlayButton('../image/miniButton.svg' , 50 , 50 , 0 , 0 , 100 , 100);
+        this.controls.setPlayButton('../image/miniButton.svg' , '../image/miniButtonPause.svg' , 50 , 50 , 100 , 100, 0 , 0 , 0 , 0);
 
         target.addEventListener('click' , () => {
             this.togglePauseRestart();

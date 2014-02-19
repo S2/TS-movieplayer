@@ -1,0 +1,9 @@
+<svg height="50" id="largePlayButton" width="50" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <circle cx="25" cy="25" fill="red" r="25" stroke="black" />
+  <polyline fill="pink" points="15,11 15,35 39,25 " stroke="black" />
+  <!-- 
+	Generated using the Perl SVG Module V2.59
+	by Ronan Oger
+	Info: http://www.roitsystems.com/
+ -->
+</svg>
