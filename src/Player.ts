@@ -76,7 +76,7 @@ class Player{
         this.seekbar = new SeekBar(seekBarOption , this.width);
         
         this.controls = new Controls(this , this.control);
-        this.controls.setCenterPlayButton('../image/largeButton.svg' , 0 , 0);
+        this.controls.setCenterPlayButton('../image/largeButton.svg' , 240 , 240 , 30 , 30 , 80 , 80);
 
         if(createOption.viewControllBar){
             this.setLowerBar(this.control);

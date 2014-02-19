@@ -5,7 +5,7 @@
 class Controls{
     player : Player;
     controlBar : Bar;
-    centerPlayButton     :HTMLImageElement
+    centerPlayButton     :HTMLDivElement
     constructor(player : Player , controlBar : Bar){
         this.player = player;
         this.controlBar = controlBar;
@@ -14,28 +14,35 @@ class Controls{
     private setButtonImage(src : string , top : number , left : number){
     }
 
-    private setCenterElementPosition(element:HTMLElement , ratio:number){
-        element.style.width = this.player.width * ratio + "px";
-        element.style.height = element.style.width;
-        element.style.left = (this.player.width  - this.player.width * ratio) / 2 + "px";
-        element.style.top  = (this.player.height - this.player.width * ratio) / 2 + "px";
-        element.style.zIndex = "10000";
-    }
-
     /**
         <br>
         
         @method setCenterPlayButton 
-        @param {} 
+        @param width        {number} image element Width
+        @param height       {number} image element Height
+        @param top          {number} image element view area start top  for CSS Sprite
+        @param left         {number} image element view area start left for CSS Sprite
+        @param scaleWidth   {number} background image view ratio
+        @param scaleHeight  {number} background image view ratio
         @return void
     */
-    public setCenterPlayButton(src : string , top : number , left : number):void{
-        var centerPlayButton = document.createElement('img');
-        centerPlayButton.style.position = 'absolute';
+    public setCenterPlayButton(src : string , width : number , height : number , top : number , left : number , scaleWidth : number , scaleHeight : number):void{
+        //top *= -1
+        //left *= -1
+
+        var centerPlayButton = document.createElement('div');
+        var style = centerPlayButton.style;
         centerPlayButton.className = 'centerPlayButton';
-        centerPlayButton.src = src;
+        style.position            = 'absolute';
+        style.width               = width + "px";
+        style.height              = height + "px";
+        style.backgroundImage     = "url('" + src + "')";
+        style.backgroundRepeat    =  "no-repeat";
+        style.backgroundPosition  = top + "px " + left + "px";
+        style.backgroundSize      = scaleWidth + "% " + scaleHeight + "%";
+        style.left = (this.player.width  - width) / 2 + "px";
+        style.top  = (this.player.height - height) / 2 + "px";
         
-        this.setCenterElementPosition(centerPlayButton , 0.5);
         var targetParent:HTMLDivElement = this.player.targetParent;
         targetParent.appendChild(centerPlayButton);
 
@@ -50,11 +57,9 @@ class Controls{
         },false);
 
         this.player.hookFullscreenEnter(() => {
-            this.setCenterElementPosition(centerPlayButton , 0.5);
         });
 
         this.player.hookFullscreenExit(() => {
-            this.setCenterElementPosition(centerPlayButton , 0.5);
         });
         
         var style= this.centerPlayButton.style;

@@ -130,22 +130,21 @@ var Controls = (function () {
     Controls.prototype.setButtonImage = function (src, top, left) {
     };
 
-    Controls.prototype.setCenterElementPosition = function (element, ratio) {
-        element.style.width = this.player.width * ratio + "px";
-        element.style.height = element.style.width;
-        element.style.left = (this.player.width - this.player.width * ratio) / 2 + "px";
-        element.style.top = (this.player.height - this.player.width * ratio) / 2 + "px";
-        element.style.zIndex = "10000";
-    };
-
-    Controls.prototype.setCenterPlayButton = function (src, top, left) {
+    Controls.prototype.setCenterPlayButton = function (src, width, height, top, left, scaleWidth, scaleHeight) {
         var _this = this;
-        var centerPlayButton = document.createElement('img');
-        centerPlayButton.style.position = 'absolute';
+        var centerPlayButton = document.createElement('div');
+        var style = centerPlayButton.style;
         centerPlayButton.className = 'centerPlayButton';
-        centerPlayButton.src = src;
+        style.position = 'absolute';
+        style.width = width + "px";
+        style.height = height + "px";
+        style.backgroundImage = "url('" + src + "')";
+        style.backgroundRepeat = "no-repeat";
+        style.backgroundPosition = top + "px " + left + "px";
+        style.backgroundSize = scaleWidth + "% " + scaleHeight + "%";
+        style.left = (this.player.width - width) / 2 + "px";
+        style.top = (this.player.height - height) / 2 + "px";
 
-        this.setCenterElementPosition(centerPlayButton, 0.5);
         var targetParent = this.player.targetParent;
         targetParent.appendChild(centerPlayButton);
 
@@ -160,11 +159,9 @@ var Controls = (function () {
         }, false);
 
         this.player.hookFullscreenEnter(function () {
-            _this.setCenterElementPosition(centerPlayButton, 0.5);
         });
 
         this.player.hookFullscreenExit(function () {
-            _this.setCenterElementPosition(centerPlayButton, 0.5);
         });
 
         var style = this.centerPlayButton.style;
@@ -503,7 +500,7 @@ var Player = (function () {
         this.seekbar = new SeekBar(seekBarOption, this.width);
 
         this.controls = new Controls(this, this.control);
-        this.controls.setCenterPlayButton('../image/largeButton.svg', 0, 0);
+        this.controls.setCenterPlayButton('../image/largeButton.svg', 240, 240, 30, 30, 80, 80);
 
         if (createOption.viewControllBar) {
             this.setLowerBar(this.control);
