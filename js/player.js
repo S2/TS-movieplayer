@@ -345,6 +345,7 @@ var Player = (function () {
         this.controls = new Controls(this, this.control);
         this.controls.setCenterPlayButton('../image/largeButton.svg', 240, 240, 30, 30, 80, 80);
         this.controls.setPlayButton('../image/miniButton.svg', '../image/miniButtonPause.svg', 50, 50, 100, 100, 0, 0, 0, 0);
+        this.controls.setFullscreenButton('../image/largeButton.svg', 50, 50, 0, 0, 100, 100);
 
         target.addEventListener('click', function () {
             _this.togglePauseRestart();
@@ -733,7 +734,6 @@ var Controls = (function () {
         var _this = this;
         var playPauseButton = this.createButton(pauseSrc, width, height, pauseTop, pauseLeft, scaleWidth, scaleHeight);
         playPauseButton.className = 'playPauseButton';
-        var style = playPauseButton.style;
         this.controlBar.getElement().appendChild(playPauseButton);
 
         this.player.hookAfterRestart(function () {
@@ -749,16 +749,19 @@ var Controls = (function () {
         this.player.hookEnded(function () {
             _this.modifyButton(playPauseButton, pauseSrc, width, height, pauseTop, pauseLeft, scaleWidth, scaleHeight);
         });
-    };
-
-    Controls.prototype.setPauseButton = function (src, width, height, top, left, scaleWidth, scaleHeight) {
-        var pauseButton = this.createButton(src, width, height, top, left, scaleWidth, scaleHeight);
-        pauseButton.className = 'pauseButton';
-        var style = pauseButton.style;
-        this.controlBar.getElement().appendChild(pauseButton);
+        playPauseButton.addEventListener('click', function () {
+            _this.player.togglePlayPause();
+        }, false);
+        playPauseButton.addEventListener('touch', function () {
+            _this.player.togglePlayPause();
+        }, false);
     };
 
     Controls.prototype.setFullscreenButton = function (src, width, height, top, left, scaleWidth, scaleHeight) {
+        var fullscreenButton = this.createButton(src, width, height, top, left, scaleWidth, scaleHeight);
+        fullscreenButton.className = 'playPauseButton';
+        fullscreenButton.style.styleFloat = "right";
+        this.controlBar.getElement().appendChild(fullscreenButton);
     };
 
     Controls.prototype.setVolumeButton = function (src, width, height, top, left, scaleWidth, scaleHeight) {

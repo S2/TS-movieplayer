@@ -100,8 +100,7 @@ class Controls{
             width : number , height : number , scaleWidth : number , scaleHeight : number , playTop : number , playLeft : number , pauseTop : number , pauseLeft : number):void{
 
         var playPauseButton  : HTMLDivElement = this.createButton(pauseSrc  , width , height , pauseTop  , pauseLeft  , scaleWidth , scaleHeight )
-        playPauseButton .className = 'playPauseButton';
-        var style = playPauseButton.style;
+        playPauseButton.className = 'playPauseButton';
         this.controlBar.getElement().appendChild(playPauseButton);
         
         // play
@@ -119,20 +118,12 @@ class Controls{
         this.player.hookEnded(() => {
             this.modifyButton(playPauseButton , pauseSrc  , width , height , pauseTop  , pauseLeft  , scaleWidth , scaleHeight)
         });
-    }
-
-    /**
-        <br>
-        
-        @method setPauseButton 
-        @param {} 
-        @return void
-    */
-    public setPauseButton(src : string , width : number , height : number , top : number , left : number , scaleWidth : number , scaleHeight : number):void{
-        var pauseButton : HTMLDivElement = this.createButton(src , width , height , top , left , scaleWidth , scaleHeight )
-        pauseButton .className = 'pauseButton';
-        var style = pauseButton.style;
-        this.controlBar.getElement().appendChild(pauseButton);
+        playPauseButton.addEventListener('click' , () => {
+            this.player.togglePlayPause();
+        },false);
+        playPauseButton.addEventListener('touch' , () => {
+            this.player.togglePlayPause();
+        },false);
     }
 
     /**
@@ -143,6 +134,10 @@ class Controls{
         @return void
     */
     public setFullscreenButton(src : string , width : number , height : number , top : number , left : number , scaleWidth : number , scaleHeight : number):void{
+        var fullscreenButton  : HTMLDivElement = this.createButton(src  , width , height , top  , left  , scaleWidth , scaleHeight )
+        fullscreenButton.className = 'playPauseButton';
+        fullscreenButton.style.styleFloat = "right";
+        this.controlBar.getElement().appendChild(fullscreenButton);
     }
     
     /**
