@@ -94,6 +94,10 @@ class Player{
         var pauseButtonOption = new ButtonOption('../image/miniButtonPause.svg' , 30 , 30 , 0 , 0 , 100 , 100);
         this.controls.setPlayButton(playButtonOption , pauseButtonOption );
 
+        this.controls.setCurrentTime();
+        this.controls.setSeparator(" / ");
+        this.controls.setDuration(this.duration);
+
         var fullscreenButtonOption = new ButtonOption('../image/miniButtonPause.svg' , 30 , 30 , 0 , 0 , 100 , 100);
         this.controls.setFullscreenButton(fullscreenButtonOption);
 
@@ -165,6 +169,11 @@ class Player{
         var target = this.target;
         target.currentTime = moveToSec;
         target.play();
+    }
+
+    public getCurrentTime() : number{
+        var target = this.target;
+        return target.currentTime ;
     }
 
     public getDuration():number{

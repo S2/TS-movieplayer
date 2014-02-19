@@ -25,6 +25,9 @@ class Controls{
     player : Player;
     controlBar : Bar;
     centerPlayButton     :HTMLDivElement
+    separateString : string
+    hasSetDuration      : Boolean = false
+    hasSetCurrentTime   : Boolean = false
     constructor(player : Player , controlBar : Bar ){
         this.player = player;
         this.controlBar = controlBar;
@@ -185,14 +188,92 @@ class Controls{
     */
     public setVolumeBackground(src : string , width : number , height : number , top : number , left : number , scaleWidth : number , scaleHeight : number):void{
     }
+    
+    /**
+        <br>
+        
+        @method setSeparator 
+        @param {string} 
+        @return void
+    */
+    public setSeparator(separateString : string):void{
+        this.separateString = separateString;
+    }
 
     /**
         <br>
         
-        @method setControlBackground 
+        @method setCurrentTime 
         @param {} 
         @return void
     */
-    public setControlBackground(src : string , width : number , height : number , top : number , left : number , scaleWidth : number , scaleHeight : number):void{
+    public setCurrentTime():void{
+        this.hasSetCurrentTime = true;
+        var barHeight : number = this.controlBar.getHeight();
+        var area : HTMLDivElement = document.createElement('div');
+        area.style.height = barHeight + "px";
+        area.innerHTML = "00:00";
+        area.className = 'controllButtonLeft currentTime';
+        this.controlBar.getElement().appendChild(area);
+
+        this.player.hookTimeUpdate((player:Player , video:HTMLVideoElement)=>{
+            var currentTime = player.getCurrentTime();
+            var currentTimeString = this.getTime(currentTime);
+            area.innerHTML = currentTimeString;
+        });
+    }
+
+    /**
+        <br>
+        
+        @method setDuration 
+        @param {} 
+        @return void
+    */
+    public setDuration(durationSeconds : number):void{
+        var barHeight : number = this.controlBar.getHeight();
+        var area : HTMLDivElement = document.createElement('div');
+        area.style.height = barHeight + "px";
+        
+        var durationString : string = this.getTime(durationSeconds)
+
+        area.innerHTML = durationString;
+        area.className = 'controllButtonLeft duration';
+
+        if(this.hasSetCurrentTime && this.separateString){
+            // display separator
+            var separator : HTMLDivElement = document.createElement('div');
+            separator.style.height = barHeight + "px";
+            separator.innerHTML = this.separateString;
+            separator.className = 'controllButtonLeft';
+            this.controlBar.getElement().appendChild(separator);
+        }
+        this.controlBar.getElement().appendChild(area);
+    }
+
+    private getTime(time : number) : string{
+        var hour   = 0 ;
+        var minute = 0 ;
+        var second = 0 ;
+
+        while(time > 3600){
+            time -= 3600;
+            hour ++
+        }
+        while(time> 60){
+            time -= 60;
+            minute ++
+        }
+        second = parseInt(time.toString());
+        var timeString = "";
+        if(hour > 0){
+            timeString += hour < 10 ? "0" + hour : hour.toString();
+            timeString += ":"
+        }
+        timeString += minute < 10 ? "0" + minute : minute.toString();
+        timeString += ":"
+        timeString += second < 10 ? "0" + second : second.toString();
+        
+        return timeString
     }
 }

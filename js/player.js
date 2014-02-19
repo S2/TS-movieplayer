@@ -355,6 +355,10 @@ var Player = (function () {
         var pauseButtonOption = new ButtonOption('../image/miniButtonPause.svg', 30, 30, 0, 0, 100, 100);
         this.controls.setPlayButton(playButtonOption, pauseButtonOption);
 
+        this.controls.setCurrentTime();
+        this.controls.setSeparator(" / ");
+        this.controls.setDuration(this.duration);
+
         var fullscreenButtonOption = new ButtonOption('../image/miniButtonPause.svg', 30, 30, 0, 0, 100, 100);
         this.controls.setFullscreenButton(fullscreenButtonOption);
 
@@ -425,6 +429,11 @@ var Player = (function () {
         var target = this.target;
         target.currentTime = moveToSec;
         target.play();
+    };
+
+    Player.prototype.getCurrentTime = function () {
+        var target = this.target;
+        return target.currentTime;
     };
 
     Player.prototype.getDuration = function () {
@@ -688,6 +697,8 @@ var ButtonOption = (function () {
 
 var Controls = (function () {
     function Controls(player, controlBar) {
+        this.hasSetDuration = false;
+        this.hasSetCurrentTime = false;
         this.player = player;
         this.controlBar = controlBar;
     }
@@ -798,7 +809,71 @@ var Controls = (function () {
     Controls.prototype.setVolumeBackground = function (src, width, height, top, left, scaleWidth, scaleHeight) {
     };
 
-    Controls.prototype.setControlBackground = function (src, width, height, top, left, scaleWidth, scaleHeight) {
+    Controls.prototype.setSeparator = function (separateString) {
+        this.separateString = separateString;
+    };
+
+    Controls.prototype.setCurrentTime = function () {
+        var _this = this;
+        this.hasSetCurrentTime = true;
+        var barHeight = this.controlBar.getHeight();
+        var area = document.createElement('div');
+        area.style.height = barHeight + "px";
+        area.innerHTML = "00:00";
+        area.className = 'controllButtonLeft currentTime';
+        this.controlBar.getElement().appendChild(area);
+
+        this.player.hookTimeUpdate(function (player, video) {
+            var currentTime = player.getCurrentTime();
+            var currentTimeString = _this.getTime(currentTime);
+            area.innerHTML = currentTimeString;
+        });
+    };
+
+    Controls.prototype.setDuration = function (durationSeconds) {
+        var barHeight = this.controlBar.getHeight();
+        var area = document.createElement('div');
+        area.style.height = barHeight + "px";
+
+        var durationString = this.getTime(durationSeconds);
+
+        area.innerHTML = durationString;
+        area.className = 'controllButtonLeft duration';
+
+        if (this.hasSetCurrentTime && this.separateString) {
+            var separator = document.createElement('div');
+            separator.style.height = barHeight + "px";
+            separator.innerHTML = this.separateString;
+            separator.className = 'controllButtonLeft';
+            this.controlBar.getElement().appendChild(separator);
+        }
+        this.controlBar.getElement().appendChild(area);
+    };
+
+    Controls.prototype.getTime = function (time) {
+        var hour = 0;
+        var minute = 0;
+        var second = 0;
+
+        while (time > 3600) {
+            time -= 3600;
+            hour++;
+        }
+        while (time > 60) {
+            time -= 60;
+            minute++;
+        }
+        second = parseInt(time.toString());
+        var timeString = "";
+        if (hour > 0) {
+            timeString += hour < 10 ? "0" + hour : hour.toString();
+            timeString += ":";
+        }
+        timeString += minute < 10 ? "0" + minute : minute.toString();
+        timeString += ":";
+        timeString += second < 10 ? "0" + second : second.toString();
+
+        return timeString;
     };
     return Controls;
 })();
