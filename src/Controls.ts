@@ -6,7 +6,7 @@ class Controls{
     player : Player;
     controlBar : Bar;
     centerPlayButton     :HTMLDivElement
-    constructor(player : Player , controlBar : Bar){
+    constructor(player : Player , controlBar : Bar ){
         this.player = player;
         this.controlBar = controlBar;
     }
@@ -20,6 +20,7 @@ class Controls{
         style.backgroundRepeat    =  "no-repeat";
         style.backgroundPosition  = top + "px " + left + "px";
         style.backgroundSize      = scaleWidth + "% " + scaleHeight + "%";
+        style.zIndex              = (<ControlBar>this.controlBar).getZIndex() + 1 + "";
         return button;
     }
 
@@ -100,7 +101,7 @@ class Controls{
             width : number , height : number , scaleWidth : number , scaleHeight : number , playTop : number , playLeft : number , pauseTop : number , pauseLeft : number):void{
 
         var playPauseButton  : HTMLDivElement = this.createButton(pauseSrc  , width , height , pauseTop  , pauseLeft  , scaleWidth , scaleHeight )
-        playPauseButton.className = 'playPauseButton';
+        playPauseButton.className = 'controllButtonLeft playPauseButton';
         this.controlBar.getElement().appendChild(playPauseButton);
         
         // play
@@ -135,8 +136,7 @@ class Controls{
     */
     public setFullscreenButton(src : string , width : number , height : number , top : number , left : number , scaleWidth : number , scaleHeight : number):void{
         var fullscreenButton  : HTMLDivElement = this.createButton(src  , width , height , top  , left  , scaleWidth , scaleHeight )
-        fullscreenButton.className = 'playPauseButton';
-        fullscreenButton.style.styleFloat = "right";
+        fullscreenButton.className = 'controllButtonRight playPauseButton';
         this.controlBar.getElement().appendChild(fullscreenButton);
     }
     

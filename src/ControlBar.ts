@@ -37,6 +37,10 @@ class ControlBar extends Bar{
         this.appendMethods[buttonName] = buttonCreateFunction;
     }
 
+    public getZIndex():number{
+        return this.options.zIndex;
+    }
+
 //    public getCreateButtonMethods(player:Player):{}{
 //        var createMethods = {
 //            //'play'        : () : HTMLElement => {
