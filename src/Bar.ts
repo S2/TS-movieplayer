@@ -136,4 +136,8 @@ class Bar{
         var element:HTMLElement = this.createdElement;
         return parseInt(element.style.height.replace("px" , ""))
     }
+
+    public getElement():HTMLElement{
+        return this.createdElement;
+    }
 }

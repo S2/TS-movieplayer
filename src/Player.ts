@@ -75,10 +75,7 @@ class Player{
         this.control = new ControlBar(controlOption , this.width);
         this.seekbar = new SeekBar(seekBarOption , this.width);
         
-        this.controls = new Controls(this , this.control);
-        this.controls.setCenterPlayButton('../image/largeButton.svg' , 240 , 240 , 30 , 30 , 80 , 80);
-
-        if(createOption.viewControllBar){
+       if(createOption.viewControllBar){
             this.setLowerBar(this.control);
         }
         if(createOption.viewTitleBar){
@@ -88,6 +85,9 @@ class Player{
         if(createOption.viewSeekBar){
             seekbar = this.setLowerBar(this.seekbar);
         }
+        this.controls = new Controls(this , this.control);
+        this.controls.setCenterPlayButton('../image/largeButton.svg' , 240 , 240 , 30 , 30 , 80 , 80);
+        this.controls.setPlayButton('../image/miniButton.svg' , 50 , 50 , 0 , 0 , 100 , 100);
 
         target.addEventListener('click' , () => {
             this.togglePauseRestart();

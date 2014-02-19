@@ -11,7 +11,16 @@ class Controls{
         this.controlBar = controlBar;
     }
     
-    private setButtonImage(src : string , top : number , left : number){
+    private createButton(src : string , width : number , height : number , top : number , left : number , scaleWidth : number , scaleHeight : number):HTMLDivElement{
+        var button: HTMLDivElement = document.createElement('div');
+        var style = button.style;
+        style.width               = width + "px";
+        style.height              = height + "px";
+        style.backgroundImage     = "url('" + src + "')";
+        style.backgroundRepeat    =  "no-repeat";
+        style.backgroundPosition  = top + "px " + left + "px";
+        style.backgroundSize      = scaleWidth + "% " + scaleHeight + "%";
+        return button;
     }
 
     /**
@@ -27,19 +36,10 @@ class Controls{
         @return void
     */
     public setCenterPlayButton(src : string , width : number , height : number , top : number , left : number , scaleWidth : number , scaleHeight : number):void{
-        //top *= -1
-        //left *= -1
-
-        var centerPlayButton = document.createElement('div');
-        var style = centerPlayButton.style;
+        var centerPlayButton : HTMLDivElement = this.createButton(src , width , height , top , left , scaleWidth , scaleHeight )
         centerPlayButton.className = 'centerPlayButton';
-        style.position            = 'absolute';
-        style.width               = width + "px";
-        style.height              = height + "px";
-        style.backgroundImage     = "url('" + src + "')";
-        style.backgroundRepeat    =  "no-repeat";
-        style.backgroundPosition  = top + "px " + left + "px";
-        style.backgroundSize      = scaleWidth + "% " + scaleHeight + "%";
+        var style = centerPlayButton.style;
+        style.position = 'absolute';
         style.left = (this.player.width  - width) / 2 + "px";
         style.top  = (this.player.height - height) / 2 + "px";
         
@@ -56,13 +56,6 @@ class Controls{
             this.player.togglePlayPause();
         },false);
 
-        this.player.hookFullscreenEnter(() => {
-        });
-
-        this.player.hookFullscreenExit(() => {
-        });
-        
-        var style= this.centerPlayButton.style;
         // hide
         this.player.hookAfterRestart(() => {
             style.visibility = "hidden";
@@ -91,7 +84,11 @@ class Controls{
         @param {} 
         @return void
     */
-    public setPlayButton(src : string , top : number , left : number):void{
+    public setPlayButton(src : string , width : number , height : number , top : number , left : number , scaleWidth : number , scaleHeight : number):void{
+        var playButton : HTMLDivElement = this.createButton(src , width , height , top , left , scaleWidth , scaleHeight )
+        playButton .className = 'playButton';
+        var style = playButton.style;
+        this.controlBar.getElement().appendChild(playButton);
     }
 
     /**
@@ -101,7 +98,11 @@ class Controls{
         @param {} 
         @return void
     */
-    public setPauseButton(src : string , top : number , left : number):void{
+    public setPauseButton(src : string , width : number , height : number , top : number , left : number , scaleWidth : number , scaleHeight : number):void{
+        var pauseButton : HTMLDivElement = this.createButton(src , width , height , top , left , scaleWidth , scaleHeight )
+        pauseButton .className = 'pauseButton';
+        var style = pauseButton.style;
+        this.controlBar.getElement().appendChild(pauseButton);
     }
 
     /**
@@ -111,7 +112,7 @@ class Controls{
         @param {} 
         @return void
     */
-    public setFullscreenButton(src : string , top : number , left : number):void{
+    public setFullscreenButton(src : string , width : number , height : number , top : number , left : number , scaleWidth : number , scaleHeight : number):void{
     }
     
     /**
@@ -121,7 +122,7 @@ class Controls{
         @param {} 
         @return void
     */
-    public setVolumeButton(src : string , top : number , left : number):void{
+    public setVolumeButton(src : string , width : number , height : number , top : number , left : number , scaleWidth : number , scaleHeight : number):void{
     }
 
     /**
@@ -131,7 +132,7 @@ class Controls{
         @param {} 
         @return void
     */
-    public setVolumeBar(src : string , top : number , left : number):void{
+    public setVolumeBar(src : string , width : number , height : number , top : number , left : number , scaleWidth : number , scaleHeight : number):void{
     }
 
     /**
@@ -141,7 +142,7 @@ class Controls{
         @param {} 
         @return void
     */
-    public setVolumeBackground(src : string , top : number , left : number):void{
+    public setVolumeBackground(src : string , width : number , height : number , top : number , left : number , scaleWidth : number , scaleHeight : number):void{
     }
 
     /**
@@ -151,6 +152,6 @@ class Controls{
         @param {} 
         @return void
     */
-    public setControlBackground(src : string , top : number , left : number):void{
+    public setControlBackground(src : string , width : number , height : number , top : number , left : number , scaleWidth : number , scaleHeight : number):void{
     }
 }
