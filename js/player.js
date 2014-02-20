@@ -348,19 +348,19 @@ var Player = (function () {
         }
         this.controls = new Controls(this, this.control);
 
-        var centerButtonOption = new ButtonOption('../image/largeButton.svg', 240, 240, 30, 30, 80, 80);
-        this.controls.setCenterPlayButton(centerButtonOption);
+        var centerBackgroundImageSetting = new BackgroundImageSetting('../image/largeButton.svg', 240, 240, 30, 30, 80, 80);
+        this.controls.setCenterPlayButton(centerBackgroundImageSetting);
 
-        var playButtonOption = new ButtonOption('../image/miniButton.svg', 30, 30, 0, 0, 100, 100);
-        var pauseButtonOption = new ButtonOption('../image/miniButtonPause.svg', 30, 30, 0, 0, 100, 100);
-        this.controls.setPlayButton(playButtonOption, pauseButtonOption);
+        var playBackgroundImageSetting = new BackgroundImageSetting('../image/miniButton.svg', 30, 30, 0, 0, 100, 100);
+        var pauseBackgroundImageSetting = new BackgroundImageSetting('../image/miniButtonPause.svg', 30, 30, 0, 0, 100, 100);
+        this.controls.setPlayButton(playBackgroundImageSetting, pauseBackgroundImageSetting);
 
         this.controls.setCurrentTime();
         this.controls.setSeparator(" / ");
         this.controls.setDuration(this.duration);
 
-        var fullscreenButtonOption = new ButtonOption('../image/miniButtonPause.svg', 30, 30, 0, 0, 100, 100);
-        this.controls.setFullscreenButton(fullscreenButtonOption);
+        var fullscreenBackgroundImageSetting = new BackgroundImageSetting('../image/miniButtonPause.svg', 30, 30, 0, 0, 100, 100);
+        this.controls.setFullscreenButton(fullscreenBackgroundImageSetting);
 
         target.addEventListener('click', function () {
             _this.togglePauseRestart();
@@ -682,8 +682,8 @@ var Player = (function () {
     };
     return Player;
 })();
-var ButtonOption = (function () {
-    function ButtonOption(src, width, height, top, left, scaleWidth, scaleHeight) {
+var BackgroundImageSetting = (function () {
+    function BackgroundImageSetting(src, width, height, top, left, scaleWidth, scaleHeight) {
         this.src = src;
         this.width = width;
         this.height = height;
@@ -692,7 +692,7 @@ var ButtonOption = (function () {
         this.scaleWidth = scaleWidth;
         this.scaleHeight = scaleHeight;
     }
-    return ButtonOption;
+    return BackgroundImageSetting;
 })();
 
 var Controls = (function () {
@@ -702,27 +702,27 @@ var Controls = (function () {
         this.player = player;
         this.controlBar = controlBar;
     }
-    Controls.prototype.createButton = function (buttonOption) {
+    Controls.prototype.createButton = function (backgroundImageSetting) {
         var button = document.createElement('div');
         var style = button.style;
-        style.width = buttonOption.width + "px";
-        style.height = buttonOption.height + "px";
-        style.backgroundImage = "url('" + buttonOption.src + "')";
+        style.width = backgroundImageSetting.width + "px";
+        style.height = backgroundImageSetting.height + "px";
+        style.backgroundImage = "url('" + backgroundImageSetting.src + "')";
         style.backgroundRepeat = "no-repeat";
-        style.backgroundPosition = buttonOption.top + "px " + buttonOption.left + "px";
-        style.backgroundSize = buttonOption.scaleWidth + "% " + buttonOption.scaleHeight + "%";
+        style.backgroundPosition = backgroundImageSetting.top + "px " + backgroundImageSetting.left + "px";
+        style.backgroundSize = backgroundImageSetting.scaleWidth + "% " + backgroundImageSetting.scaleHeight + "%";
         style.zIndex = (this.controlBar).getZIndex() + 1 + "";
         return button;
     };
 
-    Controls.prototype.setCenterPlayButton = function (buttonOption) {
+    Controls.prototype.setCenterPlayButton = function (backgroundImageSetting) {
         var _this = this;
-        var centerPlayButton = this.createButton(buttonOption);
+        var centerPlayButton = this.createButton(backgroundImageSetting);
         centerPlayButton.className = 'centerPlayButton';
         var style = centerPlayButton.style;
         style.position = 'absolute';
-        style.left = (this.player.width - buttonOption.width) / 2 + "px";
-        style.top = (this.player.height - buttonOption.height) / 2 + "px";
+        style.left = (this.player.width - backgroundImageSetting.width) / 2 + "px";
+        style.top = (this.player.height - backgroundImageSetting.height) / 2 + "px";
 
         var targetParent = this.player.targetParent;
         targetParent.appendChild(centerPlayButton);
@@ -756,34 +756,34 @@ var Controls = (function () {
         });
     };
 
-    Controls.prototype.modifyButton = function (button, buttonOption) {
+    Controls.prototype.modifyButton = function (button, backgroundImageSetting) {
         var style = button.style;
-        style.width = buttonOption.width + "px";
-        style.height = buttonOption.height + "px";
-        style.backgroundImage = "url('" + buttonOption.src + "')";
+        style.width = backgroundImageSetting.width + "px";
+        style.height = backgroundImageSetting.height + "px";
+        style.backgroundImage = "url('" + backgroundImageSetting.src + "')";
         style.backgroundRepeat = "no-repeat";
-        style.backgroundPosition = buttonOption.top + "px " + buttonOption.left + "px";
-        style.backgroundSize = buttonOption.scaleWidth + "% " + buttonOption.scaleHeight + "%";
+        style.backgroundPosition = backgroundImageSetting.top + "px " + backgroundImageSetting.left + "px";
+        style.backgroundSize = backgroundImageSetting.scaleWidth + "% " + backgroundImageSetting.scaleHeight + "%";
     };
 
-    Controls.prototype.setPlayButton = function (playButtonOption, pauseButtonOption) {
+    Controls.prototype.setPlayButton = function (playBackgroundImageSetting, pauseBackgroundImageSetting) {
         var _this = this;
-        var playPauseButton = this.createButton(pauseButtonOption);
+        var playPauseButton = this.createButton(pauseBackgroundImageSetting);
         playPauseButton.className = 'controllButtonLeft playPauseButton';
         this.controlBar.getElement().appendChild(playPauseButton);
 
         this.player.hookAfterRestart(function () {
-            _this.modifyButton(playPauseButton, pauseButtonOption);
+            _this.modifyButton(playPauseButton, pauseBackgroundImageSetting);
         });
         this.player.hookAfterPlay(function () {
-            _this.modifyButton(playPauseButton, pauseButtonOption);
+            _this.modifyButton(playPauseButton, pauseBackgroundImageSetting);
         });
 
         this.player.hookAfterPause(function () {
-            _this.modifyButton(playPauseButton, playButtonOption);
+            _this.modifyButton(playPauseButton, playBackgroundImageSetting);
         });
         this.player.hookEnded(function () {
-            _this.modifyButton(playPauseButton, playButtonOption);
+            _this.modifyButton(playPauseButton, playBackgroundImageSetting);
         });
 
         playPauseButton.addEventListener('click', function () {
@@ -794,13 +794,13 @@ var Controls = (function () {
         }, false);
     };
 
-    Controls.prototype.setFullscreenButton = function (buttonOption) {
-        var fullscreenButton = this.createButton(buttonOption);
+    Controls.prototype.setFullscreenButton = function (backgroundImageSetting) {
+        var fullscreenButton = this.createButton(backgroundImageSetting);
         fullscreenButton.className = 'controllButtonRight playPauseButton';
         this.controlBar.getElement().appendChild(fullscreenButton);
     };
 
-    Controls.prototype.setVolumeButton = function (src, width, height, top, left, scaleWidth, scaleHeight) {
+    Controls.prototype.setVolumeButton = function (barBackgroundImageSetting, barBackgroundOption) {
     };
 
     Controls.prototype.setVolumeBar = function (src, width, height, top, left, scaleWidth, scaleHeight) {

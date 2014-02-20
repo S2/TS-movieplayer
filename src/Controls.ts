@@ -2,7 +2,7 @@
 /// <reference path="Player.ts" />
 /// <reference path="Bar.ts" />
 
-class ButtonOption{
+class BackgroundImageSetting{
     src         :  string;
     width       :  number;
     height      :  number;
@@ -33,15 +33,15 @@ class Controls{
         this.controlBar = controlBar;
     }
     
-    private createButton(buttonOption : ButtonOption):HTMLDivElement{
+    private createButton(backgroundImageSetting : BackgroundImageSetting):HTMLDivElement{
         var button: HTMLDivElement = document.createElement('div');
         var style = button.style;
-        style.width               = buttonOption.width + "px";
-        style.height              = buttonOption.height + "px";
-        style.backgroundImage     = "url('" + buttonOption.src + "')";
+        style.width               = backgroundImageSetting.width + "px";
+        style.height              = backgroundImageSetting.height + "px";
+        style.backgroundImage     = "url('" + backgroundImageSetting.src + "')";
         style.backgroundRepeat    =  "no-repeat";
-        style.backgroundPosition  = buttonOption.top + "px " + buttonOption.left + "px";
-        style.backgroundSize      = buttonOption.scaleWidth + "% " + buttonOption.scaleHeight + "%";
+        style.backgroundPosition  = backgroundImageSetting.top + "px " + backgroundImageSetting.left + "px";
+        style.backgroundSize      = backgroundImageSetting.scaleWidth + "% " + backgroundImageSetting.scaleHeight + "%";
         style.zIndex              = (<ControlBar>this.controlBar).getZIndex() + 1 + "";
         return button;
     }
@@ -58,13 +58,13 @@ class Controls{
         @param scaleHeight  {number} background image view ratio
         @return void
     */
-    public setCenterPlayButton(buttonOption : ButtonOption):void{
-        var centerPlayButton : HTMLDivElement = this.createButton(buttonOption)
+    public setCenterPlayButton(backgroundImageSetting : BackgroundImageSetting):void{
+        var centerPlayButton : HTMLDivElement = this.createButton(backgroundImageSetting)
         centerPlayButton.className = 'centerPlayButton';
         var style = centerPlayButton.style;
         style.position = 'absolute';
-        style.left = (this.player.width  - buttonOption.width) / 2 + "px";
-        style.top  = (this.player.height - buttonOption.height) / 2 + "px";
+        style.left = (this.player.width  - backgroundImageSetting.width) / 2 + "px";
+        style.top  = (this.player.height - backgroundImageSetting.height) / 2 + "px";
         
         var targetParent:HTMLDivElement = this.player.targetParent;
         targetParent.appendChild(centerPlayButton);
@@ -100,14 +100,14 @@ class Controls{
         });
     }
  
-    private modifyButton(button:HTMLDivElement , buttonOption : ButtonOption):void{
+    private modifyButton(button:HTMLDivElement , backgroundImageSetting : BackgroundImageSetting):void{
         var style = button.style;
-        style.width               = buttonOption.width + "px";
-        style.height              = buttonOption.height + "px";
-        style.backgroundImage     = "url('" + buttonOption.src + "')";
+        style.width               = backgroundImageSetting.width + "px";
+        style.height              = backgroundImageSetting.height + "px";
+        style.backgroundImage     = "url('" + backgroundImageSetting.src + "')";
         style.backgroundRepeat    =  "no-repeat";
-        style.backgroundPosition  = buttonOption.top + "px " + buttonOption.left + "px";
-        style.backgroundSize      = buttonOption.scaleWidth + "% " + buttonOption.scaleHeight + "%";
+        style.backgroundPosition  = backgroundImageSetting.top + "px " + backgroundImageSetting.left + "px";
+        style.backgroundSize      = backgroundImageSetting.scaleWidth + "% " + backgroundImageSetting.scaleHeight + "%";
     }
 
     /**
@@ -117,25 +117,25 @@ class Controls{
         @param {} 
         @return void
     */
-    public setPlayButton(playButtonOption : ButtonOption , pauseButtonOption : ButtonOption){
-        var playPauseButton  : HTMLDivElement = this.createButton(pauseButtonOption)
+    public setPlayButton(playBackgroundImageSetting : BackgroundImageSetting , pauseBackgroundImageSetting : BackgroundImageSetting){
+        var playPauseButton  : HTMLDivElement = this.createButton(pauseBackgroundImageSetting)
         playPauseButton.className = 'controllButtonLeft playPauseButton';
         this.controlBar.getElement().appendChild(playPauseButton);
         
         // play
         this.player.hookAfterRestart(() => {
-            this.modifyButton(playPauseButton , pauseButtonOption)
+            this.modifyButton(playPauseButton , pauseBackgroundImageSetting)
         });
         this.player.hookAfterPlay(() => {
-            this.modifyButton(playPauseButton , pauseButtonOption)
+            this.modifyButton(playPauseButton , pauseBackgroundImageSetting)
         });
 
         // pause/end 
         this.player.hookAfterPause(() => {
-            this.modifyButton(playPauseButton , playButtonOption)
+            this.modifyButton(playPauseButton , playBackgroundImageSetting)
         });
         this.player.hookEnded(() => {
-            this.modifyButton(playPauseButton , playButtonOption)
+            this.modifyButton(playPauseButton , playBackgroundImageSetting)
         });
 
         playPauseButton.addEventListener('click' , () => {
@@ -153,8 +153,8 @@ class Controls{
         @param {} 
         @return void
     */
-    public setFullscreenButton(buttonOption : ButtonOption):void{
-        var fullscreenButton  : HTMLDivElement = this.createButton(buttonOption)
+    public setFullscreenButton(backgroundImageSetting : BackgroundImageSetting):void{
+        var fullscreenButton  : HTMLDivElement = this.createButton(backgroundImageSetting)
         fullscreenButton.className = 'controllButtonRight playPauseButton';
         this.controlBar.getElement().appendChild(fullscreenButton);
     }
@@ -166,7 +166,7 @@ class Controls{
         @param {} 
         @return void
     */
-    public setVolumeButton(src : string , width : number , height : number , top : number , left : number , scaleWidth : number , scaleHeight : number):void{
+    public setVolumeButton(barBackgroundImageSetting : BackgroundImageSetting , barBackgroundOption : BackgroundImageSetting):void{
     }
 
     /**
@@ -193,7 +193,7 @@ class Controls{
         <br>
         
         @method setSeparator 
-        @param {string} 
+        @param separateString {string} 
         @return void
     */
     public setSeparator(separateString : string):void{
@@ -204,7 +204,6 @@ class Controls{
         <br>
         
         @method setCurrentTime 
-        @param {} 
         @return void
     */
     public setCurrentTime():void{
@@ -227,7 +226,7 @@ class Controls{
         <br>
         
         @method setDuration 
-        @param {} 
+        @param durationSeconds {number} 
         @return void
     */
     public setDuration(durationSeconds : number):void{

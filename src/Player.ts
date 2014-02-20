@@ -87,19 +87,19 @@ class Player{
         }
         this.controls = new Controls(this , this.control);
 
-        var centerButtonOption = new ButtonOption('../image/largeButton.svg' , 240 , 240 , 30 , 30 , 80 , 80);
-        this.controls.setCenterPlayButton(centerButtonOption);
+        var centerBackgroundImageSetting = new BackgroundImageSetting('../image/largeButton.svg' , 240 , 240 , 30 , 30 , 80 , 80);
+        this.controls.setCenterPlayButton(centerBackgroundImageSetting);
 
-        var playButtonOption = new ButtonOption('../image/miniButton.svg'      , 30 , 30 , 0 , 0 , 100 , 100);
-        var pauseButtonOption = new ButtonOption('../image/miniButtonPause.svg' , 30 , 30 , 0 , 0 , 100 , 100);
-        this.controls.setPlayButton(playButtonOption , pauseButtonOption );
+        var playBackgroundImageSetting = new BackgroundImageSetting('../image/miniButton.svg'      , 30 , 30 , 0 , 0 , 100 , 100);
+        var pauseBackgroundImageSetting = new BackgroundImageSetting('../image/miniButtonPause.svg' , 30 , 30 , 0 , 0 , 100 , 100);
+        this.controls.setPlayButton(playBackgroundImageSetting , pauseBackgroundImageSetting );
 
         this.controls.setCurrentTime();
         this.controls.setSeparator(" / ");
         this.controls.setDuration(this.duration);
 
-        var fullscreenButtonOption = new ButtonOption('../image/miniButtonPause.svg' , 30 , 30 , 0 , 0 , 100 , 100);
-        this.controls.setFullscreenButton(fullscreenButtonOption);
+        var fullscreenBackgroundImageSetting = new BackgroundImageSetting('../image/miniButtonPause.svg' , 30 , 30 , 0 , 0 , 100 , 100);
+        this.controls.setFullscreenButton(fullscreenBackgroundImageSetting);
 
         target.addEventListener('click' , () => {
             this.togglePauseRestart();
