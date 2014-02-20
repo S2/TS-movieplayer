@@ -348,8 +348,11 @@ var Player = (function () {
 
         var playBackgroundImageSetting = new BackgroundImageSetting('../image/controls.svg', 16, 16, 0, 0, 100, 100, new Margin(7, 5, 7, 5));
         var pauseBackgroundImageSetting = new BackgroundImageSetting('../image/controls.svg', 16, 16, 0, -16, 100, 100, new Margin(7, 5, 7, 5));
-
         this.controls.setPlayButton(playBackgroundImageSetting, pauseBackgroundImageSetting);
+
+        var volumeOnBackgroundImageSetting = new BackgroundImageSetting('../image/controls.svg', 16, 16, -16, -16, 100, 100, new Margin(7, 5, 7, 5));
+        var volumeOffBackgroundImageSetting = new BackgroundImageSetting('../image/controls.svg', 16, 16, -16, 0, 100, 100, new Margin(7, 5, 7, 5));
+        this.controls.setVolumeButton(volumeOnBackgroundImageSetting, volumeOffBackgroundImageSetting);
 
         this.controls.setCurrentTime();
         this.controls.setSeparator(" / ");
@@ -831,7 +834,10 @@ var Controls = (function () {
         this.controlBar.getElement().appendChild(fullscreenButton);
     };
 
-    Controls.prototype.setVolumeButton = function (barBackgroundImageSetting, barBackgroundOption) {
+    Controls.prototype.setVolumeButton = function (volumeOnImageSetting, volumeOffImageSetting) {
+        var volumeButton = this.createButton(volumeOnImageSetting);
+        volumeButton.className = 'controllButtonLeft volumeButton';
+        this.controlBar.getElement().appendChild(volumeButton);
     };
 
     Controls.prototype.setVolumeBar = function (src, width, height, top, left, scaleWidth, scaleHeight) {

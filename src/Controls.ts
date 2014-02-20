@@ -198,7 +198,19 @@ class Controls{
         @param {} 
         @return void
     */
-    public setVolumeButton(barBackgroundImageSetting : BackgroundImageSetting , barBackgroundOption : BackgroundImageSetting):void{
+    public setVolumeButton(volumeOnImageSetting : BackgroundImageSetting , volumeOffImageSetting : BackgroundImageSetting):void{
+        var volumeButton  : HTMLDivElement = this.createButton(volumeOnImageSetting)
+        volumeButton.className = 'controllButtonLeft volumeButton';
+        this.controlBar.getElement().appendChild(volumeButton);
+        
+//        //  volume on
+//        this.player.hookVolumeOn(() => {
+//            this.modifyButton(volumeButton , volumeOnImageSetting)
+//        });
+//        // volume off
+//        this.player.hookVolumeOff(() => {
+//            this.modifyButton(volumeButton , volumeOffImageSetting)
+//        });
     }
 
     /**
