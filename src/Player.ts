@@ -41,8 +41,8 @@ class Player{
     width               :number;
     height              :number;
     setHeight           :number = 0;
-    target              :HTMLVideoElement;
-    targetParent        :HTMLDivElement;
+    media              :HTMLVideoElement;
+    mediaParent        :HTMLDivElement;
     isPlaying           :bool = false;
     isPaused            :bool = false;
     isFullScreen        :bool = false;
@@ -65,12 +65,12 @@ class Player{
     enableSound : Boolean = true;
     createOption:CreateOption;
 
-    constructor(target:HTMLVideoElement ,  
+    constructor(media:HTMLVideoElement ,  
             createOption:CreateOption = new CreateOption(), 
             controlOption:ControlBarOption = new ControlBarOption() ,
             titleBarOption:TitleBarOption = new TitleBarOption() ,
             seekBarOption:SeekBarOption = new SeekBarOption()){
-        this.target = target;
+        this.media = media;
         this.createOption = createOption;
         this.getEnvironment();
         this.getSize();
@@ -113,24 +113,24 @@ class Player{
         var fullscreenBackgroundImageSetting = new BackgroundImageSetting('../image/controls.svg' , 16 , 16 , -32  , 0 , 100 , 100 , new Margin(7 , 5 , 7 , 5));
         this.controls.setFullscreenButton(fullscreenBackgroundImageSetting);
 
-        target.addEventListener('click' , () => {
+        media.addEventListener('click' , () => {
             this.togglePauseRestart();
         },false);
-        target.addEventListener('touch' , () => {
+        media.addEventListener('touch' , () => {
             this.togglePauseRestart();
         },false);
         
-        target.addEventListener('timeupdate' , () => {
+        media.addEventListener('timeupdate' , () => {
             this.doMethodArray(this.timeUpdate)
         },false);
 
-        target.addEventListener('ended' , () => {
+        media.addEventListener('ended' , () => {
             this.doMethodArray(this.ended)
             this.isPlaying = false;
             this.isPaused = false
         },false);
         
-        target.addEventListener('volumechange' , () => {
+        media.addEventListener('volumechange' , () => {
             this.doMethodArray(this.volumeChange)
         },false);
  
@@ -150,7 +150,7 @@ class Player{
             }
         }
 
-        target.addEventListener('mouseover' , barFeedIn ,false);
+        media.addEventListener('mouseover' , barFeedIn ,false);
         if(controlBar){
             controlBar.addEventListener('mouseover' , barFeedIn ,false);
         }
@@ -161,7 +161,7 @@ class Player{
             seekBar.addEventListener('mouseover' , barFeedIn ,false);
         }
 
-        target.addEventListener('mouseout' , () => {
+        media.addEventListener('mouseout' , () => {
             if(this.isPlaying){
                 this.title.feedOut(0 , 50);
                 this.control.feedOut(0 , 50);
@@ -194,19 +194,19 @@ class Player{
     }
     
     public setCurrentTime(moveToSec:number){
-        var target = this.target;
-        target.currentTime = moveToSec;
-        target.play();
+        var media = this.media;
+        media.currentTime = moveToSec;
+        media.play();
     }
 
     public getCurrentTime() : number{
-        var target = this.target;
-        return target.currentTime ;
+        var media = this.media;
+        return media.currentTime ;
     }
 
     public getDuration():number{
         if(!this.duration){
-            this.duration = this.target.duration;
+            this.duration = this.media.duration;
         }
         return this.duration;
     }
@@ -240,40 +240,40 @@ class Player{
     }
 
     private getSize(){
-        var target:HTMLVideoElement = this.target;
-        this.width = parseInt(target.style.width.replace('px',''));
+        var media:HTMLVideoElement = this.media;
+        this.width = parseInt(media.style.width.replace('px',''));
         if(!this.width){
-            this.width = parseInt(getComputedStyle( target , '').width.replace('px', ''));
+            this.width = parseInt(getComputedStyle( media , '').width.replace('px', ''));
         }
         
-        this.height = parseInt(target.style.height.replace('px',''));
+        this.height = parseInt(media.style.height.replace('px',''));
         if(!this.height){
-            this.height = parseInt(getComputedStyle( target , '').height.replace('px', ''));
+            this.height = parseInt(getComputedStyle( media , '').height.replace('px', ''));
         }
     }
     
     private createParentDiv(){
-        var target:HTMLVideoElement = this.target;
+        var media:HTMLVideoElement = this.media;
 
-        target.style.position = 'absolute';
+        media.style.position = 'absolute';
         
-        var parentNode = target.parentNode;
-        var targetParent:HTMLDivElement = document.createElement('div');
-        targetParent.appendChild(target);
-        parentNode.appendChild(targetParent);
-        this.targetParent = targetParent;
+        var parentNode = media.parentNode;
+        var mediaParent:HTMLDivElement = document.createElement('div');
+        mediaParent.appendChild(media);
+        parentNode.appendChild(mediaParent);
+        this.mediaParent = mediaParent;
 
-        target.style.top = "0";
-        this.target = target;
+        media.style.top = "0";
+        this.media = media;
 
-        this.duration = target.duration;
+        this.duration = media.duration;
     }
     
     private setFullscreenCenterElementPosition(element:HTMLElement , ratio:number){
-        var targetParent:HTMLElement = this.targetParent;
-        var width = parseInt(targetParent.style.width.replace('px',''));
+        var mediaParent:HTMLElement = this.mediaParent;
+        var width = parseInt(mediaParent.style.width.replace('px',''));
         if(!width){
-            width = parseInt(getComputedStyle( targetParent , '').width.replace('px', ''));
+            width = parseInt(getComputedStyle( mediaParent , '').width.replace('px', ''));
         }
         
         var height = screen.height;
@@ -285,13 +285,13 @@ class Player{
     }
 
     private setInitialVolume(volume:number){
-        var target:HTMLVideoElement = this.target;
-        target.volume = volume ;
+        var media:HTMLVideoElement = this.media;
+        media.volume = volume ;
     }
 
     public toggleFullScreen(){
-        var targetParent:HTMLElement = this.targetParent
-        var target:HTMLVideoElement = this.target
+        var mediaParent:HTMLElement = this.mediaParent
+        var media:HTMLVideoElement = this.media
         if(this.isFullScreen){
             if (document.exitFullscreen) {
                 document.exitFullscreen();
@@ -300,19 +300,19 @@ class Player{
             } else if (document.webkitCancelFullScreen) {
                 document.webkitCancelFullScreen();
             }
-            target.style.width  = this.width + "px";
-            target.style.height = this.height + "px";
+            media.style.width  = this.width + "px";
+            media.style.height = this.height + "px";
             this.isFullScreen = false;
         }else{
-            if (targetParent.requestFullscreen) {
-                targetParent.requestFullscreen();
-            } else if (targetParent.mozRequestFullScreen) {
-                targetParent.mozRequestFullScreen();
-            } else if (targetParent.webkitRequestFullScreen) {
-                targetParent.webkitRequestFullScreen();
+            if (mediaParent.requestFullscreen) {
+                mediaParent.requestFullscreen();
+            } else if (mediaParent.mozRequestFullScreen) {
+                mediaParent.mozRequestFullScreen();
+            } else if (mediaParent.webkitRequestFullScreen) {
+                mediaParent.webkitRequestFullScreen();
             }
-            target.style.width  = '100%';
-            target.style.height = '100%';
+            media.style.width  = '100%';
+            media.style.height = '100%';
             this.isFullScreen = true;
         }
     }
@@ -391,8 +391,8 @@ class Player{
         @return void
     */
     public setVolumeOn():void{
-        this.volume = this.target.volume;
-        this.target.muted = true;
+        this.volume = this.media.volume;
+        this.media.muted = true;
         this.enableSound = true;
         this.doMethodArray(this.volumeOn)
     }
@@ -405,7 +405,7 @@ class Player{
         @return void
     */
     public setVolumeOff():void{
-        this.target.muted = false;
+        this.media.muted = false;
         this.enableSound = false;
         this.doMethodArray(this.volumeOff)
     }
@@ -425,15 +425,15 @@ class Player{
 
     private doMethodArray(methods:Array){
         for(var i = 0 ; i < methods.length ; i++){
-            methods[i](this, this.target);
+            methods[i](this, this.media);
         }
     }
     
     public togglePlayPause(){
-        var target:HTMLVideoElement = this.target;
+        var media:HTMLVideoElement = this.media;
         if(this.isPlaying){
             this.doMethodArray(this.beforePause)
-            target.pause()
+            media.pause()
             this.isPaused = true;
             this.doMethodArray(this.afterPause)
             this.isPlaying = false
@@ -442,7 +442,7 @@ class Player{
                 this.doMethodArray(this.beforeRestart)
             }
             this.doMethodArray(this.beforePlay)
-            target.play()
+            media.play()
             this.doMethodArray(this.afterPlay)
             if(this.isPaused){
                 this.doMethodArray(this.afterRestart)
@@ -453,18 +453,18 @@ class Player{
     }
 
     public togglePauseRestart(){
-        var target:HTMLVideoElement = this.target;
+        var media:HTMLVideoElement = this.media;
         if(!this.isPlaying && this.isPaused){
             this.doMethodArray(this.beforePlay)
             this.doMethodArray(this.beforeRestart)
-            target.play()
+            media.play()
             this.doMethodArray(this.afterPlay)
             this.doMethodArray(this.afterRestart)
             this.isPlaying = true 
             this.isPaused = false
         }else if(this.isPlaying){
             this.doMethodArray(this.beforePause)
-            target.pause()
+            media.pause()
             this.isPaused = true;
             this.doMethodArray(this.afterPause)
             this.isPlaying = false
@@ -489,8 +489,8 @@ class Player{
         bar.style.top  = (this.height - height - setHeight) + "px";
         this.setHeight += (height);
 
-        var target:HTMLVideoElement = this.target;
-        var parentNode = target.parentNode;
+        var media:HTMLVideoElement = this.media;
+        var parentNode = media.parentNode;
         parentNode.appendChild(bar);
         return bar;
     }
@@ -499,8 +499,8 @@ class Player{
         var bar:HTMLElement = barObject.createElement(this);
         bar.style.top  = "0px";
 
-        var target:HTMLVideoElement = this.target;
-        var parentNode = target.parentNode;
+        var media:HTMLVideoElement = this.media;
+        var parentNode = media.parentNode;
         parentNode.appendChild(bar);
         return bar;
     }
@@ -516,5 +516,27 @@ class Player{
         }
 
         bar.style.top  = (screenHeight - height) + "px";
+    }
+
+    /**
+        <br>
+        
+        @method getMedia 
+        @param {} 
+        @return HTMLVideoElement
+    */
+    public getMedia():HTMLVideoElement{
+        return this.media
+    }
+
+    /**
+        <br>
+        
+        @method getMediaParent 
+        @param {} 
+        @return HTMLDivElement
+    */
+    public getMediaParent():HTMLDivElement{
+        return this.mediaParent;
     }
 }

@@ -292,7 +292,7 @@ var CreateOption = (function () {
 })();
 
 var Player = (function () {
-    function Player(target, createOption, controlOption, titleBarOption, seekBarOption) {
+    function Player(media, createOption, controlOption, titleBarOption, seekBarOption) {
         if (typeof createOption === "undefined") { createOption = new CreateOption(); }
         if (typeof controlOption === "undefined") { controlOption = new ControlBarOption(); }
         if (typeof titleBarOption === "undefined") { titleBarOption = new TitleBarOption(); }
@@ -326,7 +326,7 @@ var Player = (function () {
         this.volumeChange = [];
         this.volumeOn = [];
         this.volumeOff = [];
-        this.target = target;
+        this.media = media;
         this.createOption = createOption;
         this.getEnvironment();
         this.getSize();
@@ -369,24 +369,24 @@ var Player = (function () {
         var fullscreenBackgroundImageSetting = new BackgroundImageSetting('../image/controls.svg', 16, 16, -32, 0, 100, 100, new Margin(7, 5, 7, 5));
         this.controls.setFullscreenButton(fullscreenBackgroundImageSetting);
 
-        target.addEventListener('click', function () {
+        media.addEventListener('click', function () {
             _this.togglePauseRestart();
         }, false);
-        target.addEventListener('touch', function () {
+        media.addEventListener('touch', function () {
             _this.togglePauseRestart();
         }, false);
 
-        target.addEventListener('timeupdate', function () {
+        media.addEventListener('timeupdate', function () {
             _this.doMethodArray(_this.timeUpdate);
         }, false);
 
-        target.addEventListener('ended', function () {
+        media.addEventListener('ended', function () {
             _this.doMethodArray(_this.ended);
             _this.isPlaying = false;
             _this.isPaused = false;
         }, false);
 
-        target.addEventListener('volumechange', function () {
+        media.addEventListener('volumechange', function () {
             _this.doMethodArray(_this.volumeChange);
         }, false);
 
@@ -406,7 +406,7 @@ var Player = (function () {
             }
         };
 
-        target.addEventListener('mouseover', barFeedIn, false);
+        media.addEventListener('mouseover', barFeedIn, false);
         if (controlBar) {
             controlBar.addEventListener('mouseover', barFeedIn, false);
         }
@@ -417,7 +417,7 @@ var Player = (function () {
             seekBar.addEventListener('mouseover', barFeedIn, false);
         }
 
-        target.addEventListener('mouseout', function () {
+        media.addEventListener('mouseout', function () {
             if (_this.isPlaying) {
                 _this.title.feedOut(0, 50);
                 _this.control.feedOut(0, 50);
@@ -449,19 +449,19 @@ var Player = (function () {
         this.setInitialVolume(0);
     }
     Player.prototype.setCurrentTime = function (moveToSec) {
-        var target = this.target;
-        target.currentTime = moveToSec;
-        target.play();
+        var media = this.media;
+        media.currentTime = moveToSec;
+        media.play();
     };
 
     Player.prototype.getCurrentTime = function () {
-        var target = this.target;
-        return target.currentTime;
+        var media = this.media;
+        return media.currentTime;
     };
 
     Player.prototype.getDuration = function () {
         if (!this.duration) {
-            this.duration = this.target.duration;
+            this.duration = this.media.duration;
         }
         return this.duration;
     };
@@ -494,40 +494,40 @@ var Player = (function () {
     };
 
     Player.prototype.getSize = function () {
-        var target = this.target;
-        this.width = parseInt(target.style.width.replace('px', ''));
+        var media = this.media;
+        this.width = parseInt(media.style.width.replace('px', ''));
         if (!this.width) {
-            this.width = parseInt(getComputedStyle(target, '').width.replace('px', ''));
+            this.width = parseInt(getComputedStyle(media, '').width.replace('px', ''));
         }
 
-        this.height = parseInt(target.style.height.replace('px', ''));
+        this.height = parseInt(media.style.height.replace('px', ''));
         if (!this.height) {
-            this.height = parseInt(getComputedStyle(target, '').height.replace('px', ''));
+            this.height = parseInt(getComputedStyle(media, '').height.replace('px', ''));
         }
     };
 
     Player.prototype.createParentDiv = function () {
-        var target = this.target;
+        var media = this.media;
 
-        target.style.position = 'absolute';
+        media.style.position = 'absolute';
 
-        var parentNode = target.parentNode;
-        var targetParent = document.createElement('div');
-        targetParent.appendChild(target);
-        parentNode.appendChild(targetParent);
-        this.targetParent = targetParent;
+        var parentNode = media.parentNode;
+        var mediaParent = document.createElement('div');
+        mediaParent.appendChild(media);
+        parentNode.appendChild(mediaParent);
+        this.mediaParent = mediaParent;
 
-        target.style.top = "0";
-        this.target = target;
+        media.style.top = "0";
+        this.media = media;
 
-        this.duration = target.duration;
+        this.duration = media.duration;
     };
 
     Player.prototype.setFullscreenCenterElementPosition = function (element, ratio) {
-        var targetParent = this.targetParent;
-        var width = parseInt(targetParent.style.width.replace('px', ''));
+        var mediaParent = this.mediaParent;
+        var width = parseInt(mediaParent.style.width.replace('px', ''));
         if (!width) {
-            width = parseInt(getComputedStyle(targetParent, '').width.replace('px', ''));
+            width = parseInt(getComputedStyle(mediaParent, '').width.replace('px', ''));
         }
 
         var height = screen.height;
@@ -539,13 +539,13 @@ var Player = (function () {
     };
 
     Player.prototype.setInitialVolume = function (volume) {
-        var target = this.target;
-        target.volume = volume;
+        var media = this.media;
+        media.volume = volume;
     };
 
     Player.prototype.toggleFullScreen = function () {
-        var targetParent = this.targetParent;
-        var target = this.target;
+        var mediaParent = this.mediaParent;
+        var media = this.media;
         if (this.isFullScreen) {
             if (document.exitFullscreen) {
                 document.exitFullscreen();
@@ -554,19 +554,19 @@ var Player = (function () {
             } else if (document.webkitCancelFullScreen) {
                 document.webkitCancelFullScreen();
             }
-            target.style.width = this.width + "px";
-            target.style.height = this.height + "px";
+            media.style.width = this.width + "px";
+            media.style.height = this.height + "px";
             this.isFullScreen = false;
         } else {
-            if (targetParent.requestFullscreen) {
-                targetParent.requestFullscreen();
-            } else if (targetParent.mozRequestFullScreen) {
-                targetParent.mozRequestFullScreen();
-            } else if (targetParent.webkitRequestFullScreen) {
-                targetParent.webkitRequestFullScreen();
+            if (mediaParent.requestFullscreen) {
+                mediaParent.requestFullscreen();
+            } else if (mediaParent.mozRequestFullScreen) {
+                mediaParent.mozRequestFullScreen();
+            } else if (mediaParent.webkitRequestFullScreen) {
+                mediaParent.webkitRequestFullScreen();
             }
-            target.style.width = '100%';
-            target.style.height = '100%';
+            media.style.width = '100%';
+            media.style.height = '100%';
             this.isFullScreen = true;
         }
     };
@@ -625,14 +625,14 @@ var Player = (function () {
     };
 
     Player.prototype.setVolumeOn = function () {
-        this.volume = this.target.volume;
-        this.target.muted = true;
+        this.volume = this.media.volume;
+        this.media.muted = true;
         this.enableSound = true;
         this.doMethodArray(this.volumeOn);
     };
 
     Player.prototype.setVolumeOff = function () {
-        this.target.muted = false;
+        this.media.muted = false;
         this.enableSound = false;
         this.doMethodArray(this.volumeOff);
     };
@@ -643,15 +643,15 @@ var Player = (function () {
 
     Player.prototype.doMethodArray = function (methods) {
         for (var i = 0; i < methods.length; i++) {
-            methods[i](this, this.target);
+            methods[i](this, this.media);
         }
     };
 
     Player.prototype.togglePlayPause = function () {
-        var target = this.target;
+        var media = this.media;
         if (this.isPlaying) {
             this.doMethodArray(this.beforePause);
-            target.pause();
+            media.pause();
             this.isPaused = true;
             this.doMethodArray(this.afterPause);
             this.isPlaying = false;
@@ -660,7 +660,7 @@ var Player = (function () {
                 this.doMethodArray(this.beforeRestart);
             }
             this.doMethodArray(this.beforePlay);
-            target.play();
+            media.play();
             this.doMethodArray(this.afterPlay);
             if (this.isPaused) {
                 this.doMethodArray(this.afterRestart);
@@ -671,18 +671,18 @@ var Player = (function () {
     };
 
     Player.prototype.togglePauseRestart = function () {
-        var target = this.target;
+        var media = this.media;
         if (!this.isPlaying && this.isPaused) {
             this.doMethodArray(this.beforePlay);
             this.doMethodArray(this.beforeRestart);
-            target.play();
+            media.play();
             this.doMethodArray(this.afterPlay);
             this.doMethodArray(this.afterRestart);
             this.isPlaying = true;
             this.isPaused = false;
         } else if (this.isPlaying) {
             this.doMethodArray(this.beforePause);
-            target.pause();
+            media.pause();
             this.isPaused = true;
             this.doMethodArray(this.afterPause);
             this.isPlaying = false;
@@ -705,8 +705,8 @@ var Player = (function () {
         bar.style.top = (this.height - height - setHeight) + "px";
         this.setHeight += (height);
 
-        var target = this.target;
-        var parentNode = target.parentNode;
+        var media = this.media;
+        var parentNode = media.parentNode;
         parentNode.appendChild(bar);
         return bar;
     };
@@ -715,8 +715,8 @@ var Player = (function () {
         var bar = barObject.createElement(this);
         bar.style.top = "0px";
 
-        var target = this.target;
-        var parentNode = target.parentNode;
+        var media = this.media;
+        var parentNode = media.parentNode;
         parentNode.appendChild(bar);
         return bar;
     };
@@ -732,6 +732,14 @@ var Player = (function () {
         }
 
         bar.style.top = (screenHeight - height) + "px";
+    };
+
+    Player.prototype.getMedia = function () {
+        return this.media;
+    };
+
+    Player.prototype.getMediaParent = function () {
+        return this.mediaParent;
     };
     return Player;
 })();
@@ -810,7 +818,7 @@ var Controls = (function () {
         style.left = (this.player.width - backgroundImageSetting.width) / 2 + "px";
         style.top = (this.player.height - backgroundImageSetting.height) / 2 + "px";
 
-        var targetParent = this.player.targetParent;
+        var targetParent = this.player.getMediaParent();
         targetParent.appendChild(centerPlayButton);
 
         this.centerPlayButton = centerPlayButton;

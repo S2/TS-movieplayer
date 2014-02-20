@@ -96,7 +96,7 @@ class Controls{
         style.left = (this.player.width  - backgroundImageSetting.width) / 2 + "px";
         style.top  = (this.player.height - backgroundImageSetting.height) / 2 + "px";
         
-        var targetParent:HTMLDivElement = this.player.targetParent;
+        var targetParent:HTMLDivElement = this.player.getMediaParent();
         targetParent.appendChild(centerPlayButton);
 
         this.centerPlayButton = centerPlayButton;
