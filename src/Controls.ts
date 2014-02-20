@@ -201,40 +201,88 @@ class Controls{
     public setVolumeButton(volumeOnImageSetting : BackgroundImageSetting , volumeOffImageSetting : BackgroundImageSetting):void{
         var volumeButton  : HTMLDivElement = this.createButton(volumeOnImageSetting)
         volumeButton.className = 'controllButtonLeft volumeButton';
+        volumeButton.style.position = "relative"
         this.controlBar.getElement().appendChild(volumeButton);
         
         volumeButton.addEventListener("click" , () => {this.player.toggleVolume()});
         volumeButton.addEventListener("touch" , () => {this.player.toggleVolume()});
         //  volume on
         this.player.hookVolumeOn(() => {
-            this.modifyButton(volumeButton , volumeOnImageSetting)
+//            this.modifyButton(volumeButton , volumeOnImageSetting)
         });
         // volume off
         this.player.hookVolumeOff(() => {
-            this.modifyButton(volumeButton , volumeOffImageSetting)
+//            this.modifyButton(volumeButton , volumeOffImageSetting)
         });
-    }
-
-    /**
-        <br>
-        
-        @method setVolumeBar 
-        @param {} 
-        @return void
-    */
-    public setVolumeBar(src : string , width : number , height : number , top : number , left : number , scaleWidth : number , scaleHeight : number):void{
-    }
-
-    /**
-        <br>
-        
-        @method setVolumeBackground 
-        @param {} 
-        @return void
-    */
-    public setVolumeBackground(src : string , width : number , height : number , top : number , left : number , scaleWidth : number , scaleHeight : number):void{
-    }
     
+        var volume = this.player.getVolume();
+        volume = 0.5
+
+        var volumeArea = document.createElement("div");
+        volumeArea.style.position = "absolute";
+        volumeArea.style.top = "-123px";
+        volumeArea.style.left = "-" + ((30 - volumeOnImageSetting.width) / 2) + "px";
+        volumeArea.className = "volumeArea";
+
+        var volumeSlider = document.createElement("div");
+        volumeSlider.className = "volumeSlider";
+        volumeSlider.style.top = 10 + 100 * volume + "px";
+        
+        var volumeBarTotal = document.createElement("div");
+        volumeBarTotal.className = "volumeBarTotal";
+
+        var volumeBarCurrent = document.createElement("div");
+        volumeBarCurrent.className = "volumeBarCurrent";
+        
+        volumeBarTotal.style.height = 100 * volume + "px";
+        volumeBarTotal.style.top = "10px";
+        volumeBarCurrent.style.height = (100 - 100 * volume) + "px";
+        volumeBarCurrent.style.top = 10 + (100 - 100 * volume) + "px";
+        
+        volumeArea.appendChild(volumeSlider);
+        volumeArea.appendChild(volumeBarTotal);
+        volumeArea.appendChild(volumeBarCurrent);
+
+        volumeButton.appendChild(volumeArea);
+        volumeButton.addEventListener('mouseover' , () => {
+            console.log("view button")
+            volumeArea.style.visibility = "visible";
+            volumeArea.style.display    = "block";
+        }, false);
+        volumeArea.addEventListener('mouseover' , () => {
+            volumeArea.style.visibility = "visible";
+            volumeArea.style.display    = "block";
+        }, false);
+        volumeButton.addEventListener('mouseout' , () => {
+            volumeArea.style.visibility = "hidden";
+            volumeArea.style.display    = "none";
+        }, false);
+
+        volumeArea.addEventListener('click', (e) => {
+            var barTop = volumeSlider.getBoundingClientRect().top
+            var dy = e.pageY - barTop
+            volumeSlider.style.top = parseInt(volumeSlider.style.top.replace("px" , "")) + dy + "px"
+        }, false);
+        
+        var moveStart = false;
+        volumeSlider.addEventListener('mousedown', (e) => {
+            moveStart = true;
+        }, false);
+
+        volumeArea.addEventListener('mousemove', (e) => {
+            if(!moveStart){
+                return;
+            }
+            var barTop = volumeSlider.getBoundingClientRect().top
+            var dy = e.pageY - barTop
+            volumeSlider.style.top = parseInt(volumeSlider.style.top.replace("px" , "")) + dy + "px"
+        }, false);
+
+        document.addEventListener('mouseup', (e) => {
+            moveStart = false;
+        }, false);
+    }
+
     /**
         <br>
         

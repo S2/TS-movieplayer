@@ -288,6 +288,18 @@ class Player{
         var media:HTMLVideoElement = this.media;
         media.volume = volume ;
     }
+    
+    /**
+        <br>
+        
+        @method getVolume 
+        @param {} 
+        @return number
+    */
+    public getVolume():number{
+        var media:HTMLVideoElement = this.media;
+        return media.volume ;
+    }
 
     public toggleFullScreen(){
         var mediaParent:HTMLElement = this.mediaParent

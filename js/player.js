@@ -245,7 +245,7 @@ var ControlBarOption = (function () {
         this.displayLeftButtons = ['play', 'volume', 'duration', '::', 'current'];
         this.displayRightButtons = ['fullscreen'];
         this.height = 30;
-        this.zIndex = 100;
+        this.zIndex = 120;
     }
     return ControlBarOption;
 })();
@@ -541,6 +541,11 @@ var Player = (function () {
     Player.prototype.setInitialVolume = function (volume) {
         var media = this.media;
         media.volume = volume;
+    };
+
+    Player.prototype.getVolume = function () {
+        var media = this.media;
+        return media.volume;
     };
 
     Player.prototype.toggleFullScreen = function () {
@@ -900,6 +905,7 @@ var Controls = (function () {
         var _this = this;
         var volumeButton = this.createButton(volumeOnImageSetting);
         volumeButton.className = 'controllButtonLeft volumeButton';
+        volumeButton.style.position = "relative";
         this.controlBar.getElement().appendChild(volumeButton);
 
         volumeButton.addEventListener("click", function () {
@@ -910,18 +916,78 @@ var Controls = (function () {
         });
 
         this.player.hookVolumeOn(function () {
-            _this.modifyButton(volumeButton, volumeOnImageSetting);
         });
 
         this.player.hookVolumeOff(function () {
-            _this.modifyButton(volumeButton, volumeOffImageSetting);
         });
-    };
 
-    Controls.prototype.setVolumeBar = function (src, width, height, top, left, scaleWidth, scaleHeight) {
-    };
+        var volume = this.player.getVolume();
+        volume = 0.5;
 
-    Controls.prototype.setVolumeBackground = function (src, width, height, top, left, scaleWidth, scaleHeight) {
+        var volumeArea = document.createElement("div");
+        volumeArea.style.position = "absolute";
+        volumeArea.style.top = "-123px";
+        volumeArea.style.left = "-" + ((30 - volumeOnImageSetting.width) / 2) + "px";
+        volumeArea.className = "volumeArea";
+
+        var volumeSlider = document.createElement("div");
+        volumeSlider.className = "volumeSlider";
+        volumeSlider.style.top = 10 + 100 * volume + "px";
+
+        var volumeBarTotal = document.createElement("div");
+        volumeBarTotal.className = "volumeBarTotal";
+
+        var volumeBarCurrent = document.createElement("div");
+        volumeBarCurrent.className = "volumeBarCurrent";
+
+        volumeBarTotal.style.height = 100 * volume + "px";
+        volumeBarTotal.style.top = "10px";
+        volumeBarCurrent.style.height = (100 - 100 * volume) + "px";
+        volumeBarCurrent.style.top = 10 + (100 - 100 * volume) + "px";
+
+        volumeArea.appendChild(volumeSlider);
+        volumeArea.appendChild(volumeBarTotal);
+        volumeArea.appendChild(volumeBarCurrent);
+
+        volumeButton.appendChild(volumeArea);
+        volumeButton.addEventListener('mouseover', function () {
+            console.log("view button");
+            volumeArea.style.visibility = "visible";
+            volumeArea.style.display = "block";
+        }, false);
+        volumeArea.addEventListener('mouseover', function () {
+            volumeArea.style.visibility = "visible";
+            volumeArea.style.display = "block";
+        }, false);
+        volumeButton.addEventListener('mouseout', function () {
+            volumeArea.style.visibility = "hidden";
+            volumeArea.style.display = "none";
+            console.log("out");
+        }, false);
+
+        volumeArea.addEventListener('click', function (e) {
+            var barTop = volumeSlider.getBoundingClientRect().top;
+            var dy = e.pageY - barTop;
+            volumeSlider.style.top = parseInt(volumeSlider.style.top.replace("px", "")) + dy + "px";
+        }, false);
+
+        var moveStart = false;
+        volumeSlider.addEventListener('mousedown', function (e) {
+            moveStart = true;
+        }, false);
+
+        volumeArea.addEventListener('mousemove', function (e) {
+            if (!moveStart) {
+                return;
+            }
+            var barTop = volumeSlider.getBoundingClientRect().top;
+            var dy = e.pageY - barTop;
+            volumeSlider.style.top = parseInt(volumeSlider.style.top.replace("px", "")) + dy + "px";
+        }, false);
+
+        document.addEventListener('mouseup', function (e) {
+            moveStart = false;
+        }, false);
     };
 
     Controls.prototype.setSeparator = function (separateString) {
