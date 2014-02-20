@@ -434,7 +434,24 @@ class Player{
             this.setVolumeOff() : 
             this.setVolumeOn() ;
     }
-
+    
+    /**
+        <br>
+        
+        @method setVolume 
+        @param {} 
+        @return void
+    */
+    public setVolume(dVolume : number):void{
+        var newVolume = this.media.volume + dVolume ;
+        if(newVolume < 0){
+            newVolume = 0;
+        }
+        if(newVolume > 1){
+            newVolume = 1;
+        }
+        this.media.volume + newVolume ;
+    }
     private doMethodArray(methods:Array){
         for(var i = 0 ; i < methods.length ; i++){
             methods[i](this, this.media);

@@ -646,6 +646,16 @@ var Player = (function () {
         this.enableSound ? this.setVolumeOff() : this.setVolumeOn();
     };
 
+    Player.prototype.setVolume = function (dVolume) {
+        var newVolume = this.media.volume + dVolume;
+        if (newVolume < 0) {
+            newVolume = 0;
+        }
+        if (newVolume > 1) {
+            newVolume = 1;
+        }
+        this.media.volume + newVolume;
+    };
     Player.prototype.doMethodArray = function (methods) {
         for (var i = 0; i < methods.length; i++) {
             methods[i](this, this.media);
@@ -922,7 +932,6 @@ var Controls = (function () {
         });
 
         var volume = this.player.getVolume();
-        volume = 0.5;
 
         var volumeArea = document.createElement("div");
         volumeArea.style.position = "absolute";
@@ -951,7 +960,6 @@ var Controls = (function () {
 
         volumeButton.appendChild(volumeArea);
         volumeButton.addEventListener('mouseover', function () {
-            console.log("view button");
             volumeArea.style.visibility = "visible";
             volumeArea.style.display = "block";
         }, false);
@@ -962,13 +970,20 @@ var Controls = (function () {
         volumeButton.addEventListener('mouseout', function () {
             volumeArea.style.visibility = "hidden";
             volumeArea.style.display = "none";
-            console.log("out");
         }, false);
 
         volumeArea.addEventListener('click', function (e) {
             var barTop = volumeSlider.getBoundingClientRect().top;
             var dy = e.pageY - barTop;
-            volumeSlider.style.top = parseInt(volumeSlider.style.top.replace("px", "")) + dy + "px";
+            var changeToBarTop = parseInt(volumeSlider.style.top.replace("px", "")) + dy;
+            if (changeToBarTop < 10) {
+                changeToBarTop = 10;
+            }
+            if (changeToBarTop > 110) {
+                changeToBarTop = 110;
+            }
+            volumeSlider.style.top = changeToBarTop + "px";
+            _this.player.setVolume(-1 * dy / 100);
         }, false);
 
         var moveStart = false;
@@ -982,7 +997,15 @@ var Controls = (function () {
             }
             var barTop = volumeSlider.getBoundingClientRect().top;
             var dy = e.pageY - barTop;
-            volumeSlider.style.top = parseInt(volumeSlider.style.top.replace("px", "")) + dy + "px";
+            var changeToBarTop = parseInt(volumeSlider.style.top.replace("px", "")) + dy;
+            if (changeToBarTop < 10) {
+                changeToBarTop = 10;
+            }
+            if (changeToBarTop > 110) {
+                changeToBarTop = 110;
+            }
+            volumeSlider.style.top = changeToBarTop + "px";
+            _this.player.setVolume(-1 * dy / 100);
         }, false);
 
         document.addEventListener('mouseup', function (e) {

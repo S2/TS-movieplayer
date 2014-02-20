@@ -216,7 +216,6 @@ class Controls{
         });
     
         var volume = this.player.getVolume();
-        volume = 0.5
 
         var volumeArea = document.createElement("div");
         volumeArea.style.position = "absolute";
@@ -245,7 +244,6 @@ class Controls{
 
         volumeButton.appendChild(volumeArea);
         volumeButton.addEventListener('mouseover' , () => {
-            console.log("view button")
             volumeArea.style.visibility = "visible";
             volumeArea.style.display    = "block";
         }, false);
@@ -261,7 +259,15 @@ class Controls{
         volumeArea.addEventListener('click', (e) => {
             var barTop = volumeSlider.getBoundingClientRect().top
             var dy = e.pageY - barTop
-            volumeSlider.style.top = parseInt(volumeSlider.style.top.replace("px" , "")) + dy + "px"
+            var changeToBarTop = parseInt(volumeSlider.style.top.replace("px" , "")) + dy
+            if(changeToBarTop < 10){
+                changeToBarTop = 10;
+            }
+            if(changeToBarTop > 110){
+                changeToBarTop = 110;
+            }
+            volumeSlider.style.top = changeToBarTop + "px"
+            this.player.setVolume(-1 * dy / 100)
         }, false);
         
         var moveStart = false;
@@ -275,7 +281,15 @@ class Controls{
             }
             var barTop = volumeSlider.getBoundingClientRect().top
             var dy = e.pageY - barTop
-            volumeSlider.style.top = parseInt(volumeSlider.style.top.replace("px" , "")) + dy + "px"
+            var changeToBarTop = parseInt(volumeSlider.style.top.replace("px" , "")) + dy
+            if(changeToBarTop < 10){
+                changeToBarTop = 10;
+            }
+            if(changeToBarTop > 110){
+                changeToBarTop = 110;
+            }
+            volumeSlider.style.top = changeToBarTop + "px"
+            this.player.setVolume(-1 * dy / 100)
         }, false);
 
         document.addEventListener('mouseup', (e) => {
