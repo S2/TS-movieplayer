@@ -11,9 +11,6 @@ class SeekBar extends Bar{
     constructor(options:SeekBarOption, width:number){
         super();
         this.options = options;
-        if(this.options == null){
-            this.options = new SeekBarOption;
-        }
         this.width = width;
     }
     

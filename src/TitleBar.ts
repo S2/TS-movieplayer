@@ -9,9 +9,6 @@ class TitleBar extends Bar{
     constructor(options:TitleBarOption , width:number){
         super();
         this.options = options;
-        if(this.options == null){
-            this.options = new TitleBarOption;
-        }
         this.width = width;
     }
 

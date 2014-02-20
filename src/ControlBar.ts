@@ -8,12 +8,9 @@ class ControlBar extends Bar{
     width: number;
     appendMethods : {} = {};
     barElement : HTMLDivElement;
-    constructor(options:ControlBarOption, width:number){
+    constructor(options:ControlBarOption , width:number){
         super();
         this.options = options;
-        if(this.options == null){
-            this.options = new ControlBarOption;
-        }
         this.width = width;
     }
     

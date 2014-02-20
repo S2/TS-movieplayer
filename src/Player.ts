@@ -63,7 +63,11 @@ class Player{
     duration    : number;
     createOption:CreateOption;
 
-    constructor(target:HTMLVideoElement ,  createOption:CreateOption , controlOption:ControlBarOption ,titleBarOption:TitleBarOption  ,seekBarOption:SeekBarOption){
+    constructor(target:HTMLVideoElement ,  
+            createOption:CreateOption = new CreateOption(), 
+            controlOption:ControlBarOption = new ControlBarOption() ,
+            titleBarOption:TitleBarOption = new TitleBarOption() ,
+            seekBarOption:SeekBarOption = new SeekBarOption()){
         this.target = target;
         this.createOption = createOption;
         this.getEnvironment();
@@ -87,18 +91,19 @@ class Player{
         }
         this.controls = new Controls(this , this.control);
 
-        var centerBackgroundImageSetting = new BackgroundImageSetting('../image/largeButton.svg' , 240 , 240 , 30 , 30 , 80 , 80);
+        var centerBackgroundImageSetting = new BackgroundImageSetting('../image/largeButton.svg' , 240 , 240 , 30 , 30 , 80 , 80 , new Margin(0 , 0 , 0 , 0));
         this.controls.setCenterPlayButton(centerBackgroundImageSetting);
 
-        var playBackgroundImageSetting = new BackgroundImageSetting('../image/miniButton.svg'      , 30 , 30 , 0 , 0 , 100 , 100);
-        var pauseBackgroundImageSetting = new BackgroundImageSetting('../image/miniButtonPause.svg' , 30 , 30 , 0 , 0 , 100 , 100);
+        var playBackgroundImageSetting = new BackgroundImageSetting('../image/controls.svg'      , 16 , 16 , 0 , 0 , 100 , 100 , new Margin(7 , 5 , 7 , 5));
+        var pauseBackgroundImageSetting = new BackgroundImageSetting('../image/controls.svg' , 16 , 16 , 0 , -16  , 100 , 100 , new Margin(7 , 5 , 7 , 5));
+
         this.controls.setPlayButton(playBackgroundImageSetting , pauseBackgroundImageSetting );
 
         this.controls.setCurrentTime();
         this.controls.setSeparator(" / ");
         this.controls.setDuration(this.duration);
 
-        var fullscreenBackgroundImageSetting = new BackgroundImageSetting('../image/miniButtonPause.svg' , 30 , 30 , 0 , 0 , 100 , 100);
+        var fullscreenBackgroundImageSetting = new BackgroundImageSetting('../image/controls.svg' , 16 , 16 , -32  , 0 , 100 , 100 , new Margin(7 , 5 , 7 , 5));
         this.controls.setFullscreenButton(fullscreenBackgroundImageSetting);
 
         target.addEventListener('click' , () => {

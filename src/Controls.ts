@@ -10,7 +10,8 @@ class BackgroundImageSetting{
     left        :  number;
     scaleWidth  :  number;
     scaleHeight :  number;
-    constructor(src , width , height , top , left , scaleWidth , scaleHeight){
+    margin      :  Margin;
+    constructor(src , width , height , top = 0 , left = 0, scaleWidth = 100 , scaleHeight = 100 , margin : Margin = new Margin(0 , 0)){
         this.src         = src
         this.width       = width
         this.height      = height
@@ -18,6 +19,32 @@ class BackgroundImageSetting{
         this.left        = left
         this.scaleWidth  = scaleWidth
         this.scaleHeight = scaleHeight
+        this.margin      = margin;
+    }
+}
+
+class Margin{
+    top    : number;
+    right  : number;
+    bottom : number;
+    left   : number;
+    constructor(top , right , bottom = null , left = null){
+        if(bottom == null && left == null){
+            this.top    = top;
+            this.right  = right;
+            this.bottom = top;
+            this.left   = right;
+        }else{
+            this.top    = top;
+            this.right  = right;
+            this.bottom = top;
+            this.left   = right;
+        }
+    }
+    public getMarginString():string{
+        return [this.top , this.right , this.bottom , this.left].map(function(value){
+            return value ? value + "px" : "0" ;
+        }).join(" ");
     }
 }
 
@@ -41,7 +68,10 @@ class Controls{
         style.backgroundImage     = "url('" + backgroundImageSetting.src + "')";
         style.backgroundRepeat    =  "no-repeat";
         style.backgroundPosition  = backgroundImageSetting.top + "px " + backgroundImageSetting.left + "px";
-        style.backgroundSize      = backgroundImageSetting.scaleWidth + "% " + backgroundImageSetting.scaleHeight + "%";
+        style.margin              = backgroundImageSetting.margin.getMarginString();
+        if(backgroundImageSetting.scaleWidth != 100 || backgroundImageSetting.scaleHeight != 100){
+            style.backgroundSize      = backgroundImageSetting.scaleWidth + "% " + backgroundImageSetting.scaleHeight + "%";
+        }
         style.zIndex              = (<ControlBar>this.controlBar).getZIndex() + 1 + "";
         return button;
     }
@@ -107,7 +137,9 @@ class Controls{
         style.backgroundImage     = "url('" + backgroundImageSetting.src + "')";
         style.backgroundRepeat    =  "no-repeat";
         style.backgroundPosition  = backgroundImageSetting.top + "px " + backgroundImageSetting.left + "px";
-        style.backgroundSize      = backgroundImageSetting.scaleWidth + "% " + backgroundImageSetting.scaleHeight + "%";
+        if(backgroundImageSetting.scaleWidth != 100 || backgroundImageSetting.scaleHeight != 100){
+            style.backgroundSize      = backgroundImageSetting.scaleWidth + "% " + backgroundImageSetting.scaleHeight + "%";
+        }
     }
 
     /**
@@ -118,7 +150,7 @@ class Controls{
         @return void
     */
     public setPlayButton(playBackgroundImageSetting : BackgroundImageSetting , pauseBackgroundImageSetting : BackgroundImageSetting){
-        var playPauseButton  : HTMLDivElement = this.createButton(pauseBackgroundImageSetting)
+        var playPauseButton  : HTMLDivElement = this.createButton(playBackgroundImageSetting)
         playPauseButton.className = 'controllButtonLeft playPauseButton';
         this.controlBar.getElement().appendChild(playPauseButton);
         
