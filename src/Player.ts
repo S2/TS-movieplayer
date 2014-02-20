@@ -61,6 +61,8 @@ class Player{
     canTouch    : bool = false;
     version     : number;
     duration    : number;
+    volume      : number;
+    enableSound : Boolean = true;
     createOption:CreateOption;
 
     constructor(target:HTMLVideoElement ,  
@@ -79,15 +81,17 @@ class Player{
         this.control = new ControlBar(controlOption , this.width);
         this.seekbar = new SeekBar(seekBarOption , this.width);
         
-       if(createOption.viewControllBar){
-            this.setLowerBar(this.control);
+        var controlBar = null
+        var titleBar = null
+        var seekBar = null
+        if(createOption.viewControllBar){
+            controlBar = this.setLowerBar(this.control);
         }
         if(createOption.viewTitleBar){
-            this.setUpperBar(this.title);
+            titleBar = this.setUpperBar(this.title);
         }
-        var seekbar
         if(createOption.viewSeekBar){
-            seekbar = this.setLowerBar(this.seekbar);
+            seekBar = this.setLowerBar(this.seekbar);
         }
         this.controls = new Controls(this , this.control);
 
@@ -126,8 +130,12 @@ class Player{
             this.isPaused = false
         },false);
         
+        target.addEventListener('volumechange' , () => {
+            this.doMethodArray(this.volumeChange)
+        },false);
+ 
         var displayControll = true;
-        target.addEventListener('mouseover' , () => {
+        var barFeedIn = () => {
             if(this.isPlaying){
                 this.title.feedIn(0 , 50);
                 this.control.feedIn(0 , 50);
@@ -135,12 +143,24 @@ class Player{
                     this.seekbar.feedIn(0 , 50);
                 }else{
                     if(!displayControll){
-                        seekbar.style.top = parseInt(seekbar.style.top.replace("px" , "")) - this.control.getHeight() + "px";
+                        seekBar.style.top = parseInt(seekBar.style.top.replace("px" , "")) - this.control.getHeight() + "px";
                     }
                 }
                 displayControll  = true;
             }
-        },false);
+        }
+
+        target.addEventListener('mouseover' , barFeedIn ,false);
+        if(controlBar){
+            controlBar.addEventListener('mouseover' , barFeedIn ,false);
+        }
+        if(titleBar){
+            titleBar.addEventListener('mouseover' , barFeedIn ,false);
+        }
+        if(seekBar){
+            seekBar.addEventListener('mouseover' , barFeedIn ,false);
+        }
+
         target.addEventListener('mouseout' , () => {
             if(this.isPlaying){
                 this.title.feedOut(0 , 50);
@@ -150,7 +170,7 @@ class Player{
                 }else{
                     if(displayControll){
                         this.control.setFeedOutHookOnce( () => {
-                            seekbar.style.top = parseInt(seekbar.style.top.replace("px" , "")) + this.control.getHeight() + "px";
+                            seekBar.style.top = parseInt(seekBar.style.top.replace("px" , "")) + this.control.getHeight() + "px";
                         })
                     }
                 }
@@ -165,7 +185,7 @@ class Player{
                 this.seekbar.feedIn(0 , 50);
             }else{
                 if(!displayControll){
-                    seekbar.style.top = parseInt(seekbar.style.top.replace("px" , "")) - this.control.getHeight() + "px";
+                    seekBar.style.top = parseInt(seekBar.style.top.replace("px" , "")) - this.control.getHeight() + "px";
                 }
             }
             displayControll  = true;
@@ -345,6 +365,62 @@ class Player{
     private fullscreenExit : Array = [];
     public hookFullscreenExit(hookMethod:(player:Player , video:HTMLVideoElement)=>void){
         this.fullscreenExit.push(hookMethod);
+    }
+
+    private volumeChange : Array = [];
+    public hookVolumeChange(hookMethod:(player:Player , video:HTMLVideoElement)=>void){
+        this.volumeChange.push(hookMethod);
+    }
+
+    private volumeOn : Array = [];
+    public hookVolumeOn(hookMethod:(player:Player , video:HTMLVideoElement)=>void){
+        this.volumeOn.push(hookMethod);
+    }
+
+    private volumeOff : Array = [];
+    public hookVolumeOff(hookMethod:(player:Player , video:HTMLVideoElement)=>void){
+        this.volumeOff.push(hookMethod);
+        this.doMethodArray(this.volumeOff)
+    }
+
+    /**
+        <br>
+        
+        @method setVolumeOn 
+        @param {} 
+        @return void
+    */
+    public setVolumeOn():void{
+        this.volume = this.target.volume;
+        this.target.muted = true;
+        this.enableSound = true;
+        this.doMethodArray(this.volumeOn)
+    }
+    
+    /**
+        <br>
+        
+        @method setVolumeOff 
+        @param {} 
+        @return void
+    */
+    public setVolumeOff():void{
+        this.target.muted = false;
+        this.enableSound = false;
+        this.doMethodArray(this.volumeOff)
+    }
+
+    /**
+        <br>
+        
+        @method toggleVolume
+        @param {} 
+        @return void
+    */
+    public toggleVolume():void{
+        this.enableSound ? 
+            this.setVolumeOff() : 
+            this.setVolumeOn() ;
     }
 
     private doMethodArray(methods:Array){

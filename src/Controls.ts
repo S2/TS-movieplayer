@@ -203,14 +203,16 @@ class Controls{
         volumeButton.className = 'controllButtonLeft volumeButton';
         this.controlBar.getElement().appendChild(volumeButton);
         
-//        //  volume on
-//        this.player.hookVolumeOn(() => {
-//            this.modifyButton(volumeButton , volumeOnImageSetting)
-//        });
-//        // volume off
-//        this.player.hookVolumeOff(() => {
-//            this.modifyButton(volumeButton , volumeOffImageSetting)
-//        });
+        volumeButton.addEventListener("click" , () => {this.player.toggleVolume()});
+        volumeButton.addEventListener("touch" , () => {this.player.toggleVolume()});
+        //  volume on
+        this.player.hookVolumeOn(() => {
+            this.modifyButton(volumeButton , volumeOnImageSetting)
+        });
+        // volume off
+        this.player.hookVolumeOff(() => {
+            this.modifyButton(volumeButton , volumeOffImageSetting)
+        });
     }
 
     /**

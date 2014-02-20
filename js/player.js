@@ -1,7 +1,8 @@
 var Bar = (function () {
     function Bar() {
-        this.maxAlpha = 0.5;
+        this.maxAlpha = 1;
         this.eventEnable = true;
+        this.className = "bar";
         this.inFeedOut = false;
         this.inFeedIn = false;
         this.feedInHook = [];
@@ -10,7 +11,9 @@ var Bar = (function () {
         this.feedOutHookOnce = [];
     }
     Bar.prototype.createElement = function (player) {
-        return document.createElement("div");
+        var element = document.createElement("div");
+        element.className = this.className;
+        return element;
     };
 
     Bar.prototype.feedOut = function (waitSeconds, feedOutSeconds) {
@@ -145,9 +148,10 @@ var TitleBar = (function (_super) {
         _super.call(this);
         this.options = options;
         this.width = width;
+        this.className = "bar titleBar";
     }
     TitleBar.prototype.createElement = function (player) {
-        var newElement = document.createElement("div");
+        var newElement = _super.prototype.createElement.call(this, player);
         newElement.style.width = this.width + "px";
         newElement.style.height = this.options.height + "px";
         newElement.style.backgroundColor = "#888888";
@@ -163,11 +167,11 @@ var TitleBar = (function (_super) {
 })(Bar);
 var SeekBarOption = (function () {
     function SeekBarOption() {
-        this.height = 20;
+        this.height = 5;
         this.zIndex = 100;
         this.railColor = "#000000";
         this.filledColor = "#FF0000";
-        this.class = "seekbar";
+        this.class = "seekBar";
     }
     return SeekBarOption;
 })();
@@ -178,11 +182,11 @@ var SeekBar = (function (_super) {
         this.appendMethods = {};
         this.options = options;
         this.width = width;
+        this.className = "bar seekBar";
     }
     SeekBar.prototype.createElement = function (player) {
-        var newElement = document.createElement("div");
+        var newElement = _super.prototype.createElement.call(this, player);
         newElement.style.width = this.width + "px";
-        newElement.className = this.options.class;
         if (this.options.height) {
             newElement.style.height = this.options.height + "px";
         }
@@ -252,20 +256,18 @@ var ControlBar = (function (_super) {
         this.appendMethods = {};
         this.options = options;
         this.width = width;
+        this.className = "bar controlBar";
     }
     ControlBar.prototype.createElement = function (player) {
-        var newElement = document.createElement("div");
+        var newElement = _super.prototype.createElement.call(this, player);
         newElement.style.width = this.width + "px";
         newElement.style.height = this.options.height + "px";
-        newElement.style.backgroundColor = "#888888";
         newElement.style.zIndex = this.options.zIndex + "";
         newElement.style.position = "absolute";
-        newElement.style.opacity = "0.5";
 
         var options = this.options;
 
         this.createdElement = newElement;
-
         return newElement;
     };
 
@@ -310,6 +312,7 @@ var Player = (function () {
         this.isFirefox = false;
         this.isPC = false;
         this.canTouch = false;
+        this.enableSound = true;
         this.beforePlay = [];
         this.afterPlay = [];
         this.beforePause = [];
@@ -320,6 +323,9 @@ var Player = (function () {
         this.ended = [];
         this.fullscreenEnter = [];
         this.fullscreenExit = [];
+        this.volumeChange = [];
+        this.volumeOn = [];
+        this.volumeOff = [];
         this.target = target;
         this.createOption = createOption;
         this.getEnvironment();
@@ -331,15 +337,17 @@ var Player = (function () {
         this.control = new ControlBar(controlOption, this.width);
         this.seekbar = new SeekBar(seekBarOption, this.width);
 
+        var controlBar = null;
+        var titleBar = null;
+        var seekBar = null;
         if (createOption.viewControllBar) {
-            this.setLowerBar(this.control);
+            controlBar = this.setLowerBar(this.control);
         }
         if (createOption.viewTitleBar) {
-            this.setUpperBar(this.title);
+            titleBar = this.setUpperBar(this.title);
         }
-        var seekbar;
         if (createOption.viewSeekBar) {
-            seekbar = this.setLowerBar(this.seekbar);
+            seekBar = this.setLowerBar(this.seekbar);
         }
         this.controls = new Controls(this, this.control);
 
@@ -378,8 +386,12 @@ var Player = (function () {
             _this.isPaused = false;
         }, false);
 
+        target.addEventListener('volumechange', function () {
+            _this.doMethodArray(_this.volumeChange);
+        }, false);
+
         var displayControll = true;
-        target.addEventListener('mouseover', function () {
+        var barFeedIn = function () {
             if (_this.isPlaying) {
                 _this.title.feedIn(0, 50);
                 _this.control.feedIn(0, 50);
@@ -387,12 +399,24 @@ var Player = (function () {
                     _this.seekbar.feedIn(0, 50);
                 } else {
                     if (!displayControll) {
-                        seekbar.style.top = parseInt(seekbar.style.top.replace("px", "")) - _this.control.getHeight() + "px";
+                        seekBar.style.top = parseInt(seekBar.style.top.replace("px", "")) - _this.control.getHeight() + "px";
                     }
                 }
                 displayControll = true;
             }
-        }, false);
+        };
+
+        target.addEventListener('mouseover', barFeedIn, false);
+        if (controlBar) {
+            controlBar.addEventListener('mouseover', barFeedIn, false);
+        }
+        if (titleBar) {
+            titleBar.addEventListener('mouseover', barFeedIn, false);
+        }
+        if (seekBar) {
+            seekBar.addEventListener('mouseover', barFeedIn, false);
+        }
+
         target.addEventListener('mouseout', function () {
             if (_this.isPlaying) {
                 _this.title.feedOut(0, 50);
@@ -402,7 +426,7 @@ var Player = (function () {
                 } else {
                     if (displayControll) {
                         _this.control.setFeedOutHookOnce(function () {
-                            seekbar.style.top = parseInt(seekbar.style.top.replace("px", "")) + _this.control.getHeight() + "px";
+                            seekBar.style.top = parseInt(seekBar.style.top.replace("px", "")) + _this.control.getHeight() + "px";
                         });
                     }
                 }
@@ -417,7 +441,7 @@ var Player = (function () {
                 _this.seekbar.feedIn(0, 50);
             } else {
                 if (!displayControll) {
-                    seekbar.style.top = parseInt(seekbar.style.top.replace("px", "")) - _this.control.getHeight() + "px";
+                    seekBar.style.top = parseInt(seekBar.style.top.replace("px", "")) - _this.control.getHeight() + "px";
                 }
             }
             displayControll = true;
@@ -585,6 +609,36 @@ var Player = (function () {
 
     Player.prototype.hookFullscreenExit = function (hookMethod) {
         this.fullscreenExit.push(hookMethod);
+    };
+
+    Player.prototype.hookVolumeChange = function (hookMethod) {
+        this.volumeChange.push(hookMethod);
+    };
+
+    Player.prototype.hookVolumeOn = function (hookMethod) {
+        this.volumeOn.push(hookMethod);
+    };
+
+    Player.prototype.hookVolumeOff = function (hookMethod) {
+        this.volumeOff.push(hookMethod);
+        this.doMethodArray(this.volumeOff);
+    };
+
+    Player.prototype.setVolumeOn = function () {
+        this.volume = this.target.volume;
+        this.target.muted = true;
+        this.enableSound = true;
+        this.doMethodArray(this.volumeOn);
+    };
+
+    Player.prototype.setVolumeOff = function () {
+        this.target.muted = false;
+        this.enableSound = false;
+        this.doMethodArray(this.volumeOff);
+    };
+
+    Player.prototype.toggleVolume = function () {
+        this.enableSound ? this.setVolumeOff() : this.setVolumeOn();
     };
 
     Player.prototype.doMethodArray = function (methods) {
@@ -835,9 +889,25 @@ var Controls = (function () {
     };
 
     Controls.prototype.setVolumeButton = function (volumeOnImageSetting, volumeOffImageSetting) {
+        var _this = this;
         var volumeButton = this.createButton(volumeOnImageSetting);
         volumeButton.className = 'controllButtonLeft volumeButton';
         this.controlBar.getElement().appendChild(volumeButton);
+
+        volumeButton.addEventListener("click", function () {
+            _this.player.toggleVolume();
+        });
+        volumeButton.addEventListener("touch", function () {
+            _this.player.toggleVolume();
+        });
+
+        this.player.hookVolumeOn(function () {
+            _this.modifyButton(volumeButton, volumeOnImageSetting);
+        });
+
+        this.player.hookVolumeOff(function () {
+            _this.modifyButton(volumeButton, volumeOffImageSetting);
+        });
     };
 
     Controls.prototype.setVolumeBar = function (src, width, height, top, left, scaleWidth, scaleHeight) {

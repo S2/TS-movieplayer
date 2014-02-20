@@ -3,10 +3,13 @@
 
 class Bar{
     public createdElement:HTMLElement;
-    public maxAlpha:number = 0.5;
+    public maxAlpha:number = 1;
     private eventEnable:boolean = true;
+    public className : string = "bar";
     public createElement(player:Player):HTMLElement{
-        return document.createElement("div");
+        var element = document.createElement("div");
+        element.className = this.className;
+        return element;
     }
     
     private inFeedOut : boolean = false;

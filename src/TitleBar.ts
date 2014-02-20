@@ -10,10 +10,11 @@ class TitleBar extends Bar{
         super();
         this.options = options;
         this.width = width;
+        this.className = "bar titleBar";
     }
 
     public createElement(player:Player):HTMLElement{
-        var newElement = document.createElement("div");
+        var newElement = super.createElement(player);
         newElement.style.width = this.width + "px";
         newElement.style.height = this.options.height + "px";
         newElement.style.backgroundColor = "#888888";

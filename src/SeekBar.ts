@@ -12,12 +12,12 @@ class SeekBar extends Bar{
         super();
         this.options = options;
         this.width = width;
+        this.className = "bar seekBar";
     }
     
     public createElement(player:Player):HTMLElement{
-        var newElement = document.createElement("div");
+        var newElement = super.createElement(player);
         newElement.style.width = this.width + "px";
-        newElement.className = this.options.class
         if(this.options.height){
             newElement.style.height = this.options.height + "px";
         }

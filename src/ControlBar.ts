@@ -12,21 +12,19 @@ class ControlBar extends Bar{
         super();
         this.options = options;
         this.width = width;
+        this.className = "bar controlBar";
     }
     
     public createElement(player:Player):HTMLElement{
-        var newElement = document.createElement("div");
+        var newElement = super.createElement(player);
         newElement.style.width = this.width + "px";
         newElement.style.height = this.options.height + "px";
-        newElement.style.backgroundColor = "#888888";
         newElement.style.zIndex = this.options.zIndex + "";
         newElement.style.position = "absolute";
-        newElement.style.opacity = "0.5";
 
         var options : ControlBarOption = this.options;
 
         this.createdElement = newElement;
-
         return newElement;
     }
     

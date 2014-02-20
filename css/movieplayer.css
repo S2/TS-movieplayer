@@ -13,11 +13,22 @@
     float:left;
 }
 
-.seekbar{
-    height : 20px;
+.seekBar{
+    height : 5px;
     zIndex : 100;
     background-color : #888888;
     position : absolute;
     opacity : 0.5;
 }
 
+.bar{
+    background: none;
+    background: url(../image/background.png);
+    background: rgba(217, 217, 217, 0.7) !important;
+    background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(rgba(217,217,217,0.7)), to(rgba(217,217,217,0.7)))!important;
+    background: -webkit-linear-gradient(top, rgba(217,217,217,0.7), rgba(217,217,217,0.7)) !important;
+    background: -moz-linear-gradient(top, rgba(217,217,217,0.7), rgba(217,217,217,0.7)) !important;
+    background: -o-linear-gradient(top, rgba(217,217,217,0.7), rgba(217,217,217,0.7)) !important;
+    background: -ms-linear-gradient(top, rgba(217,217,217,0.7), rgba(217,217,217,0.7)) !important;
+    background: linear-gradient(rgba(217,217,217,0.7), rgba(217,217,217,0.7)) !important;
+}
