@@ -208,11 +208,11 @@ class Controls{
         volumeButton.addEventListener("touch" , () => {this.player.toggleVolume()});
         //  volume on
         this.player.hookVolumeOn(() => {
-//            this.modifyButton(volumeButton , volumeOnImageSetting)
+            this.modifyButton(volumeButton , volumeOnImageSetting)
         });
         // volume off
         this.player.hookVolumeOff(() => {
-//            this.modifyButton(volumeButton , volumeOffImageSetting)
+            this.modifyButton(volumeButton , volumeOffImageSetting)
         });
     
         var volume = this.player.getVolume();

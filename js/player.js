@@ -926,9 +926,11 @@ var Controls = (function () {
         });
 
         this.player.hookVolumeOn(function () {
+            _this.modifyButton(volumeButton, volumeOnImageSetting);
         });
 
         this.player.hookVolumeOff(function () {
+            _this.modifyButton(volumeButton, volumeOffImageSetting);
         });
 
         var volume = this.player.getVolume();
