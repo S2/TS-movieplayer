@@ -92,6 +92,9 @@ class Player{
         }
         if(createOption.viewSeekBar){
             seekBar = this.setLowerBar(this.seekbar);
+            if(this.title){
+                this.seekbar.setMoveDownHeight(this.control.getHeight());
+            }
         }
         this.controls = new Controls(this , this.control);
 
@@ -143,7 +146,7 @@ class Player{
                     this.seekbar.feedIn(0 , 50);
                 }else{
                     if(!displayControll){
-                        seekBar.style.top = parseInt(seekBar.style.top.replace("px" , "")) - this.control.getHeight() + "px";
+                        this.seekbar.moveUpBar();
                     }
                 }
                 displayControll  = true;
@@ -170,7 +173,7 @@ class Player{
                 }else{
                     if(displayControll){
                         this.control.setFeedOutHookOnce( () => {
-                            seekBar.style.top = parseInt(seekBar.style.top.replace("px" , "")) + this.control.getHeight() + "px";
+                            this.seekbar.moveDownBar();
                         })
                     }
                 }
@@ -185,7 +188,7 @@ class Player{
                 this.seekbar.feedIn(0 , 50);
             }else{
                 if(!displayControll){
-                    seekBar.style.top = parseInt(seekBar.style.top.replace("px" , "")) - this.control.getHeight() + "px";
+                    this.seekbar.moveUpBar();
                 }
             }
             displayControll  = true;

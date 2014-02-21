@@ -9,6 +9,7 @@ class Bar{
     public createElement(player:Player):HTMLElement{
         var element = document.createElement("div");
         element.className = this.className;
+        this.createdElement = element;
         return element;
     }
     

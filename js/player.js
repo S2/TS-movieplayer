@@ -13,6 +13,7 @@ var Bar = (function () {
     Bar.prototype.createElement = function (player) {
         var element = document.createElement("div");
         element.className = this.className;
+        this.createdElement = element;
         return element;
     };
 
@@ -238,6 +239,24 @@ var SeekBar = (function (_super) {
         this.seekbar = seekbar;
         return newElement;
     };
+
+    SeekBar.prototype.setMoveDownHeight = function (moveDownHeight) {
+        this.moveDownHeight = moveDownHeight;
+    };
+
+    SeekBar.prototype.moveDownBar = function () {
+        if (this.initTop == null) {
+            this.initTop = parseInt(this.createdElement.style.top.replace("px", ""));
+        }
+        this.createdElement.style.top = this.initTop + this.moveDownHeight + "px";
+    };
+
+    SeekBar.prototype.moveUpBar = function () {
+        if (this.initTop == null) {
+            this.initTop = parseInt(this.createdElement.style.top.replace("px", ""));
+        }
+        this.createdElement.style.top = this.initTop + "px";
+    };
     return SeekBar;
 })(Bar);
 var ControlBarOption = (function () {
@@ -348,6 +367,9 @@ var Player = (function () {
         }
         if (createOption.viewSeekBar) {
             seekBar = this.setLowerBar(this.seekbar);
+            if (this.title) {
+                this.seekbar.setMoveDownHeight(this.control.getHeight());
+            }
         }
         this.controls = new Controls(this, this.control);
 
@@ -399,7 +421,7 @@ var Player = (function () {
                     _this.seekbar.feedIn(0, 50);
                 } else {
                     if (!displayControll) {
-                        seekBar.style.top = parseInt(seekBar.style.top.replace("px", "")) - _this.control.getHeight() + "px";
+                        _this.seekbar.moveUpBar();
                     }
                 }
                 displayControll = true;
@@ -426,7 +448,7 @@ var Player = (function () {
                 } else {
                     if (displayControll) {
                         _this.control.setFeedOutHookOnce(function () {
-                            seekBar.style.top = parseInt(seekBar.style.top.replace("px", "")) + _this.control.getHeight() + "px";
+                            _this.seekbar.moveDownBar();
                         });
                     }
                 }
@@ -441,7 +463,7 @@ var Player = (function () {
                 _this.seekbar.feedIn(0, 50);
             } else {
                 if (!displayControll) {
-                    seekBar.style.top = parseInt(seekBar.style.top.replace("px", "")) - _this.control.getHeight() + "px";
+                    _this.seekbar.moveUpBar();
                 }
             }
             displayControll = true;

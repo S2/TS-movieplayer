@@ -8,6 +8,8 @@ class SeekBar extends Bar{
     seekbar : HTMLElement;
     width: number;
     appendMethods : {} = {};
+    initTop : number;
+    moveDownHeight : number;
     constructor(options:SeekBarOption, width:number){
         super();
         this.options = options;
@@ -68,5 +70,44 @@ class SeekBar extends Bar{
         newElement.appendChild(seekbar);
         this.seekbar = seekbar;
         return newElement;
+    }
+    
+    /**
+        <br>
+        
+        @method setMoveDownHeight 
+        @param moveDownHeight {number} 
+        @return void
+    */
+    public setMoveDownHeight(moveDownHeight : number):void{
+        this.moveDownHeight = moveDownHeight;
+    }
+
+    /**
+        <br>
+        
+        @method moveUpBar
+        @param {} 
+        @return void
+    */
+    public moveDownBar():void{
+        if(this.initTop == null){
+            this.initTop = parseInt(this.createdElement.style.top.replace("px" ,""));
+        }
+        this.createdElement.style.top = this.initTop + this.moveDownHeight + "px";
+    }
+
+    /**
+        <br>
+        
+        @method moveDownBar
+        @param {} 
+        @return void
+    */
+    public moveUpBar():void{
+        if(this.initTop == null){
+            this.initTop = parseInt(this.createdElement.style.top.replace("px" ,""));
+        }
+        this.createdElement.style.top = this.initTop + "px";
     }
 }
