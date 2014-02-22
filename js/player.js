@@ -3,6 +3,7 @@ var Bar = (function () {
         this.maxAlpha = 1;
         this.eventEnable = true;
         this.className = "bar";
+        this.displayed = true;
         this.inFeedOut = false;
         this.inFeedIn = false;
         this.feedInHook = [];
@@ -127,6 +128,21 @@ var Bar = (function () {
 
     Bar.prototype.getElement = function () {
         return this.createdElement;
+    };
+
+    Bar.prototype.toggle = function () {
+        if (this.createdElement) {
+            var style = this.createdElement.style;
+            if (this.displayed) {
+                style.display = "none";
+                style.visibility = "hidden";
+                this.displayed = false;
+            } else {
+                style.display = "visible";
+                style.visibility = "block";
+                this.displayed = true;
+            }
+        }
     };
     return Bar;
 })();
@@ -320,7 +336,7 @@ var Player = (function () {
         this.setHeight = 0;
         this.isPlaying = false;
         this.isPaused = false;
-        this.isFullScreen = false;
+        this.isFullscreen = false;
         this.isIOS = false;
         this.isIPad = false;
         this.isIPod = false;
@@ -345,6 +361,7 @@ var Player = (function () {
         this.volumeChange = [];
         this.volumeOn = [];
         this.volumeOff = [];
+        this.loadedmetadata = [];
         this.media = media;
         this.createOption = createOption;
         this.getEnvironment();
@@ -386,7 +403,9 @@ var Player = (function () {
 
         this.controls.setCurrentTime();
         this.controls.setSeparator(" / ");
-        this.controls.setDuration(this.duration);
+        this.hookLoadedmetadata(function () {
+            _this.controls.setDuration(_this.getDuration());
+        });
 
         var fullscreenBackgroundImageSetting = new BackgroundImageSetting('../image/controls.svg', 16, 16, -32, 0, 100, 100, new Margin(7, 5, 7, 5));
         this.controls.setFullscreenButton(fullscreenBackgroundImageSetting);
@@ -400,6 +419,9 @@ var Player = (function () {
 
         media.addEventListener('timeupdate', function () {
             _this.doMethodArray(_this.timeUpdate);
+        }, false);
+        media.addEventListener('loadedmetadata', function () {
+            _this.doMethodArray(_this.loadedmetadata);
         }, false);
 
         media.addEventListener('ended', function () {
@@ -468,7 +490,7 @@ var Player = (function () {
             }
             displayControll = true;
         });
-        this.setInitialVolume(0);
+        media.load();
     }
     Player.prototype.setCurrentTime = function (moveToSec) {
         var media = this.media;
@@ -541,8 +563,6 @@ var Player = (function () {
 
         media.style.top = "0";
         this.media = media;
-
-        this.duration = media.duration;
     };
 
     Player.prototype.setFullscreenCenterElementPosition = function (element, ratio) {
@@ -570,32 +590,51 @@ var Player = (function () {
         return media.volume;
     };
 
-    Player.prototype.toggleFullScreen = function () {
+    Player.prototype.toggleFullscreen = function () {
+        if (this.isFullscreen) {
+            this.enterFullscreen();
+            this.isFullscreen = false;
+        } else {
+            this.exitFullscreen();
+            this.isFullscreen = true;
+        }
+    };
+
+    Player.prototype.enterFullscreen = function () {
         var mediaParent = this.mediaParent;
         var media = this.media;
-        if (this.isFullScreen) {
-            if (document.exitFullscreen) {
-                document.exitFullscreen();
-            } else if (document.mozCancelFullScreen) {
-                document.mozCancelFullScreen();
-            } else if (document.webkitCancelFullScreen) {
-                document.webkitCancelFullScreen();
-            }
-            media.style.width = this.width + "px";
-            media.style.height = this.height + "px";
-            this.isFullScreen = false;
-        } else {
-            if (mediaParent.requestFullscreen) {
-                mediaParent.requestFullscreen();
-            } else if (mediaParent.mozRequestFullScreen) {
-                mediaParent.mozRequestFullScreen();
-            } else if (mediaParent.webkitRequestFullScreen) {
-                mediaParent.webkitRequestFullScreen();
-            }
-            media.style.width = '100%';
-            media.style.height = '100%';
-            this.isFullScreen = true;
+        if (document.exitFullscreen) {
+            document.exitFullscreen();
+        } else if (document.mozCancelFullscreen) {
+            document.mozCancelFullscreen();
+        } else if (document.webkitCancelFullscreen) {
+            document.webkitCancelFullscreen();
         }
+
+        this.doMethodArray(this.fullscreenExit);
+    };
+
+    Player.prototype.exitFullscreen = function () {
+        var mediaParent = this.mediaParent;
+        var media = this.media;
+        if (mediaParent.requestFullscreen) {
+            mediaParent.requestFullscreen();
+        } else if (mediaParent.mozRequestFullscreen) {
+            mediaParent.mozRequestFullscreen();
+        } else if (mediaParent.webkitRequestFullscreen) {
+            mediaParent.webkitRequestFullscreen();
+        }
+        if (this.title) {
+            this.title.toggle();
+        }
+        if (this.control) {
+            this.control.toggle();
+        }
+        if (this.seekbar) {
+            this.seekbar.toggle();
+        }
+
+        this.doMethodArray(this.fullscreenEnter);
     };
 
     Player.prototype.hookBeforePlay = function (hookMethod) {
@@ -648,7 +687,10 @@ var Player = (function () {
 
     Player.prototype.hookVolumeOff = function (hookMethod) {
         this.volumeOff.push(hookMethod);
-        this.doMethodArray(this.volumeOff);
+    };
+
+    Player.prototype.hookLoadedmetadata = function (hookMethod) {
+        this.loadedmetadata.push(hookMethod);
     };
 
     Player.prototype.setVolumeOn = function () {
@@ -685,26 +727,35 @@ var Player = (function () {
     };
 
     Player.prototype.togglePlayPause = function () {
-        var media = this.media;
         if (this.isPlaying) {
-            this.doMethodArray(this.beforePause);
-            media.pause();
-            this.isPaused = true;
-            this.doMethodArray(this.afterPause);
-            this.isPlaying = false;
+            this.pause();
         } else {
-            if (this.isPaused) {
-                this.doMethodArray(this.beforeRestart);
-            }
-            this.doMethodArray(this.beforePlay);
-            media.play();
-            this.doMethodArray(this.afterPlay);
-            if (this.isPaused) {
-                this.doMethodArray(this.afterRestart);
-            }
-            this.isPlaying = true;
-            this.isPaused = false;
+            this.play();
         }
+    };
+
+    Player.prototype.play = function () {
+        var media = this.media;
+        if (this.isPaused) {
+            this.doMethodArray(this.beforeRestart);
+        }
+        this.doMethodArray(this.beforePlay);
+        media.play();
+        this.doMethodArray(this.afterPlay);
+        if (this.isPaused) {
+            this.doMethodArray(this.afterRestart);
+        }
+        this.isPlaying = true;
+        this.isPaused = false;
+    };
+
+    Player.prototype.pause = function () {
+        var media = this.media;
+        this.doMethodArray(this.beforePause);
+        media.pause();
+        this.isPaused = true;
+        this.doMethodArray(this.afterPause);
+        this.isPlaying = false;
     };
 
     Player.prototype.togglePauseRestart = function () {
@@ -928,8 +979,12 @@ var Controls = (function () {
     };
 
     Controls.prototype.setFullscreenButton = function (backgroundImageSetting) {
+        var _this = this;
         var fullscreenButton = this.createButton(backgroundImageSetting);
         fullscreenButton.className = 'controllButtonRight playPauseButton';
+        fullscreenButton.addEventListener('click', function () {
+            _this.player.toggleFullscreen();
+        }, false);
         this.controlBar.getElement().appendChild(fullscreenButton);
     };
 

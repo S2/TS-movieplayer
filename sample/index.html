@@ -13,10 +13,32 @@
 </video>
 
 <script src="../js/player.js"></script>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
 <button id="fuga">hogehoge</button>
 <link rel="stylesheet" href="../css/movieplayer.css">
 
 <script>
     var target = document.getElementById('hoge');
-    new Player(target , new CreateOption());
+    var player = new Player(target , new CreateOption());
+    document.getElementById("fuga").addEventListener('click' , function(){
+        player.toggleFullscreen();
+        player.togglePlayPause();
+    });
 </script>

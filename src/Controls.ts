@@ -188,7 +188,11 @@ class Controls{
     public setFullscreenButton(backgroundImageSetting : BackgroundImageSetting):void{
         var fullscreenButton  : HTMLDivElement = this.createButton(backgroundImageSetting)
         fullscreenButton.className = 'controllButtonRight playPauseButton';
+        fullscreenButton.addEventListener('click' , ()=>{
+            this.player.toggleFullscreen()
+        } , false);
         this.controlBar.getElement().appendChild(fullscreenButton);
+
     }
     
     /**

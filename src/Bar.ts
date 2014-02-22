@@ -6,6 +6,7 @@ class Bar{
     public maxAlpha:number = 1;
     private eventEnable:boolean = true;
     public className : string = "bar";
+    public displayed = true;
     public createElement(player:Player):HTMLElement{
         var element = document.createElement("div");
         element.className = this.className;
@@ -143,5 +144,26 @@ class Bar{
 
     public getElement():HTMLElement{
         return this.createdElement;
+    }
+    /**
+        <br>
+        
+        @method toggle 
+        @param {} 
+        @return void
+    */
+    public toggle():void{
+        if(this.createdElement){
+            var style = this.createdElement.style;
+            if(this.displayed){
+                style.display    = "none";
+                style.visibility = "hidden";
+                this.displayed   = false;
+            }else{
+                style.display    = "visible"
+                style.visibility = "block"
+                this.displayed   = true;
+            }
+        }
     }
 }

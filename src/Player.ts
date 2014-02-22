@@ -11,14 +11,14 @@
 // Add the missing definitions: 
 interface HTMLElement{
     requestFullscreen();
-    webkitRequestFullScreen();
-    mozRequestFullScreen();
+    webkitRequestFullscreen();
+    mozRequestFullscreen();
 }
 
 interface HTMLDocument{
     exitFullscreen();
-    mozCancelFullScreen();
-    webkitCancelFullScreen();
+    mozCancelFullscreen();
+    webkitCancelFullscreen();
     ontouchstart();
 }
 
@@ -45,7 +45,7 @@ class Player{
     mediaParent        :HTMLDivElement;
     isPlaying           :bool = false;
     isPaused            :bool = false;
-    isFullScreen        :bool = false;
+    isFullscreen        :bool = false;
 
     isIOS       : bool = false;
     isIPad      : bool = false;
@@ -111,7 +111,9 @@ class Player{
 
         this.controls.setCurrentTime();
         this.controls.setSeparator(" / ");
-        this.controls.setDuration(this.duration);
+        this.hookLoadedmetadata(()=>{
+            this.controls.setDuration(this.getDuration());
+        });
 
         var fullscreenBackgroundImageSetting = new BackgroundImageSetting('../image/controls.svg' , 16 , 16 , -32  , 0 , 100 , 100 , new Margin(7 , 5 , 7 , 5));
         this.controls.setFullscreenButton(fullscreenBackgroundImageSetting);
@@ -125,6 +127,9 @@ class Player{
         
         media.addEventListener('timeupdate' , () => {
             this.doMethodArray(this.timeUpdate)
+        },false);
+        media.addEventListener('loadedmetadata' , () => {
+            this.doMethodArray(this.loadedmetadata);
         },false);
 
         media.addEventListener('ended' , () => {
@@ -193,7 +198,7 @@ class Player{
             }
             displayControll  = true;
         });
-        this.setInitialVolume(0);
+        media.load();
     }
     
     public setCurrentTime(moveToSec:number){
@@ -204,7 +209,7 @@ class Player{
 
     public getCurrentTime() : number{
         var media = this.media;
-        return media.currentTime ;
+        return media.currentTime;
     }
 
     public getDuration():number{
@@ -268,8 +273,6 @@ class Player{
 
         media.style.top = "0";
         this.media = media;
-
-        this.duration = media.duration;
     }
     
     private setFullscreenCenterElementPosition(element:HTMLElement , ratio:number){
@@ -304,32 +307,67 @@ class Player{
         return media.volume ;
     }
 
-    public toggleFullScreen(){
+    public toggleFullscreen(){
+        if(this.isFullscreen){
+            this.enterFullscreen()
+            this.isFullscreen = false;
+        }else{
+            this.exitFullscreen()
+            this.isFullscreen = true;
+        }
+    }
+    
+    /**
+        <br>
+        
+        @method enterFullscreen 
+        @param {} 
+        @return void
+    */
+    public enterFullscreen():void{
         var mediaParent:HTMLElement = this.mediaParent
         var media:HTMLVideoElement = this.media
-        if(this.isFullScreen){
-            if (document.exitFullscreen) {
-                document.exitFullscreen();
-            } else if (document.mozCancelFullScreen) {
-                document.mozCancelFullScreen();
-            } else if (document.webkitCancelFullScreen) {
-                document.webkitCancelFullScreen();
-            }
-            media.style.width  = this.width + "px";
-            media.style.height = this.height + "px";
-            this.isFullScreen = false;
-        }else{
-            if (mediaParent.requestFullscreen) {
-                mediaParent.requestFullscreen();
-            } else if (mediaParent.mozRequestFullScreen) {
-                mediaParent.mozRequestFullScreen();
-            } else if (mediaParent.webkitRequestFullScreen) {
-                mediaParent.webkitRequestFullScreen();
-            }
-            media.style.width  = '100%';
-            media.style.height = '100%';
-            this.isFullScreen = true;
+        if (document.exitFullscreen) {
+            document.exitFullscreen();
+        } else if (document.mozCancelFullscreen) {
+            document.mozCancelFullscreen();
+        } else if (document.webkitCancelFullscreen) {
+            document.webkitCancelFullscreen();
         }
+        media.style.width  = this.width + "px";
+        media.style.height = this.height + "px";
+        this.doMethodArray(this.fullscreenExit);
+    }
+
+    /**
+        <br>
+        
+        @method exitFullscreen 
+        @param {} 
+        @return void
+    */
+    public exitFullscreen():void{
+        var mediaParent:HTMLElement = this.mediaParent
+        var media:HTMLVideoElement = this.media
+        if (mediaParent.requestFullscreen) {
+            mediaParent.requestFullscreen();
+        } else if (mediaParent.mozRequestFullscreen) {
+            mediaParent.mozRequestFullscreen();
+        } else if (mediaParent.webkitRequestFullscreen) {
+            mediaParent.webkitRequestFullscreen();
+        }
+        if(this.title){
+            this.title.toggle();
+        }
+        if(this.control){
+            this.control.toggle();
+        }
+        if(this.seekbar){
+            this.seekbar.toggle();
+        }
+        media.style.width  = '100%';
+        media.style.height = '100%';
+        this.doMethodArray(this.fullscreenEnter);
     }
 
     private beforePlay : Array = [];
@@ -371,7 +409,7 @@ class Player{
     public hookEnded(hookMethod:(player:Player , video:HTMLVideoElement)=>void){
         this.ended.push(hookMethod);
     }
-
+    
     private fullscreenEnter : Array = [];
     public hookFullscreenEnter(hookMethod:(player:Player , video:HTMLVideoElement)=>void){
         this.fullscreenEnter.push(hookMethod);
@@ -395,7 +433,11 @@ class Player{
     private volumeOff : Array = [];
     public hookVolumeOff(hookMethod:(player:Player , video:HTMLVideoElement)=>void){
         this.volumeOff.push(hookMethod);
-        this.doMethodArray(this.volumeOff)
+    }
+
+    private loadedmetadata : Array = [];
+    public hookLoadedmetadata(hookMethod:(player:Player , video:HTMLVideoElement)=>void){
+        this.loadedmetadata.push(hookMethod);
     }
 
     /**
@@ -462,26 +504,49 @@ class Player{
     }
     
     public togglePlayPause(){
-        var media:HTMLVideoElement = this.media;
         if(this.isPlaying){
-            this.doMethodArray(this.beforePause)
-            media.pause()
-            this.isPaused = true;
-            this.doMethodArray(this.afterPause)
-            this.isPlaying = false
+            this.pause();
         }else{
-            if(this.isPaused){
-                this.doMethodArray(this.beforeRestart)
-            }
-            this.doMethodArray(this.beforePlay)
-            media.play()
-            this.doMethodArray(this.afterPlay)
-            if(this.isPaused){
-                this.doMethodArray(this.afterRestart)
-            }
-            this.isPlaying = true 
-            this.isPaused = false
+            this.play();
         }
+    }
+
+    /**
+        <br>
+        
+        @method play 
+        @param {} 
+        @return void
+    */
+    public play():void{
+        var media:HTMLVideoElement = this.media;
+        if(this.isPaused){
+            this.doMethodArray(this.beforeRestart)
+        }
+        this.doMethodArray(this.beforePlay)
+        media.play()
+        this.doMethodArray(this.afterPlay)
+        if(this.isPaused){
+            this.doMethodArray(this.afterRestart)
+        }
+        this.isPlaying = true 
+        this.isPaused = false
+    }
+
+    /**
+        <br>
+        
+        @method pause 
+        @param {} 
+        @return void
+    */
+    public pause():void{
+        var media:HTMLVideoElement = this.media;
+        this.doMethodArray(this.beforePause)
+        media.pause()
+        this.isPaused = true;
+        this.doMethodArray(this.afterPause)
+        this.isPlaying = false
     }
 
     public togglePauseRestart(){
