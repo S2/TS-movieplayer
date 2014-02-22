@@ -5,6 +5,7 @@
 /// <reference path="BarParts/VolumeButton.ts" />
 /// <reference path="BarParts/Times.ts" />
 /// <reference path="BarParts/CenterPlayButton.ts" />
+/// <reference path="BarParts/TitleString.ts" />
 /// <reference path="Bar.ts" />
 /// <reference path="TitleBar.ts" />
 /// <reference path="TitleBarOption.ts" />
@@ -122,6 +123,7 @@ class Player{
         var fullscreenBarPartsSetting = new BarPartsSetting('../image/controls.svg' , 16 , 16 , -32  , 0 , 100 , 100 , new Margin(7 , 5 , 7 , 5));
         new BarPartsFullscreenButton(this , this.control , fullscreenBarPartsSetting);
 
+        new BarPartsTitleString(this , this.title , "hogehoge");
         media.addEventListener('click' , () => {
             this.togglePauseRestart();
         },false);

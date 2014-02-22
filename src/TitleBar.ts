@@ -11,16 +11,19 @@ class TitleBar extends Bar{
         this.options = options;
         this.width = width;
         this.className = "bar titleBar";
+        this.options = options;
     }
 
     public createElement(player:Player):HTMLElement{
         var newElement = super.createElement(player);
-        newElement.style.width = this.width + "px";
-        newElement.style.height = this.options.height + "px";
-        newElement.style.backgroundColor = "#888888";
-        newElement.style.zIndex = this.options.zIndex + "";
-        newElement.style.position = "absolute";
-        newElement.style.opacity = "0.5";
+        newElement.className          = "bar titleBarString"
+        newElement.style.width        = this.width + "px"
+        newElement.style.height       = this.options.height + "px"
+        newElement.style.zIndex       = this.options.zIndex + "";
+        newElement.style.textAlign    = this.options.align;
+        newElement.style.position     = "absolute";
+
+        newElement.style.textOverflow = "ellipsis"
 
         this.createdElement = newElement;
 

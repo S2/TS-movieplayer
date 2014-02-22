@@ -1,3 +1,9 @@
+var BarOption = (function () {
+    function BarOption() {
+        this.zIndex = 100;
+    }
+    return BarOption;
+})();
 var Bar = (function () {
     function Bar() {
         this.maxAlpha = 1;
@@ -144,6 +150,10 @@ var Bar = (function () {
             }
         }
     };
+
+    Bar.prototype.getZIndex = function () {
+        return this.options.zIndex;
+    };
     return Bar;
 })();
 var BarPartsSetting = (function () {
@@ -208,7 +218,7 @@ var BarParts = (function () {
         if (backgroundImageSetting.scaleWidth != 100 || backgroundImageSetting.scaleHeight != 100) {
             style.backgroundSize = backgroundImageSetting.scaleWidth + "% " + backgroundImageSetting.scaleHeight + "%";
         }
-        style.zIndex = (this.controlBar).getZIndex() + 1 + "";
+        style.zIndex = this.controlBar.getZIndex() + 1 + "";
         return button;
     };
 
@@ -503,13 +513,31 @@ var BarPartsCenterPlayButton = (function (_super) {
     }
     return BarPartsCenterPlayButton;
 })(BarParts);
-var TitleBarOption = (function () {
+var BarPartsTitleString = (function (_super) {
+    __extends(BarPartsTitleString, _super);
+    function BarPartsTitleString(player, titleBar, titleString) {
+        _super.call(this, player, titleBar);
+
+        this.hasSetCurrentTime = true;
+        var barHeight = this.controlBar.getHeight();
+        var area = document.createElement('div');
+        area.style.height = barHeight + "px";
+        area.innerHTML = titleString;
+        area.className = 'controllButtonCenter';
+        this.controlBar.getElement().appendChild(area);
+    }
+    return BarPartsTitleString;
+})(BarParts);
+var TitleBarOption = (function (_super) {
+    __extends(TitleBarOption, _super);
     function TitleBarOption() {
-        this.height = 40;
+        _super.apply(this, arguments);
+        this.height = 30;
         this.zIndex = 100;
+        this.align = "center";
     }
     return TitleBarOption;
-})();
+})(BarOption);
 var TitleBar = (function (_super) {
     __extends(TitleBar, _super);
     function TitleBar(options, width) {
@@ -517,15 +545,18 @@ var TitleBar = (function (_super) {
         this.options = options;
         this.width = width;
         this.className = "bar titleBar";
+        this.options = options;
     }
     TitleBar.prototype.createElement = function (player) {
         var newElement = _super.prototype.createElement.call(this, player);
+        newElement.className = "bar titleBarString";
         newElement.style.width = this.width + "px";
         newElement.style.height = this.options.height + "px";
-        newElement.style.backgroundColor = "#888888";
         newElement.style.zIndex = this.options.zIndex + "";
+        newElement.style.textAlign = this.options.align;
         newElement.style.position = "absolute";
-        newElement.style.opacity = "0.5";
+
+        newElement.style.textOverflow = "ellipsis";
 
         this.createdElement = newElement;
 
@@ -533,8 +564,10 @@ var TitleBar = (function (_super) {
     };
     return TitleBar;
 })(Bar);
-var SeekBarOption = (function () {
+var SeekBarOption = (function (_super) {
+    __extends(SeekBarOption, _super);
     function SeekBarOption() {
+        _super.apply(this, arguments);
         this.height = 5;
         this.zIndex = 100;
         this.railColor = "#000000";
@@ -542,7 +575,7 @@ var SeekBarOption = (function () {
         this.class = "seekBar";
     }
     return SeekBarOption;
-})();
+})(BarOption);
 var SeekBar = (function (_super) {
     __extends(SeekBar, _super);
     function SeekBar(options, width) {
@@ -626,15 +659,17 @@ var SeekBar = (function (_super) {
     };
     return SeekBar;
 })(Bar);
-var ControlBarOption = (function () {
+var ControlBarOption = (function (_super) {
+    __extends(ControlBarOption, _super);
     function ControlBarOption() {
+        _super.apply(this, arguments);
         this.displayLeftButtons = ['play', 'volume', 'duration', '::', 'current'];
         this.displayRightButtons = ['fullscreen'];
         this.height = 30;
         this.zIndex = 120;
     }
     return ControlBarOption;
-})();
+})(BarOption);
 var ControlBar = (function (_super) {
     __extends(ControlBar, _super);
     function ControlBar(options, width) {
@@ -659,10 +694,6 @@ var ControlBar = (function (_super) {
 
     ControlBar.prototype.appendCreateButtonMethods = function (buttonName, buttonCreateFunction) {
         this.appendMethods[buttonName] = buttonCreateFunction;
-    };
-
-    ControlBar.prototype.getZIndex = function () {
-        return this.options.zIndex;
     };
     return ControlBar;
 })(Bar);
@@ -761,6 +792,7 @@ var Player = (function () {
         var fullscreenBarPartsSetting = new BarPartsSetting('../image/controls.svg', 16, 16, -32, 0, 100, 100, new Margin(7, 5, 7, 5));
         new BarPartsFullscreenButton(this, this.control, fullscreenBarPartsSetting);
 
+        new BarPartsTitleString(this, this.title, "hogehoge");
         media.addEventListener('click', function () {
             _this.togglePauseRestart();
         }, false);

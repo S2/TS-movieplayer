@@ -98,3 +98,11 @@
     background: rgba(255, 255, 255, 0.9);
     margin: 0;
 }
+
+.titleBarString{
+    font-size      : "11pt";
+    padding-left   : "5px";
+    padding-right  : "5px";
+    text-align     : "center";
+
+}

@@ -1,7 +1,9 @@
 /// <reference path="jquery.d.ts" />
 /// <reference path="Player.ts" />
+/// <reference path="BarOption.ts" />
 
 class Bar{
+    options : BarOption;
     public createdElement:HTMLElement;
     public maxAlpha:number = 1;
     private eventEnable:boolean = true;
@@ -165,5 +167,9 @@ class Bar{
                 this.displayed   = true;
             }
         }
+    }
+
+    public getZIndex():number{
+        return this.options.zIndex;
     }
 }

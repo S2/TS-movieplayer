@@ -72,7 +72,7 @@ class BarParts{
         if(backgroundImageSetting.scaleWidth != 100 || backgroundImageSetting.scaleHeight != 100){
             style.backgroundSize      = backgroundImageSetting.scaleWidth + "% " + backgroundImageSetting.scaleHeight + "%";
         }
-        style.zIndex              = (<ControlBar>this.controlBar).getZIndex() + 1 + "";
+        style.zIndex              = this.controlBar.getZIndex() + 1 + "";
         return button;
     }
 
