@@ -704,6 +704,9 @@ var CreateOption = (function () {
         this.viewTitleBar = true;
         this.viewSeekBar = true;
         this.displayAlwaysSeekBar = true;
+        this.titleString = "";
+        this.feedInTime = 100;
+        this.feedOutTime = 100;
     }
     return CreateOption;
 })();
@@ -792,7 +795,8 @@ var Player = (function () {
         var fullscreenBarPartsSetting = new BarPartsSetting('../image/controls.svg', 16, 16, -32, 0, 100, 100, new Margin(7, 5, 7, 5));
         new BarPartsFullscreenButton(this, this.control, fullscreenBarPartsSetting);
 
-        new BarPartsTitleString(this, this.title, "hogehoge");
+        new BarPartsTitleString(this, this.title, createOption.titleString);
+
         media.addEventListener('click', function () {
             _this.togglePauseRestart();
         }, false);
@@ -820,10 +824,10 @@ var Player = (function () {
         var displayControll = true;
         var barFeedIn = function () {
             if (_this.isPlaying) {
-                _this.title.feedIn(0, 50);
-                _this.control.feedIn(0, 50);
+                _this.title.feedIn(0, createOption.feedInTime);
+                _this.control.feedIn(0, createOption.feedInTime);
                 if (!_this.createOption.displayAlwaysSeekBar) {
-                    _this.seekbar.feedIn(0, 50);
+                    _this.seekbar.feedIn(0, createOption.feedInTime);
                 } else {
                     if (!displayControll) {
                         _this.seekbar.moveUpBar();
@@ -846,10 +850,10 @@ var Player = (function () {
 
         media.addEventListener('mouseout', function () {
             if (_this.isPlaying) {
-                _this.title.feedOut(0, 50);
-                _this.control.feedOut(0, 50);
+                _this.title.feedOut(0, createOption.feedOutTime);
+                _this.control.feedOut(0, createOption.feedOutTime);
                 if (!_this.createOption.displayAlwaysSeekBar) {
-                    _this.seekbar.feedOut(0, 50);
+                    _this.seekbar.feedOut(0, createOption.feedOutTime);
                 } else {
                     if (displayControll) {
                         _this.control.setFeedOutHookOnce(function () {
@@ -862,10 +866,10 @@ var Player = (function () {
         }, false);
 
         this.hookEnded(function (player, video) {
-            _this.title.feedIn(0, 50);
-            _this.control.feedIn(0, 50);
+            _this.title.feedIn(0, createOption.feedInTime);
+            _this.control.feedIn(0, createOption.feedInTime);
             if (!_this.createOption.displayAlwaysSeekBar) {
-                _this.seekbar.feedIn(0, 50);
+                _this.seekbar.feedIn(0, createOption.feedInTime);
             } else {
                 if (!displayControll) {
                     _this.seekbar.moveUpBar();

@@ -37,6 +37,9 @@ class CreateOption{
     viewTitleBar         :  Boolean = true;
     viewSeekBar          :  Boolean = true;
     displayAlwaysSeekBar :  Boolean = true;
+    titleString          :  string = "";
+    feedInTime           : number = 100;
+    feedOutTime          : number = 100;
 }
 
 class Player{
@@ -72,10 +75,10 @@ class Player{
     createOption:CreateOption;
 
     constructor(media:HTMLVideoElement ,  
-            createOption:CreateOption = new CreateOption(), 
+            createOption:CreateOption      = new CreateOption(), 
             controlOption:ControlBarOption = new ControlBarOption() ,
-            titleBarOption:TitleBarOption = new TitleBarOption() ,
-            seekBarOption:SeekBarOption = new SeekBarOption()){
+            titleBarOption:TitleBarOption  = new TitleBarOption() ,
+            seekBarOption:SeekBarOption    = new SeekBarOption()){
         this.media = media;
         this.createOption = createOption;
         this.getEnvironment();
@@ -90,8 +93,8 @@ class Player{
         this.seekbar = new SeekBar(seekBarOption , this.width);
         
         var controlBar = null
-        var titleBar = null
-        var seekBar = null
+        var titleBar   = null
+        var seekBar    = null
         if(createOption.viewControllBar){
             controlBar = this.setLowerBar(this.control);
         }
@@ -123,7 +126,8 @@ class Player{
         var fullscreenBarPartsSetting = new BarPartsSetting('../image/controls.svg' , 16 , 16 , -32  , 0 , 100 , 100 , new Margin(7 , 5 , 7 , 5));
         new BarPartsFullscreenButton(this , this.control , fullscreenBarPartsSetting);
 
-        new BarPartsTitleString(this , this.title , "hogehoge");
+        new BarPartsTitleString(this , this.title , createOption.titleString);
+
         media.addEventListener('click' , () => {
             this.togglePauseRestart();
         },false);
@@ -151,10 +155,10 @@ class Player{
         var displayControll = true;
         var barFeedIn = () => {
             if(this.isPlaying){
-                this.title.feedIn(0 , 50);
-                this.control.feedIn(0 , 50);
+                this.title.feedIn(0 , createOption.feedInTime);
+                this.control.feedIn(0 , createOption.feedInTime);
                 if(!this.createOption.displayAlwaysSeekBar){
-                    this.seekbar.feedIn(0 , 50);
+                    this.seekbar.feedIn(0 , createOption.feedInTime);
                 }else{
                     if(!displayControll){
                         this.seekbar.moveUpBar();
@@ -177,10 +181,10 @@ class Player{
 
         media.addEventListener('mouseout' , () => {
             if(this.isPlaying){
-                this.title.feedOut(0 , 50);
-                this.control.feedOut(0 , 50);
+                this.title.feedOut(0 , createOption.feedOutTime);
+                this.control.feedOut(0 , createOption.feedOutTime);
                 if(!this.createOption.displayAlwaysSeekBar){
-                    this.seekbar.feedOut(0 , 50);
+                    this.seekbar.feedOut(0 , createOption.feedOutTime);
                 }else{
                     if(displayControll){
                         this.control.setFeedOutHookOnce( () => {
@@ -193,10 +197,10 @@ class Player{
         },false);
 
         this.hookEnded((player:Player , video:HTMLVideoElement) => {
-            this.title.feedIn(0 , 50);
-            this.control.feedIn(0 , 50);
+            this.title.feedIn(0 , createOption.feedInTime);
+            this.control.feedIn(0 , createOption.feedInTime);
             if(!this.createOption.displayAlwaysSeekBar){
-                this.seekbar.feedIn(0 , 50);
+                this.seekbar.feedIn(0 , createOption.feedInTime);
             }else{
                 if(!displayControll){
                     this.seekbar.moveUpBar();
