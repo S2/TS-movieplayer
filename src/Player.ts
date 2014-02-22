@@ -1,5 +1,10 @@
 /// <reference path="jquery.d.ts" />
-/// <reference path="Controls.ts" />
+/// <reference path="BarParts.ts" />
+/// <reference path="BarParts/PlayPauseButton.ts" />
+/// <reference path="BarParts/FullscreenButton.ts" />
+/// <reference path="BarParts/VolumeButton.ts" />
+/// <reference path="BarParts/Times.ts" />
+/// <reference path="BarParts/CenterPlayButton.ts" />
 /// <reference path="Bar.ts" />
 /// <reference path="TitleBar.ts" />
 /// <reference path="TitleBarOption.ts" />
@@ -37,7 +42,7 @@ class Player{
     title               :TitleBar;
     control             :ControlBar;
     seekbar             :SeekBar;
-    controls            :Controls;
+    controls            :BarParts;
     width               :number;
     height              :number;
     setHeight           :number = 0;
@@ -61,7 +66,7 @@ class Player{
     canTouch    : bool = false;
     version     : number;
     duration    : number;
-    volume      : number;
+    volume      : number = 0.5;
     enableSound : Boolean = true;
     createOption:CreateOption;
 
@@ -76,6 +81,8 @@ class Player{
         this.getSize();
 
         this.createParentDiv();
+
+        this.setInitialVolume(this.volume)
 
         this.title = new TitleBar(titleBarOption , this.width);
         this.control = new ControlBar(controlOption , this.width);
@@ -96,27 +103,24 @@ class Player{
                 this.seekbar.setMoveDownHeight(this.control.getHeight());
             }
         }
-        this.controls = new Controls(this , this.control);
+        var centerBarPartsSetting = new BarPartsSetting('../image/largeButton.svg' , 240 , 240 , 30 , 30 , 80 , 80 , new Margin(0 , 0 , 0 , 0));
+        new BarPartsCenterPlayButton(this , this.control , centerBarPartsSetting);
 
-        var centerBackgroundImageSetting = new BackgroundImageSetting('../image/largeButton.svg' , 240 , 240 , 30 , 30 , 80 , 80 , new Margin(0 , 0 , 0 , 0));
-        this.controls.setCenterPlayButton(centerBackgroundImageSetting);
+        var playBarPartsSetting = new BarPartsSetting('../image/controls.svg'  , 16 , 16 , 0 , 0 , 100 , 100 , new Margin(7 , 5 , 7 , 5));
+        var pauseBarPartsSetting = new BarPartsSetting('../image/controls.svg' , 16 , 16 , 0 , -16  , 100 , 100 , new Margin(7 , 5 , 7 , 5));
+        new BarPartsPlayPauseButton(this , this.control , playBarPartsSetting , pauseBarPartsSetting );
 
-        var playBackgroundImageSetting = new BackgroundImageSetting('../image/controls.svg'  , 16 , 16 , 0 , 0 , 100 , 100 , new Margin(7 , 5 , 7 , 5));
-        var pauseBackgroundImageSetting = new BackgroundImageSetting('../image/controls.svg' , 16 , 16 , 0 , -16  , 100 , 100 , new Margin(7 , 5 , 7 , 5));
-        this.controls.setPlayButton(playBackgroundImageSetting , pauseBackgroundImageSetting );
+        var volumeOnBarPartsSetting  = new BarPartsSetting('../image/controls.svg' , 16 , 16 , -16 , -16  , 100 , 100 , new Margin(7 , 5 , 7 , 5));
+        var volumeOffBarPartsSetting = new BarPartsSetting('../image/controls.svg' , 16 , 16 , -16 , 0    , 100 , 100 , new Margin(7 , 5 , 7 , 5));
+        new BarPartsVolumeButton(this , this.control , volumeOnBarPartsSetting , volumeOffBarPartsSetting);
 
-        var volumeOnBackgroundImageSetting  = new BackgroundImageSetting('../image/controls.svg' , 16 , 16 , -16 , -16  , 100 , 100 , new Margin(7 , 5 , 7 , 5));
-        var volumeOffBackgroundImageSetting = new BackgroundImageSetting('../image/controls.svg' , 16 , 16 , -16 , 0    , 100 , 100 , new Margin(7 , 5 , 7 , 5));
-        this.controls.setVolumeButton(volumeOnBackgroundImageSetting , volumeOffBackgroundImageSetting);
-
-        this.controls.setCurrentTime();
-        this.controls.setSeparator(" / ");
+        var timeParts = new BarPartsTimes(this , this.control , " / ");
         this.hookLoadedmetadata(()=>{
-            this.controls.setDuration(this.getDuration());
+            timeParts.setDuration(this.getDuration());
         });
 
-        var fullscreenBackgroundImageSetting = new BackgroundImageSetting('../image/controls.svg' , 16 , 16 , -32  , 0 , 100 , 100 , new Margin(7 , 5 , 7 , 5));
-        this.controls.setFullscreenButton(fullscreenBackgroundImageSetting);
+        var fullscreenBarPartsSetting = new BarPartsSetting('../image/controls.svg' , 16 , 16 , -32  , 0 , 100 , 100 , new Margin(7 , 5 , 7 , 5));
+        new BarPartsFullscreenButton(this , this.control , fullscreenBarPartsSetting);
 
         media.addEventListener('click' , () => {
             this.togglePauseRestart();

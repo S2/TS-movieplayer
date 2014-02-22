@@ -146,12 +146,110 @@ var Bar = (function () {
     };
     return Bar;
 })();
-var TitleBarOption = (function () {
-    function TitleBarOption() {
-        this.height = 40;
-        this.zIndex = 100;
+var BarPartsSetting = (function () {
+    function BarPartsSetting(src, width, height, top, left, scaleWidth, scaleHeight, margin) {
+        if (typeof top === "undefined") { top = 0; }
+        if (typeof left === "undefined") { left = 0; }
+        if (typeof scaleWidth === "undefined") { scaleWidth = 100; }
+        if (typeof scaleHeight === "undefined") { scaleHeight = 100; }
+        if (typeof margin === "undefined") { margin = new Margin(0, 0); }
+        this.src = src;
+        this.width = width;
+        this.height = height;
+        this.top = top;
+        this.left = left;
+        this.scaleWidth = scaleWidth;
+        this.scaleHeight = scaleHeight;
+        this.margin = margin;
     }
-    return TitleBarOption;
+    return BarPartsSetting;
+})();
+
+var Margin = (function () {
+    function Margin(top, right, bottom, left) {
+        if (typeof bottom === "undefined") { bottom = null; }
+        if (typeof left === "undefined") { left = null; }
+        if (bottom == null && left == null) {
+            this.top = top;
+            this.right = right;
+            this.bottom = top;
+            this.left = right;
+        } else {
+            this.top = top;
+            this.right = right;
+            this.bottom = top;
+            this.left = right;
+        }
+    }
+    Margin.prototype.getMarginString = function () {
+        return [this.top, this.right, this.bottom, this.left].map(function (value) {
+            return value ? value + "px" : "0";
+        }).join(" ");
+    };
+    return Margin;
+})();
+
+var BarParts = (function () {
+    function BarParts(player, controlBar) {
+        this.hasSetDuration = false;
+        this.hasSetCurrentTime = false;
+        this.player = player;
+        this.controlBar = controlBar;
+    }
+    BarParts.prototype.createButton = function (backgroundImageSetting) {
+        var button = document.createElement('div');
+        var style = button.style;
+        style.width = backgroundImageSetting.width + "px";
+        style.height = backgroundImageSetting.height + "px";
+        style.backgroundImage = "url('" + backgroundImageSetting.src + "')";
+        style.backgroundRepeat = "no-repeat";
+        style.backgroundPosition = backgroundImageSetting.top + "px " + backgroundImageSetting.left + "px";
+        style.margin = backgroundImageSetting.margin.getMarginString();
+        if (backgroundImageSetting.scaleWidth != 100 || backgroundImageSetting.scaleHeight != 100) {
+            style.backgroundSize = backgroundImageSetting.scaleWidth + "% " + backgroundImageSetting.scaleHeight + "%";
+        }
+        style.zIndex = (this.controlBar).getZIndex() + 1 + "";
+        return button;
+    };
+
+    BarParts.prototype.modifyButton = function (button, backgroundImageSetting) {
+        var style = button.style;
+        style.width = backgroundImageSetting.width + "px";
+        style.height = backgroundImageSetting.height + "px";
+        style.backgroundImage = "url('" + backgroundImageSetting.src + "')";
+        style.backgroundRepeat = "no-repeat";
+        style.backgroundPosition = backgroundImageSetting.top + "px " + backgroundImageSetting.left + "px";
+        if (backgroundImageSetting.scaleWidth != 100 || backgroundImageSetting.scaleHeight != 100) {
+            style.backgroundSize = backgroundImageSetting.scaleWidth + "% " + backgroundImageSetting.scaleHeight + "%";
+        }
+    };
+
+    BarParts.prototype.getTime = function (time) {
+        var hour = 0;
+        var minute = 0;
+        var second = 0;
+
+        while (time > 3600) {
+            time -= 3600;
+            hour++;
+        }
+        while (time > 60) {
+            time -= 60;
+            minute++;
+        }
+        second = parseInt(time.toString());
+        var timeString = "";
+        if (hour > 0) {
+            timeString += hour < 10 ? "0" + hour : hour.toString();
+            timeString += ":";
+        }
+        timeString += minute < 10 ? "0" + minute : minute.toString();
+        timeString += ":";
+        timeString += second < 10 ? "0" + second : second.toString();
+
+        return timeString;
+    };
+    return BarParts;
 })();
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -159,6 +257,259 @@ var __extends = this.__extends || function (d, b) {
     __.prototype = b.prototype;
     d.prototype = new __();
 };
+var BarPartsPlayPauseButton = (function (_super) {
+    __extends(BarPartsPlayPauseButton, _super);
+    function BarPartsPlayPauseButton(player, controlBar, playBarPartsSetting, pauseBarPartsSetting) {
+        var _this = this;
+        _super.call(this, player, controlBar);
+
+        var playPauseButton = this.createButton(playBarPartsSetting);
+        playPauseButton.className = 'controllButtonLeft playPauseButton';
+        this.controlBar.getElement().appendChild(playPauseButton);
+
+        this.player.hookAfterRestart(function () {
+            _this.modifyButton(playPauseButton, pauseBarPartsSetting);
+        });
+        this.player.hookAfterPlay(function () {
+            _this.modifyButton(playPauseButton, pauseBarPartsSetting);
+        });
+
+        this.player.hookAfterPause(function () {
+            _this.modifyButton(playPauseButton, playBarPartsSetting);
+        });
+        this.player.hookEnded(function () {
+            _this.modifyButton(playPauseButton, playBarPartsSetting);
+        });
+
+        playPauseButton.addEventListener('click', function () {
+            _this.player.togglePlayPause();
+        }, false);
+        playPauseButton.addEventListener('touch', function () {
+            _this.player.togglePlayPause();
+        }, false);
+    }
+    return BarPartsPlayPauseButton;
+})(BarParts);
+var BarPartsFullscreenButton = (function (_super) {
+    __extends(BarPartsFullscreenButton, _super);
+    function BarPartsFullscreenButton(player, controlBar, imageSetting) {
+        var _this = this;
+        _super.call(this, player, controlBar);
+
+        var fullscreenButton = this.createButton(imageSetting);
+        fullscreenButton.className = 'controllButtonRight playPauseButton';
+        fullscreenButton.addEventListener('click', function () {
+            _this.player.toggleFullscreen();
+        }, false);
+        this.controlBar.getElement().appendChild(fullscreenButton);
+    }
+    return BarPartsFullscreenButton;
+})(BarParts);
+var BarPartsVolumeButton = (function (_super) {
+    __extends(BarPartsVolumeButton, _super);
+    function BarPartsVolumeButton(player, controlBar, volumeOnImageSetting, volumeOffImageSetting) {
+        var _this = this;
+        _super.call(this, player, controlBar);
+
+        var volumeButton = this.createButton(volumeOnImageSetting);
+        volumeButton.className = 'controllButtonLeft volumeButton';
+        volumeButton.style.position = "relative";
+        this.controlBar.getElement().appendChild(volumeButton);
+
+        volumeButton.addEventListener("click", function () {
+            _this.player.toggleVolume();
+        });
+        volumeButton.addEventListener("touch", function () {
+            _this.player.toggleVolume();
+        });
+
+        this.player.hookVolumeOn(function () {
+            _this.modifyButton(volumeButton, volumeOnImageSetting);
+        });
+
+        this.player.hookVolumeOff(function () {
+            _this.modifyButton(volumeButton, volumeOffImageSetting);
+        });
+
+        var volume = this.player.getVolume();
+
+        var volumeArea = document.createElement("div");
+        volumeArea.style.position = "absolute";
+        volumeArea.style.top = "-123px";
+        volumeArea.style.left = "-" + ((30 - volumeOnImageSetting.width) / 2) + "px";
+        volumeArea.className = "volumeArea";
+
+        var volumeSlider = document.createElement("div");
+        volumeSlider.className = "volumeSlider";
+        volumeSlider.style.top = 10 + 100 * volume + "px";
+
+        var volumeBarTotal = document.createElement("div");
+        volumeBarTotal.className = "volumeBarTotal";
+
+        var volumeBarCurrent = document.createElement("div");
+        volumeBarCurrent.className = "volumeBarCurrent";
+
+        volumeBarTotal.style.height = 100 * volume + "px";
+        volumeBarTotal.style.top = "10px";
+        volumeBarCurrent.style.height = (100 - 100 * volume) + "px";
+        volumeBarCurrent.style.top = 10 + (100 - 100 * volume) + "px";
+
+        volumeArea.appendChild(volumeSlider);
+        volumeArea.appendChild(volumeBarTotal);
+        volumeArea.appendChild(volumeBarCurrent);
+
+        volumeButton.appendChild(volumeArea);
+        volumeButton.addEventListener('mouseover', function () {
+            volumeArea.style.visibility = "visible";
+            volumeArea.style.display = "block";
+        }, false);
+        volumeArea.addEventListener('mouseover', function () {
+            volumeArea.style.visibility = "visible";
+            volumeArea.style.display = "block";
+        }, false);
+        volumeButton.addEventListener('mouseout', function () {
+            volumeArea.style.visibility = "hidden";
+            volumeArea.style.display = "none";
+        }, false);
+
+        volumeArea.addEventListener('click', function (e) {
+            var barTop = volumeSlider.getBoundingClientRect().top;
+            var dy = e.pageY - barTop;
+            var changeToBarTop = parseInt(volumeSlider.style.top.replace("px", "")) + dy;
+            if (changeToBarTop < 10) {
+                changeToBarTop = 10;
+            }
+            if (changeToBarTop > 110) {
+                changeToBarTop = 110;
+            }
+            volumeSlider.style.top = changeToBarTop + "px";
+            _this.player.setVolume(-1 * dy / 100);
+        }, false);
+
+        var moveStart = false;
+        volumeSlider.addEventListener('mousedown', function (e) {
+            moveStart = true;
+        }, false);
+
+        volumeArea.addEventListener('mousemove', function (e) {
+            if (!moveStart) {
+                return;
+            }
+            var barTop = volumeSlider.getBoundingClientRect().top;
+            var dy = e.pageY - barTop;
+            var changeToBarTop = parseInt(volumeSlider.style.top.replace("px", "")) + dy;
+            if (changeToBarTop < 10) {
+                changeToBarTop = 10;
+            }
+            if (changeToBarTop > 110) {
+                changeToBarTop = 110;
+            }
+            volumeSlider.style.top = changeToBarTop + "px";
+            _this.player.setVolume(-1 * dy / 100);
+        }, false);
+
+        document.addEventListener('mouseup', function (e) {
+            moveStart = false;
+        }, false);
+    }
+    return BarPartsVolumeButton;
+})(BarParts);
+var BarPartsTimes = (function (_super) {
+    __extends(BarPartsTimes, _super);
+    function BarPartsTimes(player, controlBar, separateString) {
+        var _this = this;
+        _super.call(this, player, controlBar);
+
+        this.separateString = separateString;
+
+        this.hasSetCurrentTime = true;
+        var barHeight = this.controlBar.getHeight();
+        var area = document.createElement('div');
+        area.style.height = barHeight + "px";
+        area.innerHTML = "00:00";
+        area.className = 'controllButtonLeft currentTime';
+        this.controlBar.getElement().appendChild(area);
+
+        this.player.hookTimeUpdate(function (player, video) {
+            var currentTime = player.getCurrentTime();
+            var currentTimeString = _this.getTime(currentTime);
+            area.innerHTML = currentTimeString;
+        });
+    }
+    BarPartsTimes.prototype.setDuration = function (durationSeconds) {
+        var barHeight = this.controlBar.getHeight();
+        var area = document.createElement('div');
+        area.style.height = barHeight + "px";
+
+        var durationString = this.getTime(durationSeconds);
+
+        area.innerHTML = durationString;
+        area.className = 'controllButtonLeft duration';
+
+        if (this.hasSetCurrentTime && this.separateString) {
+            var separator = document.createElement('div');
+            separator.style.height = barHeight + "px";
+            separator.innerHTML = this.separateString;
+            separator.className = 'controllButtonLeft';
+            this.controlBar.getElement().appendChild(separator);
+        }
+        this.controlBar.getElement().appendChild(area);
+    };
+    return BarPartsTimes;
+})(BarParts);
+var BarPartsCenterPlayButton = (function (_super) {
+    __extends(BarPartsCenterPlayButton, _super);
+    function BarPartsCenterPlayButton(player, controlBar, backgroundImageSetting) {
+        var _this = this;
+        _super.call(this, player, controlBar);
+
+        var centerPlayButton = this.createButton(backgroundImageSetting);
+        centerPlayButton.className = 'centerPlayButton';
+        var style = centerPlayButton.style;
+        style.position = 'absolute';
+        style.left = (this.player.width - backgroundImageSetting.width) / 2 + "px";
+        style.top = (this.player.height - backgroundImageSetting.height) / 2 + "px";
+
+        var targetParent = this.player.getMediaParent();
+        targetParent.appendChild(centerPlayButton);
+
+        this.centerPlayButton = centerPlayButton;
+
+        centerPlayButton.addEventListener('click', function () {
+            _this.player.togglePlayPause();
+        }, false);
+
+        centerPlayButton.addEventListener('touch', function () {
+            _this.player.togglePlayPause();
+        }, false);
+
+        this.player.hookAfterRestart(function () {
+            style.visibility = "hidden";
+            style.display = "none";
+        });
+        this.player.hookAfterPlay(function () {
+            style.visibility = "hidden";
+            style.display = "none";
+        });
+
+        this.player.hookAfterPause(function () {
+            style.visibility = "visible";
+            style.display = "block";
+        });
+        this.player.hookEnded(function () {
+            style.visibility = "visible";
+            style.display = "block";
+        });
+    }
+    return BarPartsCenterPlayButton;
+})(BarParts);
+var TitleBarOption = (function () {
+    function TitleBarOption() {
+        this.height = 40;
+        this.zIndex = 100;
+    }
+    return TitleBarOption;
+})();
 var TitleBar = (function (_super) {
     __extends(TitleBar, _super);
     function TitleBar(options, width) {
@@ -347,6 +698,7 @@ var Player = (function () {
         this.isFirefox = false;
         this.isPC = false;
         this.canTouch = false;
+        this.volume = 0.5;
         this.enableSound = true;
         this.beforePlay = [];
         this.afterPlay = [];
@@ -369,6 +721,8 @@ var Player = (function () {
 
         this.createParentDiv();
 
+        this.setInitialVolume(this.volume);
+
         this.title = new TitleBar(titleBarOption, this.width);
         this.control = new ControlBar(controlOption, this.width);
         this.seekbar = new SeekBar(seekBarOption, this.width);
@@ -388,27 +742,24 @@ var Player = (function () {
                 this.seekbar.setMoveDownHeight(this.control.getHeight());
             }
         }
-        this.controls = new Controls(this, this.control);
+        var centerBarPartsSetting = new BarPartsSetting('../image/largeButton.svg', 240, 240, 30, 30, 80, 80, new Margin(0, 0, 0, 0));
+        new BarPartsCenterPlayButton(this, this.control, centerBarPartsSetting);
 
-        var centerBackgroundImageSetting = new BackgroundImageSetting('../image/largeButton.svg', 240, 240, 30, 30, 80, 80, new Margin(0, 0, 0, 0));
-        this.controls.setCenterPlayButton(centerBackgroundImageSetting);
+        var playBarPartsSetting = new BarPartsSetting('../image/controls.svg', 16, 16, 0, 0, 100, 100, new Margin(7, 5, 7, 5));
+        var pauseBarPartsSetting = new BarPartsSetting('../image/controls.svg', 16, 16, 0, -16, 100, 100, new Margin(7, 5, 7, 5));
+        new BarPartsPlayPauseButton(this, this.control, playBarPartsSetting, pauseBarPartsSetting);
 
-        var playBackgroundImageSetting = new BackgroundImageSetting('../image/controls.svg', 16, 16, 0, 0, 100, 100, new Margin(7, 5, 7, 5));
-        var pauseBackgroundImageSetting = new BackgroundImageSetting('../image/controls.svg', 16, 16, 0, -16, 100, 100, new Margin(7, 5, 7, 5));
-        this.controls.setPlayButton(playBackgroundImageSetting, pauseBackgroundImageSetting);
+        var volumeOnBarPartsSetting = new BarPartsSetting('../image/controls.svg', 16, 16, -16, -16, 100, 100, new Margin(7, 5, 7, 5));
+        var volumeOffBarPartsSetting = new BarPartsSetting('../image/controls.svg', 16, 16, -16, 0, 100, 100, new Margin(7, 5, 7, 5));
+        new BarPartsVolumeButton(this, this.control, volumeOnBarPartsSetting, volumeOffBarPartsSetting);
 
-        var volumeOnBackgroundImageSetting = new BackgroundImageSetting('../image/controls.svg', 16, 16, -16, -16, 100, 100, new Margin(7, 5, 7, 5));
-        var volumeOffBackgroundImageSetting = new BackgroundImageSetting('../image/controls.svg', 16, 16, -16, 0, 100, 100, new Margin(7, 5, 7, 5));
-        this.controls.setVolumeButton(volumeOnBackgroundImageSetting, volumeOffBackgroundImageSetting);
-
-        this.controls.setCurrentTime();
-        this.controls.setSeparator(" / ");
+        var timeParts = new BarPartsTimes(this, this.control, " / ");
         this.hookLoadedmetadata(function () {
-            _this.controls.setDuration(_this.getDuration());
+            timeParts.setDuration(_this.getDuration());
         });
 
-        var fullscreenBackgroundImageSetting = new BackgroundImageSetting('../image/controls.svg', 16, 16, -32, 0, 100, 100, new Margin(7, 5, 7, 5));
-        this.controls.setFullscreenButton(fullscreenBackgroundImageSetting);
+        var fullscreenBarPartsSetting = new BarPartsSetting('../image/controls.svg', 16, 16, -32, 0, 100, 100, new Margin(7, 5, 7, 5));
+        new BarPartsFullscreenButton(this, this.control, fullscreenBarPartsSetting);
 
         media.addEventListener('click', function () {
             _this.togglePauseRestart();
@@ -610,7 +961,8 @@ var Player = (function () {
         } else if (document.webkitCancelFullscreen) {
             document.webkitCancelFullscreen();
         }
-
+        media.style.width = this.width + "px";
+        media.style.height = this.height + "px";
         this.doMethodArray(this.fullscreenExit);
     };
 
@@ -633,7 +985,8 @@ var Player = (function () {
         if (this.seekbar) {
             this.seekbar.toggle();
         }
-
+        media.style.width = '100%';
+        media.style.height = '100%';
         this.doMethodArray(this.fullscreenEnter);
     };
 
@@ -830,333 +1183,4 @@ var Player = (function () {
         return this.mediaParent;
     };
     return Player;
-})();
-var BackgroundImageSetting = (function () {
-    function BackgroundImageSetting(src, width, height, top, left, scaleWidth, scaleHeight, margin) {
-        if (typeof top === "undefined") { top = 0; }
-        if (typeof left === "undefined") { left = 0; }
-        if (typeof scaleWidth === "undefined") { scaleWidth = 100; }
-        if (typeof scaleHeight === "undefined") { scaleHeight = 100; }
-        if (typeof margin === "undefined") { margin = new Margin(0, 0); }
-        this.src = src;
-        this.width = width;
-        this.height = height;
-        this.top = top;
-        this.left = left;
-        this.scaleWidth = scaleWidth;
-        this.scaleHeight = scaleHeight;
-        this.margin = margin;
-    }
-    return BackgroundImageSetting;
-})();
-
-var Margin = (function () {
-    function Margin(top, right, bottom, left) {
-        if (typeof bottom === "undefined") { bottom = null; }
-        if (typeof left === "undefined") { left = null; }
-        if (bottom == null && left == null) {
-            this.top = top;
-            this.right = right;
-            this.bottom = top;
-            this.left = right;
-        } else {
-            this.top = top;
-            this.right = right;
-            this.bottom = top;
-            this.left = right;
-        }
-    }
-    Margin.prototype.getMarginString = function () {
-        return [this.top, this.right, this.bottom, this.left].map(function (value) {
-            return value ? value + "px" : "0";
-        }).join(" ");
-    };
-    return Margin;
-})();
-
-var Controls = (function () {
-    function Controls(player, controlBar) {
-        this.hasSetDuration = false;
-        this.hasSetCurrentTime = false;
-        this.player = player;
-        this.controlBar = controlBar;
-    }
-    Controls.prototype.createButton = function (backgroundImageSetting) {
-        var button = document.createElement('div');
-        var style = button.style;
-        style.width = backgroundImageSetting.width + "px";
-        style.height = backgroundImageSetting.height + "px";
-        style.backgroundImage = "url('" + backgroundImageSetting.src + "')";
-        style.backgroundRepeat = "no-repeat";
-        style.backgroundPosition = backgroundImageSetting.top + "px " + backgroundImageSetting.left + "px";
-        style.margin = backgroundImageSetting.margin.getMarginString();
-        if (backgroundImageSetting.scaleWidth != 100 || backgroundImageSetting.scaleHeight != 100) {
-            style.backgroundSize = backgroundImageSetting.scaleWidth + "% " + backgroundImageSetting.scaleHeight + "%";
-        }
-        style.zIndex = (this.controlBar).getZIndex() + 1 + "";
-        return button;
-    };
-
-    Controls.prototype.setCenterPlayButton = function (backgroundImageSetting) {
-        var _this = this;
-        var centerPlayButton = this.createButton(backgroundImageSetting);
-        centerPlayButton.className = 'centerPlayButton';
-        var style = centerPlayButton.style;
-        style.position = 'absolute';
-        style.left = (this.player.width - backgroundImageSetting.width) / 2 + "px";
-        style.top = (this.player.height - backgroundImageSetting.height) / 2 + "px";
-
-        var targetParent = this.player.getMediaParent();
-        targetParent.appendChild(centerPlayButton);
-
-        this.centerPlayButton = centerPlayButton;
-
-        centerPlayButton.addEventListener('click', function () {
-            _this.player.togglePlayPause();
-        }, false);
-
-        centerPlayButton.addEventListener('touch', function () {
-            _this.player.togglePlayPause();
-        }, false);
-
-        this.player.hookAfterRestart(function () {
-            style.visibility = "hidden";
-            style.display = "none";
-        });
-        this.player.hookAfterPlay(function () {
-            style.visibility = "hidden";
-            style.display = "none";
-        });
-
-        this.player.hookAfterPause(function () {
-            style.visibility = "visible";
-            style.display = "block";
-        });
-        this.player.hookEnded(function () {
-            style.visibility = "visible";
-            style.display = "block";
-        });
-    };
-
-    Controls.prototype.modifyButton = function (button, backgroundImageSetting) {
-        var style = button.style;
-        style.width = backgroundImageSetting.width + "px";
-        style.height = backgroundImageSetting.height + "px";
-        style.backgroundImage = "url('" + backgroundImageSetting.src + "')";
-        style.backgroundRepeat = "no-repeat";
-        style.backgroundPosition = backgroundImageSetting.top + "px " + backgroundImageSetting.left + "px";
-        if (backgroundImageSetting.scaleWidth != 100 || backgroundImageSetting.scaleHeight != 100) {
-            style.backgroundSize = backgroundImageSetting.scaleWidth + "% " + backgroundImageSetting.scaleHeight + "%";
-        }
-    };
-
-    Controls.prototype.setPlayButton = function (playBackgroundImageSetting, pauseBackgroundImageSetting) {
-        var _this = this;
-        var playPauseButton = this.createButton(playBackgroundImageSetting);
-        playPauseButton.className = 'controllButtonLeft playPauseButton';
-        this.controlBar.getElement().appendChild(playPauseButton);
-
-        this.player.hookAfterRestart(function () {
-            _this.modifyButton(playPauseButton, pauseBackgroundImageSetting);
-        });
-        this.player.hookAfterPlay(function () {
-            _this.modifyButton(playPauseButton, pauseBackgroundImageSetting);
-        });
-
-        this.player.hookAfterPause(function () {
-            _this.modifyButton(playPauseButton, playBackgroundImageSetting);
-        });
-        this.player.hookEnded(function () {
-            _this.modifyButton(playPauseButton, playBackgroundImageSetting);
-        });
-
-        playPauseButton.addEventListener('click', function () {
-            _this.player.togglePlayPause();
-        }, false);
-        playPauseButton.addEventListener('touch', function () {
-            _this.player.togglePlayPause();
-        }, false);
-    };
-
-    Controls.prototype.setFullscreenButton = function (backgroundImageSetting) {
-        var _this = this;
-        var fullscreenButton = this.createButton(backgroundImageSetting);
-        fullscreenButton.className = 'controllButtonRight playPauseButton';
-        fullscreenButton.addEventListener('click', function () {
-            _this.player.toggleFullscreen();
-        }, false);
-        this.controlBar.getElement().appendChild(fullscreenButton);
-    };
-
-    Controls.prototype.setVolumeButton = function (volumeOnImageSetting, volumeOffImageSetting) {
-        var _this = this;
-        var volumeButton = this.createButton(volumeOnImageSetting);
-        volumeButton.className = 'controllButtonLeft volumeButton';
-        volumeButton.style.position = "relative";
-        this.controlBar.getElement().appendChild(volumeButton);
-
-        volumeButton.addEventListener("click", function () {
-            _this.player.toggleVolume();
-        });
-        volumeButton.addEventListener("touch", function () {
-            _this.player.toggleVolume();
-        });
-
-        this.player.hookVolumeOn(function () {
-            _this.modifyButton(volumeButton, volumeOnImageSetting);
-        });
-
-        this.player.hookVolumeOff(function () {
-            _this.modifyButton(volumeButton, volumeOffImageSetting);
-        });
-
-        var volume = this.player.getVolume();
-
-        var volumeArea = document.createElement("div");
-        volumeArea.style.position = "absolute";
-        volumeArea.style.top = "-123px";
-        volumeArea.style.left = "-" + ((30 - volumeOnImageSetting.width) / 2) + "px";
-        volumeArea.className = "volumeArea";
-
-        var volumeSlider = document.createElement("div");
-        volumeSlider.className = "volumeSlider";
-        volumeSlider.style.top = 10 + 100 * volume + "px";
-
-        var volumeBarTotal = document.createElement("div");
-        volumeBarTotal.className = "volumeBarTotal";
-
-        var volumeBarCurrent = document.createElement("div");
-        volumeBarCurrent.className = "volumeBarCurrent";
-
-        volumeBarTotal.style.height = 100 * volume + "px";
-        volumeBarTotal.style.top = "10px";
-        volumeBarCurrent.style.height = (100 - 100 * volume) + "px";
-        volumeBarCurrent.style.top = 10 + (100 - 100 * volume) + "px";
-
-        volumeArea.appendChild(volumeSlider);
-        volumeArea.appendChild(volumeBarTotal);
-        volumeArea.appendChild(volumeBarCurrent);
-
-        volumeButton.appendChild(volumeArea);
-        volumeButton.addEventListener('mouseover', function () {
-            volumeArea.style.visibility = "visible";
-            volumeArea.style.display = "block";
-        }, false);
-        volumeArea.addEventListener('mouseover', function () {
-            volumeArea.style.visibility = "visible";
-            volumeArea.style.display = "block";
-        }, false);
-        volumeButton.addEventListener('mouseout', function () {
-            volumeArea.style.visibility = "hidden";
-            volumeArea.style.display = "none";
-        }, false);
-
-        volumeArea.addEventListener('click', function (e) {
-            var barTop = volumeSlider.getBoundingClientRect().top;
-            var dy = e.pageY - barTop;
-            var changeToBarTop = parseInt(volumeSlider.style.top.replace("px", "")) + dy;
-            if (changeToBarTop < 10) {
-                changeToBarTop = 10;
-            }
-            if (changeToBarTop > 110) {
-                changeToBarTop = 110;
-            }
-            volumeSlider.style.top = changeToBarTop + "px";
-            _this.player.setVolume(-1 * dy / 100);
-        }, false);
-
-        var moveStart = false;
-        volumeSlider.addEventListener('mousedown', function (e) {
-            moveStart = true;
-        }, false);
-
-        volumeArea.addEventListener('mousemove', function (e) {
-            if (!moveStart) {
-                return;
-            }
-            var barTop = volumeSlider.getBoundingClientRect().top;
-            var dy = e.pageY - barTop;
-            var changeToBarTop = parseInt(volumeSlider.style.top.replace("px", "")) + dy;
-            if (changeToBarTop < 10) {
-                changeToBarTop = 10;
-            }
-            if (changeToBarTop > 110) {
-                changeToBarTop = 110;
-            }
-            volumeSlider.style.top = changeToBarTop + "px";
-            _this.player.setVolume(-1 * dy / 100);
-        }, false);
-
-        document.addEventListener('mouseup', function (e) {
-            moveStart = false;
-        }, false);
-    };
-
-    Controls.prototype.setSeparator = function (separateString) {
-        this.separateString = separateString;
-    };
-
-    Controls.prototype.setCurrentTime = function () {
-        var _this = this;
-        this.hasSetCurrentTime = true;
-        var barHeight = this.controlBar.getHeight();
-        var area = document.createElement('div');
-        area.style.height = barHeight + "px";
-        area.innerHTML = "00:00";
-        area.className = 'controllButtonLeft currentTime';
-        this.controlBar.getElement().appendChild(area);
-
-        this.player.hookTimeUpdate(function (player, video) {
-            var currentTime = player.getCurrentTime();
-            var currentTimeString = _this.getTime(currentTime);
-            area.innerHTML = currentTimeString;
-        });
-    };
-
-    Controls.prototype.setDuration = function (durationSeconds) {
-        var barHeight = this.controlBar.getHeight();
-        var area = document.createElement('div');
-        area.style.height = barHeight + "px";
-
-        var durationString = this.getTime(durationSeconds);
-
-        area.innerHTML = durationString;
-        area.className = 'controllButtonLeft duration';
-
-        if (this.hasSetCurrentTime && this.separateString) {
-            var separator = document.createElement('div');
-            separator.style.height = barHeight + "px";
-            separator.innerHTML = this.separateString;
-            separator.className = 'controllButtonLeft';
-            this.controlBar.getElement().appendChild(separator);
-        }
-        this.controlBar.getElement().appendChild(area);
-    };
-
-    Controls.prototype.getTime = function (time) {
-        var hour = 0;
-        var minute = 0;
-        var second = 0;
-
-        while (time > 3600) {
-            time -= 3600;
-            hour++;
-        }
-        while (time > 60) {
-            time -= 60;
-            minute++;
-        }
-        second = parseInt(time.toString());
-        var timeString = "";
-        if (hour > 0) {
-            timeString += hour < 10 ? "0" + hour : hour.toString();
-            timeString += ":";
-        }
-        timeString += minute < 10 ? "0" + minute : minute.toString();
-        timeString += ":";
-        timeString += second < 10 ? "0" + second : second.toString();
-
-        return timeString;
-    };
-    return Controls;
 })();
