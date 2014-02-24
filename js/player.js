@@ -978,7 +978,7 @@ var Player = (function () {
     };
 
     Player.prototype.toggleFullscreen = function () {
-        if (this.isFullscreen) {
+        if (!this.isFullscreen) {
             this.enterFullscreen();
             this.isFullscreen = false;
         } else {
@@ -988,30 +988,6 @@ var Player = (function () {
     };
 
     Player.prototype.enterFullscreen = function () {
-        var mediaParent = this.mediaParent;
-        var media = this.media;
-        if (document.exitFullscreen) {
-            document.exitFullscreen();
-        } else if (document.mozCancelFullscreen) {
-            document.mozCancelFullscreen();
-        } else if (document.webkitCancelFullscreen) {
-            document.webkitCancelFullscreen();
-        }
-        media.style.width = this.width + "px";
-        media.style.height = this.height + "px";
-        this.doMethodArray(this.fullscreenExit);
-    };
-
-    Player.prototype.exitFullscreen = function () {
-        var mediaParent = this.mediaParent;
-        var media = this.media;
-        if (mediaParent.requestFullscreen) {
-            mediaParent.requestFullscreen();
-        } else if (mediaParent.mozRequestFullscreen) {
-            mediaParent.mozRequestFullscreen();
-        } else if (mediaParent.webkitRequestFullscreen) {
-            mediaParent.webkitRequestFullscreen();
-        }
         if (this.title) {
             this.title.toggle();
         }
@@ -1021,8 +997,42 @@ var Player = (function () {
         if (this.seekbar) {
             this.seekbar.toggle();
         }
+        var mediaParent = this.mediaParent;
+        var media = this.media;
+        if (mediaParent.requestFullscreen) {
+            mediaParent.requestFullscreen();
+        } else if (mediaParent.mozRequestFullScreen) {
+            mediaParent.mozRequestFullScreen();
+        } else if (mediaParent.webkitRequestFullScreen) {
+            mediaParent.webkitRequestFullScreen();
+        }
         media.style.width = '100%';
         media.style.height = '100%';
+        this.isFullscreen = true;
+        this.doMethodArray(this.fullscreenExit);
+    };
+
+    Player.prototype.exitFullscreen = function () {
+        if (this.title) {
+            this.title.toggle();
+        }
+        if (this.control) {
+            this.control.toggle();
+        }
+        if (this.seekbar) {
+            this.seekbar.toggle();
+        }
+        var media = this.media;
+        if (document.exitFullscreen) {
+            document.exitFullscreen();
+        } else if (document.mozCancelFullScreen) {
+            document.mozCancelFullScreen();
+        } else if (document.webkitCancelFullScreen) {
+            document.webkitCancelFullScreen();
+        }
+        media.style.width = this.width + "px";
+        media.style.height = this.height + "px";
+        this.isFullscreen = false;
         this.doMethodArray(this.fullscreenEnter);
     };
 
