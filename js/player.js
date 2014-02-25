@@ -722,6 +722,7 @@ var Player = (function () {
         this.isPlaying = false;
         this.isPaused = false;
         this.isFullscreen = false;
+        this.isIOSMobile = false;
         this.isIOS = false;
         this.isIPad = false;
         this.isIPod = false;
@@ -750,7 +751,7 @@ var Player = (function () {
         this.loadedmetadata = [];
         this.media = media;
         this.createOption = createOption;
-        this.getEnvironment();
+        this.setEnvironment();
         this.getSize();
 
         this.createParentDiv();
@@ -777,7 +778,10 @@ var Player = (function () {
             }
         }
         var centerBarPartsSetting = new BarPartsSetting('../image/largeButton.svg', 240, 240, 30, 30, 80, 80, new Margin(0, 0, 0, 0));
-        new BarPartsCenterPlayButton(this, this.control, centerBarPartsSetting);
+
+        if (!this.isIOSMobile) {
+            new BarPartsCenterPlayButton(this, this.control, centerBarPartsSetting);
+        }
 
         var playBarPartsSetting = new BarPartsSetting('../image/controls.svg', 16, 16, 0, 0, 100, 100, new Margin(7, 5, 7, 5));
         var pauseBarPartsSetting = new BarPartsSetting('../image/controls.svg', 16, 16, 0, -16, 100, 100, new Margin(7, 5, 7, 5));
@@ -897,7 +901,7 @@ var Player = (function () {
         return this.duration;
     };
 
-    Player.prototype.getEnvironment = function () {
+    Player.prototype.setEnvironment = function () {
         var userAgent = navigator.userAgent;
         var matches;
         if (matches = /Android (\d+\.\d+\.\d+)/.exec(userAgent)) {
@@ -905,14 +909,17 @@ var Player = (function () {
             this.version = matches[0];
         }
         if (userAgent.match('iPad')) {
+            this.isIOSMobile = false;
             this.isIOS = true;
             this.isIPad = true;
         }
         if (userAgent.match('iPod')) {
+            this.isIOSMobile = true;
             this.isIOS = true;
             this.isIPod = true;
         }
         if (userAgent.match('iPhone')) {
+            this.isIOSMobile = true;
             this.isIOS = true;
             this.isIPhone = true;
         }
@@ -938,6 +945,9 @@ var Player = (function () {
     };
 
     Player.prototype.createParentDiv = function () {
+        if (this.isIOSMobile) {
+            return;
+        }
         var media = this.media;
 
         media.style.position = 'absolute';
@@ -954,6 +964,9 @@ var Player = (function () {
 
     Player.prototype.setFullscreenCenterElementPosition = function (element, ratio) {
         var mediaParent = this.mediaParent;
+        if (mediaParent == null) {
+            return;
+        }
         var width = parseInt(mediaParent.style.width.replace('px', ''));
         if (!width) {
             width = parseInt(getComputedStyle(mediaParent, '').width.replace('px', ''));
@@ -999,17 +1012,15 @@ var Player = (function () {
         }
         var mediaParent = this.mediaParent;
         var media = this.media;
-        if (mediaParent.requestFullscreen) {
-            mediaParent.requestFullscreen();
-        } else if (mediaParent.mozRequestFullScreen) {
-            mediaParent.mozRequestFullScreen();
-        } else if (mediaParent.webkitRequestFullScreen) {
-            mediaParent.webkitRequestFullScreen();
+        if (media.requestFullscreen) {
+            media.requestFullscreen();
+        } else if (media.mozRequestFullScreen) {
+            media.mozRequestFullScreen();
+        } else if (media.webkitRequestFullScreen) {
+            media.webkitRequestFullScreen();
         } else if (media.webkitEnterFullScreen) {
             media.webkitEnterFullScreen();
         }
-        media.style.width = '100%';
-        media.style.height = '100%';
         this.isFullscreen = true;
         this.doMethodArray(this.fullscreenExit);
     };
@@ -1032,8 +1043,6 @@ var Player = (function () {
         } else if (document.webkitCancelFullScreen) {
             document.webkitCancelFullScreen();
         }
-        media.style.width = this.width + "px";
-        media.style.height = this.height + "px";
         this.isFullscreen = false;
         this.doMethodArray(this.fullscreenEnter);
     };
@@ -1228,7 +1237,11 @@ var Player = (function () {
     };
 
     Player.prototype.getMediaParent = function () {
-        return this.mediaParent;
+        if (this.mediaParent) {
+            return this.mediaParent;
+        } else {
+            throw "not yet set parent . ios will not set parent";
+        }
     };
     return Player;
 })();
