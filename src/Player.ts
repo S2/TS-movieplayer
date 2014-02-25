@@ -18,8 +18,11 @@
 interface HTMLElement{
     requestFullscreen();
     webkitRequestFullScreen();
-    webkitEnterFullScreen();
     mozRequestFullScreen();
+}
+
+interface HTMLVideoElement{
+    webkitEnterFullScreen();
 }
 
 interface HTMLDocument{
@@ -353,8 +356,8 @@ class Player{
             mediaParent.mozRequestFullScreen();
         } else if (mediaParent.webkitRequestFullScreen) {
             mediaParent.webkitRequestFullScreen();
-        } else if (mediaParent.webkitEnterFullScreen) {
-            mediaParent.webkitEnterFullScreen();
+        } else if (media.webkitEnterFullScreen) {
+            media.webkitEnterFullScreen();
         }
         media.style.width  = '100%';
         media.style.height = '100%';
