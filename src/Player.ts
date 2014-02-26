@@ -243,7 +243,7 @@ class Player{
         var matches;
         if(matches = /Android (\d+\.\d+)\.\d+/.exec(userAgent)){
             this.isAndroid = true;
-            this.version = matches[0];
+            this.version = matches[1];
         }
         if(userAgent.match('iPad')){
             this.isIOSMobile  = false;
