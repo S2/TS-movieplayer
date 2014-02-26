@@ -74,6 +74,7 @@ class Player{
     isPC        : bool = false;
     canTouch    : bool = false;
     version     : number;
+    majorVersion : number;
     duration    : number;
     volume      : number = 0.5;
     enableSound : Boolean = true;
@@ -240,7 +241,7 @@ class Player{
     private setEnvironment(){
         var userAgent = navigator.userAgent;
         var matches;
-        if(matches = /Android (\d+\.\d+\.\d+)/.exec(userAgent)){
+        if(matches = /Android (\d+\.\d+)\.\d+/.exec(userAgent)){
             this.isAndroid = true;
             this.version = matches[0];
         }

@@ -904,7 +904,7 @@ var Player = (function () {
     Player.prototype.setEnvironment = function () {
         var userAgent = navigator.userAgent;
         var matches;
-        if (matches = /Android (\d+\.\d+\.\d+)/.exec(userAgent)) {
+        if (matches = /Android (\d+\.\d+)\.\d+/.exec(userAgent)) {
             this.isAndroid = true;
             this.version = matches[0];
         }
