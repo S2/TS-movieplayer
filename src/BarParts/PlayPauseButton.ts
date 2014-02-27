@@ -1,6 +1,6 @@
 /// <reference path="../jquery.d.ts" />
 /// <reference path="../BarParts.ts" />
-/// <reference path="../Player.ts" />
+/// <reference path="../TSPlayer.ts" />
 /// <reference path="../Bar.ts" />
 
 class BarPartsPlayPauseButton extends BarParts{
@@ -11,7 +11,7 @@ class BarPartsPlayPauseButton extends BarParts{
         @param {} 
         @return void
     */
-    constructor(player : Player , controlBar : Bar , playBarPartsSetting : BarPartsSetting , pauseBarPartsSetting : BarPartsSetting){
+    constructor(player : TSPlayer , controlBar : Bar , playBarPartsSetting : BarPartsSetting , pauseBarPartsSetting : BarPartsSetting){
         super(player , controlBar);
 
         var playPauseButton  : HTMLDivElement = this.createButton(playBarPartsSetting)

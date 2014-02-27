@@ -1,10 +1,10 @@
 /// <reference path="../jquery.d.ts" />
 /// <reference path="../BarParts.ts" />
-/// <reference path="../Player.ts" />
+/// <reference path="../TSPlayer.ts" />
 /// <reference path="../Bar.ts" />
 
 class BarPartsTimes extends BarParts{
-    constructor(player : Player , controlBar : Bar , separateString? : string){
+    constructor(player : TSPlayer , controlBar : Bar , separateString? : string){
         super(player , controlBar);
 
         this.separateString = separateString;
@@ -17,7 +17,7 @@ class BarPartsTimes extends BarParts{
         area.className = 'controllButtonLeft currentTime';
         this.controlBar.getElement().appendChild(area);
 
-        this.player.hookTimeUpdate((player:Player , video:HTMLVideoElement)=>{
+        this.player.hookTimeUpdate((player:TSPlayer , video:HTMLVideoElement)=>{
             var currentTime = player.getCurrentTime();
             var currentTimeString = this.getTime(currentTime);
             area.innerHTML = currentTimeString;

@@ -1,7 +1,7 @@
 /// <reference path="jquery.d.ts" />
 /// <reference path="Bar.ts" />
 /// <reference path="TitleBarOption.ts" />
-/// <reference path="Player.ts" />
+/// <reference path="TSPlayer.ts" />
 
 class TitleBar extends Bar{
     options : TitleBarOption;
@@ -14,7 +14,7 @@ class TitleBar extends Bar{
         this.options = options;
     }
 
-    public createElement(player:Player):HTMLElement{
+    public createElement(player:TSPlayer):HTMLElement{
         var newElement = super.createElement(player);
         newElement.className          = "bar titleBarString"
         newElement.style.width        = this.width + "px"

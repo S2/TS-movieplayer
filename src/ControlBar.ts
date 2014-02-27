@@ -1,7 +1,7 @@
 /// <reference path="jquery.d.ts" />
 /// <reference path="Bar.ts" />
 /// <reference path="ControlBarOption.ts" />
-/// <reference path="Player.ts" />
+/// <reference path="TSPlayer.ts" />
 
 class ControlBar extends Bar{
     options : ControlBarOption;
@@ -15,7 +15,7 @@ class ControlBar extends Bar{
         this.className = "bar controlBar";
     }
     
-    public createElement(player:Player):HTMLElement{
+    public createElement(player:TSPlayer):HTMLElement{
         var newElement = super.createElement(player);
         newElement.style.width = this.width + "px";
         newElement.style.height = this.options.height + "px";

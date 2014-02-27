@@ -1,10 +1,10 @@
 /// <reference path="../jquery.d.ts" />
 /// <reference path="../BarParts.ts" />
-/// <reference path="../Player.ts" />
+/// <reference path="../TSPlayer.ts" />
 /// <reference path="../Bar.ts" />
 
 class BarPartsVolumeButton extends BarParts{
-    constructor(player : Player , controlBar : Bar ,
+    constructor(player : TSPlayer , controlBar : Bar ,
             volumeOnImageSetting : BarPartsSetting , 
             volumeOffImageSetting : BarPartsSetting
             ){

@@ -1,5 +1,5 @@
 /// <reference path="jquery.d.ts" />
-/// <reference path="Player.ts" />
+/// <reference path="TSPlayer.ts" />
 /// <reference path="BarOption.ts" />
 
 class Bar{
@@ -9,7 +9,7 @@ class Bar{
     private eventEnable:boolean = true;
     public className : string = "bar";
     public displayed = true;
-    public createElement(player:Player):HTMLElement{
+    public createElement(player:TSPlayer):HTMLElement{
         var element = document.createElement("div");
         element.className = this.className;
         this.createdElement = element;

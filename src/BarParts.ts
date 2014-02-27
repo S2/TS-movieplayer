@@ -1,5 +1,5 @@
 /// <reference path="jquery.d.ts" />
-/// <reference path="Player.ts" />
+/// <reference path="TSPlayer.ts" />
 /// <reference path="Bar.ts" />
 
 class BarPartsSetting{
@@ -49,13 +49,13 @@ class Margin{
 }
 
 class BarParts{
-    player : Player;
+    player : TSPlayer;
     controlBar : Bar;
     centerPlayButton     :HTMLDivElement
     separateString : string
     hasSetDuration      : Boolean = false
     hasSetCurrentTime   : Boolean = false
-    constructor(player : Player , controlBar : Bar ){
+    constructor(player : TSPlayer , controlBar : Bar ){
         this.player = player;
         this.controlBar = controlBar;
     }

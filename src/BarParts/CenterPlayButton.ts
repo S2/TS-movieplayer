@@ -1,6 +1,6 @@
 /// <reference path="../jquery.d.ts" />
 /// <reference path="../BarParts.ts" />
-/// <reference path="../Player.ts" />
+/// <reference path="../TSPlayer.ts" />
 /// <reference path="../Bar.ts" />
 
 class BarPartsCenterPlayButton extends BarParts{
@@ -11,7 +11,7 @@ class BarPartsCenterPlayButton extends BarParts{
         @param {} 
         @return void
     */
-    constructor(player : Player , controlBar : Bar , backgroundImageSetting : BarPartsSetting){
+    constructor(player : TSPlayer , controlBar : Bar , backgroundImageSetting : BarPartsSetting){
         super(player , controlBar);
 
         var centerPlayButton : HTMLDivElement = this.createButton(backgroundImageSetting)

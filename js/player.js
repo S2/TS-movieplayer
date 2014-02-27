@@ -711,8 +711,8 @@ var CreateOption = (function () {
     return CreateOption;
 })();
 
-var Player = (function () {
-    function Player(media, createOption, controlOption, titleBarOption, seekBarOption) {
+var TSPlayer = (function () {
+    function TSPlayer(media, createOption, controlOption, titleBarOption, seekBarOption) {
         if (typeof createOption === "undefined") { createOption = new CreateOption(); }
         if (typeof controlOption === "undefined") { controlOption = new ControlBarOption(); }
         if (typeof titleBarOption === "undefined") { titleBarOption = new TitleBarOption(); }
@@ -883,30 +883,30 @@ var Player = (function () {
         });
         media.load();
     }
-    Player.prototype.setCurrentTime = function (moveToSec) {
+    TSPlayer.prototype.setCurrentTime = function (moveToSec) {
         var media = this.media;
         media.currentTime = moveToSec;
         media.play();
     };
 
-    Player.prototype.getCurrentTime = function () {
+    TSPlayer.prototype.getCurrentTime = function () {
         var media = this.media;
         return media.currentTime;
     };
 
-    Player.prototype.getDuration = function () {
+    TSPlayer.prototype.getDuration = function () {
         if (!this.duration) {
             this.duration = this.media.duration;
         }
         return this.duration;
     };
 
-    Player.prototype.setEnvironment = function () {
+    TSPlayer.prototype.setEnvironment = function () {
         var userAgent = navigator.userAgent;
         var matches;
         if (matches = /Android (\d+\.\d+)\.\d+/.exec(userAgent)) {
             this.isAndroid = true;
-            this.version = matches[0];
+            this.version = matches[1];
         }
         if (userAgent.match('iPad')) {
             this.isIOSMobile = false;
@@ -931,7 +931,7 @@ var Player = (function () {
         }
     };
 
-    Player.prototype.getSize = function () {
+    TSPlayer.prototype.getSize = function () {
         var media = this.media;
         this.width = parseInt(media.style.width.replace('px', ''));
         if (!this.width) {
@@ -944,7 +944,7 @@ var Player = (function () {
         }
     };
 
-    Player.prototype.createParentDiv = function () {
+    TSPlayer.prototype.createParentDiv = function () {
         if (this.isIOSMobile) {
             return;
         }
@@ -962,7 +962,7 @@ var Player = (function () {
         this.media = media;
     };
 
-    Player.prototype.setFullscreenCenterElementPosition = function (element, ratio) {
+    TSPlayer.prototype.setFullscreenCenterElementPosition = function (element, ratio) {
         var mediaParent = this.mediaParent;
         if (mediaParent == null) {
             return;
@@ -980,17 +980,17 @@ var Player = (function () {
         element.style.top = (height - width * ratio) / 2 + "px";
     };
 
-    Player.prototype.setInitialVolume = function (volume) {
+    TSPlayer.prototype.setInitialVolume = function (volume) {
         var media = this.media;
         media.volume = volume;
     };
 
-    Player.prototype.getVolume = function () {
+    TSPlayer.prototype.getVolume = function () {
         var media = this.media;
         return media.volume;
     };
 
-    Player.prototype.toggleFullscreen = function () {
+    TSPlayer.prototype.toggleFullscreen = function () {
         if (!this.isFullscreen) {
             this.enterFullscreen();
             this.isFullscreen = false;
@@ -1000,7 +1000,7 @@ var Player = (function () {
         }
     };
 
-    Player.prototype.enterFullscreen = function () {
+    TSPlayer.prototype.enterFullscreen = function () {
         if (this.title) {
             this.title.toggle();
         }
@@ -1025,7 +1025,7 @@ var Player = (function () {
         this.doMethodArray(this.fullscreenExit);
     };
 
-    Player.prototype.exitFullscreen = function () {
+    TSPlayer.prototype.exitFullscreen = function () {
         if (this.title) {
             this.title.toggle();
         }
@@ -1047,80 +1047,80 @@ var Player = (function () {
         this.doMethodArray(this.fullscreenEnter);
     };
 
-    Player.prototype.hookBeforePlay = function (hookMethod) {
+    TSPlayer.prototype.hookBeforePlay = function (hookMethod) {
         this.beforePlay.push(hookMethod);
     };
 
-    Player.prototype.hookAfterPlay = function (hookMethod) {
+    TSPlayer.prototype.hookAfterPlay = function (hookMethod) {
         this.afterPlay.push(hookMethod);
     };
 
-    Player.prototype.hookBeforePause = function (hookMethod) {
+    TSPlayer.prototype.hookBeforePause = function (hookMethod) {
         this.beforePause.push(hookMethod);
     };
 
-    Player.prototype.hookAfterPause = function (hookMethod) {
+    TSPlayer.prototype.hookAfterPause = function (hookMethod) {
         this.afterPause.push(hookMethod);
     };
 
-    Player.prototype.hookBeforeRestart = function (hookMethod) {
+    TSPlayer.prototype.hookBeforeRestart = function (hookMethod) {
         this.beforeRestart.push(hookMethod);
     };
 
-    Player.prototype.hookAfterRestart = function (hookMethod) {
+    TSPlayer.prototype.hookAfterRestart = function (hookMethod) {
         this.afterRestart.push(hookMethod);
     };
 
-    Player.prototype.hookTimeUpdate = function (hookMethod) {
+    TSPlayer.prototype.hookTimeUpdate = function (hookMethod) {
         this.timeUpdate.push(hookMethod);
     };
 
-    Player.prototype.hookEnded = function (hookMethod) {
+    TSPlayer.prototype.hookEnded = function (hookMethod) {
         this.ended.push(hookMethod);
     };
 
-    Player.prototype.hookFullscreenEnter = function (hookMethod) {
+    TSPlayer.prototype.hookFullscreenEnter = function (hookMethod) {
         this.fullscreenEnter.push(hookMethod);
     };
 
-    Player.prototype.hookFullscreenExit = function (hookMethod) {
+    TSPlayer.prototype.hookFullscreenExit = function (hookMethod) {
         this.fullscreenExit.push(hookMethod);
     };
 
-    Player.prototype.hookVolumeChange = function (hookMethod) {
+    TSPlayer.prototype.hookVolumeChange = function (hookMethod) {
         this.volumeChange.push(hookMethod);
     };
 
-    Player.prototype.hookVolumeOn = function (hookMethod) {
+    TSPlayer.prototype.hookVolumeOn = function (hookMethod) {
         this.volumeOn.push(hookMethod);
     };
 
-    Player.prototype.hookVolumeOff = function (hookMethod) {
+    TSPlayer.prototype.hookVolumeOff = function (hookMethod) {
         this.volumeOff.push(hookMethod);
     };
 
-    Player.prototype.hookLoadedmetadata = function (hookMethod) {
+    TSPlayer.prototype.hookLoadedmetadata = function (hookMethod) {
         this.loadedmetadata.push(hookMethod);
     };
 
-    Player.prototype.setVolumeOn = function () {
+    TSPlayer.prototype.setVolumeOn = function () {
         this.volume = this.media.volume;
         this.media.muted = true;
         this.enableSound = true;
         this.doMethodArray(this.volumeOn);
     };
 
-    Player.prototype.setVolumeOff = function () {
+    TSPlayer.prototype.setVolumeOff = function () {
         this.media.muted = false;
         this.enableSound = false;
         this.doMethodArray(this.volumeOff);
     };
 
-    Player.prototype.toggleVolume = function () {
+    TSPlayer.prototype.toggleVolume = function () {
         this.enableSound ? this.setVolumeOff() : this.setVolumeOn();
     };
 
-    Player.prototype.setVolume = function (dVolume) {
+    TSPlayer.prototype.setVolume = function (dVolume) {
         var newVolume = this.media.volume + dVolume;
         if (newVolume < 0) {
             newVolume = 0;
@@ -1130,13 +1130,13 @@ var Player = (function () {
         }
         this.media.volume + newVolume;
     };
-    Player.prototype.doMethodArray = function (methods) {
+    TSPlayer.prototype.doMethodArray = function (methods) {
         for (var i = 0; i < methods.length; i++) {
             methods[i](this, this.media);
         }
     };
 
-    Player.prototype.togglePlayPause = function () {
+    TSPlayer.prototype.togglePlayPause = function () {
         if (this.isPlaying) {
             this.pause();
         } else {
@@ -1144,7 +1144,7 @@ var Player = (function () {
         }
     };
 
-    Player.prototype.play = function () {
+    TSPlayer.prototype.play = function () {
         var media = this.media;
         if (this.isPaused) {
             this.doMethodArray(this.beforeRestart);
@@ -1159,7 +1159,7 @@ var Player = (function () {
         this.isPaused = false;
     };
 
-    Player.prototype.pause = function () {
+    TSPlayer.prototype.pause = function () {
         var media = this.media;
         this.doMethodArray(this.beforePause);
         media.pause();
@@ -1168,7 +1168,7 @@ var Player = (function () {
         this.isPlaying = false;
     };
 
-    Player.prototype.togglePauseRestart = function () {
+    TSPlayer.prototype.togglePauseRestart = function () {
         var media = this.media;
         if (!this.isPlaying && this.isPaused) {
             this.doMethodArray(this.beforePlay);
@@ -1187,11 +1187,11 @@ var Player = (function () {
         }
     };
 
-    Player.prototype.toggleElement = function (element) {
+    TSPlayer.prototype.toggleElement = function (element) {
         element.style.display = element.style.display == 'none' ? 'block' : 'none';
     };
 
-    Player.prototype.setLowerBar = function (barObject) {
+    TSPlayer.prototype.setLowerBar = function (barObject) {
         var bar = barObject.createElement(this);
 
         var height = parseInt(bar.style.height.replace('px', ''));
@@ -1209,7 +1209,7 @@ var Player = (function () {
         return bar;
     };
 
-    Player.prototype.setUpperBar = function (barObject) {
+    TSPlayer.prototype.setUpperBar = function (barObject) {
         var bar = barObject.createElement(this);
         bar.style.top = "0px";
 
@@ -1219,7 +1219,7 @@ var Player = (function () {
         return bar;
     };
 
-    Player.prototype.setFullscreenLowerBar = function (barObject) {
+    TSPlayer.prototype.setFullscreenLowerBar = function (barObject) {
         var bar = barObject.createElement(this);
 
         var screenHeight = screen.height;
@@ -1232,16 +1232,16 @@ var Player = (function () {
         bar.style.top = (screenHeight - height) + "px";
     };
 
-    Player.prototype.getMedia = function () {
+    TSPlayer.prototype.getMedia = function () {
         return this.media;
     };
 
-    Player.prototype.getMediaParent = function () {
+    TSPlayer.prototype.getMediaParent = function () {
         if (this.mediaParent) {
             return this.mediaParent;
         } else {
             throw "not yet set parent . ios will not set parent";
         }
     };
-    return Player;
+    return TSPlayer;
 })();

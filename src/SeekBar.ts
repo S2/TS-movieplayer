@@ -1,7 +1,7 @@
 /// <reference path="jquery.d.ts" />
 /// <reference path="Bar.ts" />
 /// <reference path="SeekBarOption.ts" />
-/// <reference path="Player.ts" />
+/// <reference path="TSPlayer.ts" />
 
 class SeekBar extends Bar{
     options : SeekBarOption;
@@ -17,7 +17,7 @@ class SeekBar extends Bar{
         this.className = "bar seekBar";
     }
     
-    public createElement(player:Player):HTMLElement{
+    public createElement(player:TSPlayer):HTMLElement{
         var newElement = super.createElement(player);
         newElement.style.width = this.width + "px";
         if(this.options.height){
@@ -60,7 +60,7 @@ class SeekBar extends Bar{
             player.setCurrentTime(moveToSec);
         } , false);
 
-        player.hookTimeUpdate((player:Player , video:HTMLVideoElement) => {
+        player.hookTimeUpdate((player:TSPlayer , video:HTMLVideoElement) => {
             var current:number = video.currentTime;
             var duration:number = player.getDuration();
             var percent = current / duration;

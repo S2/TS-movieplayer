@@ -1,10 +1,10 @@
 /// <reference path="../jquery.d.ts" />
 /// <reference path="../BarParts.ts" />
-/// <reference path="../Player.ts" />
+/// <reference path="../TSPlayer.ts" />
 /// <reference path="../Bar.ts" />
 
 class BarPartsTitleString extends BarParts{
-    constructor(player : Player , titleBar : Bar , titleString : string){
+    constructor(player : TSPlayer , titleBar : Bar , titleString : string){
         super(player , titleBar);
 
         this.hasSetCurrentTime = true;

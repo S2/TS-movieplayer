@@ -46,7 +46,7 @@ class CreateOption{
     feedOutTime          : number = 100;
 }
 
-class Player{
+class TSPlayer{
     title               :TitleBar;
     control             :ControlBar;
     seekbar             :SeekBar;
@@ -205,7 +205,7 @@ class Player{
             }
         },false);
 
-        this.hookEnded((player:Player , video:HTMLVideoElement) => {
+        this.hookEnded((player:TSPlayer , video:HTMLVideoElement) => {
             this.title.feedIn(0 , createOption.feedInTime);
             this.control.feedIn(0 , createOption.feedInTime);
             if(!this.createOption.displayAlwaysSeekBar){
@@ -407,72 +407,72 @@ class Player{
     }
 
     private beforePlay : Array = [];
-    public hookBeforePlay(hookMethod:(player:Player , video:HTMLVideoElement)=>void){
+    public hookBeforePlay(hookMethod:(player:TSPlayer , video:HTMLVideoElement)=>void){
         this.beforePlay.push(hookMethod);
     }
 
     private afterPlay : Array = [];
-    public hookAfterPlay(hookMethod:(player:Player , video:HTMLVideoElement)=>void){
+    public hookAfterPlay(hookMethod:(player:TSPlayer , video:HTMLVideoElement)=>void){
         this.afterPlay.push(hookMethod);
     }
 
     private beforePause : Array = [];
-    public hookBeforePause(hookMethod:(player:Player , video:HTMLVideoElement)=>void){
+    public hookBeforePause(hookMethod:(player:TSPlayer , video:HTMLVideoElement)=>void){
         this.beforePause.push(hookMethod);
     }
 
     private afterPause : Array = [];
-    public hookAfterPause(hookMethod:(player:Player , video:HTMLVideoElement)=>void){
+    public hookAfterPause(hookMethod:(player:TSPlayer , video:HTMLVideoElement)=>void){
         this.afterPause.push(hookMethod);
     }
 
     private beforeRestart : Array = [];
-    public hookBeforeRestart(hookMethod:(player:Player , video:HTMLVideoElement)=>void){
+    public hookBeforeRestart(hookMethod:(player:TSPlayer , video:HTMLVideoElement)=>void){
         this.beforeRestart.push(hookMethod);
     }
 
     private afterRestart : Array = [];
-    public hookAfterRestart(hookMethod:(player:Player , video:HTMLVideoElement)=>void){
+    public hookAfterRestart(hookMethod:(player:TSPlayer , video:HTMLVideoElement)=>void){
         this.afterRestart.push(hookMethod);
     }
 
     private timeUpdate: Array = [];
-    public hookTimeUpdate(hookMethod:(player:Player , video:HTMLVideoElement)=>void){
+    public hookTimeUpdate(hookMethod:(player:TSPlayer , video:HTMLVideoElement)=>void){
         this.timeUpdate.push(hookMethod);
     }
 
     private ended : Array = [];
-    public hookEnded(hookMethod:(player:Player , video:HTMLVideoElement)=>void){
+    public hookEnded(hookMethod:(player:TSPlayer , video:HTMLVideoElement)=>void){
         this.ended.push(hookMethod);
     }
     
     private fullscreenEnter : Array = [];
-    public hookFullscreenEnter(hookMethod:(player:Player , video:HTMLVideoElement)=>void){
+    public hookFullscreenEnter(hookMethod:(player:TSPlayer , video:HTMLVideoElement)=>void){
         this.fullscreenEnter.push(hookMethod);
     }
 
     private fullscreenExit : Array = [];
-    public hookFullscreenExit(hookMethod:(player:Player , video:HTMLVideoElement)=>void){
+    public hookFullscreenExit(hookMethod:(player:TSPlayer , video:HTMLVideoElement)=>void){
         this.fullscreenExit.push(hookMethod);
     }
 
     private volumeChange : Array = [];
-    public hookVolumeChange(hookMethod:(player:Player , video:HTMLVideoElement)=>void){
+    public hookVolumeChange(hookMethod:(player:TSPlayer , video:HTMLVideoElement)=>void){
         this.volumeChange.push(hookMethod);
     }
 
     private volumeOn : Array = [];
-    public hookVolumeOn(hookMethod:(player:Player , video:HTMLVideoElement)=>void){
+    public hookVolumeOn(hookMethod:(player:TSPlayer , video:HTMLVideoElement)=>void){
         this.volumeOn.push(hookMethod);
     }
 
     private volumeOff : Array = [];
-    public hookVolumeOff(hookMethod:(player:Player , video:HTMLVideoElement)=>void){
+    public hookVolumeOff(hookMethod:(player:TSPlayer , video:HTMLVideoElement)=>void){
         this.volumeOff.push(hookMethod);
     }
 
     private loadedmetadata : Array = [];
-    public hookLoadedmetadata(hookMethod:(player:Player , video:HTMLVideoElement)=>void){
+    public hookLoadedmetadata(hookMethod:(player:TSPlayer , video:HTMLVideoElement)=>void){
         this.loadedmetadata.push(hookMethod);
     }
 
