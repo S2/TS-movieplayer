@@ -36,7 +36,7 @@
 
 <script>
     var target = document.getElementById('hoge');
-    var player = new Player(target , new CreateOption());
+    var player = new TSPlayer(target , new CreateOption());
     document.getElementById("fuga").addEventListener('click' , function(){
         player.toggleFullscreen();
         player.togglePlayPause();
