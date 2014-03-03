@@ -1042,6 +1042,8 @@ var TSPlayer = (function () {
             document.mozCancelFullScreen();
         } else if (document.webkitCancelFullScreen) {
             document.webkitCancelFullScreen();
+        } else if (media.webkitExitFullscreen) {
+            media.webkitExitFullscreen();
         }
         this.isFullscreen = false;
         this.doMethodArray(this.fullscreenEnter);

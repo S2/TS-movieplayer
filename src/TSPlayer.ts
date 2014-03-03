@@ -22,7 +22,8 @@ interface HTMLElement{
 }
 
 interface HTMLVideoElement{
-    webkitEnterFullScreen();
+    webkitEnterFullScreen()
+    webkitExitFullscreen()
 }
 
 interface HTMLDocument{
@@ -396,11 +397,13 @@ class TSPlayer{
         }
         var media:HTMLVideoElement = this.media
         if (document.exitFullscreen) {
-            document.exitFullscreen();
+            document.exitFullscreen()
         } else if (document.mozCancelFullScreen) {
-            document.mozCancelFullScreen();
+            document.mozCancelFullScreen()
         } else if (document.webkitCancelFullScreen) {
-            document.webkitCancelFullScreen();
+            document.webkitCancelFullScreen()
+        } else if (media.webkitExitFullscreen) {
+            media.webkitExitFullscreen()
         }
         this.isFullscreen = false;
         this.doMethodArray(this.fullscreenEnter);
