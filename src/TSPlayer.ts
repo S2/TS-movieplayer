@@ -39,15 +39,17 @@ interface HTMLDocument{
 }
 
 class CreateOption{
-    width                :  number;
-    height               :  number;
-    movieSrcURL          :  number;
-    imagePath            :  string = '../image/';
-    viewControllBar      :  Boolean = true;
-    viewTitleBar         :  Boolean = true;
-    viewSeekBar          :  Boolean = true;
-    displayAlwaysSeekBar :  Boolean = true;
-    titleString          :  string = "";
+    width                : number;
+    height               : number;
+    movieSrcURL          : number;
+    imagePath            : string = '../image/';
+    controleButtons      : string = "controls.svg"
+    centerButton         : string = "largeButton.svg"
+    viewControllBar      : Boolean = true;
+    viewTitleBar         : Boolean = true;
+    viewSeekBar          : Boolean = true;
+    displayAlwaysSeekBar : Boolean = true;
+    titleString          : string = "";
     feedInTime           : number = 100;
     feedOutTime          : number = 100;
 }
@@ -119,18 +121,19 @@ class TSPlayer{
                 this.seekbar.setMoveDownHeight(this.control.getHeight());
             }
         }
-        var centerBarPartsSetting = new BarPartsSetting('../image/largeButton.svg' , 240 , 240 , 30 , 30 , 80 , 80 , new Margin(0 , 0 , 0 , 0));
+        var centerBarPartsSetting = new BarPartsSetting(this.createOption.imagePath + this.createOption.centerButton  , 240 , 240 , 30 , 30 , 80 , 80 , new Margin(0 , 0 , 0 , 0));
 
         if(!this.isIOSMobile){
             new BarPartsCenterPlayButton(this , this.control , centerBarPartsSetting);
         }
+        var controlImage = this.createOption.imagePath + this.createOption.controleButtons
 
-        var playBarPartsSetting = new BarPartsSetting('../image/controls.svg'  , 16 , 16 , 0 , 0 , 100 , 100 , new Margin(7 , 5 , 7 , 5));
-        var pauseBarPartsSetting = new BarPartsSetting('../image/controls.svg' , 16 , 16 , 0 , -16  , 100 , 100 , new Margin(7 , 5 , 7 , 5));
+        var playBarPartsSetting = new BarPartsSetting(controlImage  , 16 , 16 , 0 , 0 , 100 , 100 , new Margin(7 , 5 , 7 , 5));
+        var pauseBarPartsSetting = new BarPartsSetting(controlImage , 16 , 16 , 0 , -16  , 100 , 100 , new Margin(7 , 5 , 7 , 5));
         new BarPartsPlayPauseButton(this , this.control , playBarPartsSetting , pauseBarPartsSetting );
 
-        var volumeOnBarPartsSetting  = new BarPartsSetting('../image/controls.svg' , 16 , 16 , -16 , -16  , 100 , 100 , new Margin(7 , 5 , 7 , 5));
-        var volumeOffBarPartsSetting = new BarPartsSetting('../image/controls.svg' , 16 , 16 , -16 , 0    , 100 , 100 , new Margin(7 , 5 , 7 , 5));
+        var volumeOnBarPartsSetting  = new BarPartsSetting(controlImage , 16 , 16 , -16 , -16  , 100 , 100 , new Margin(7 , 5 , 7 , 5));
+        var volumeOffBarPartsSetting = new BarPartsSetting(controlImage , 16 , 16 , -16 , 0    , 100 , 100 , new Margin(7 , 5 , 7 , 5));
         new BarPartsVolumeButton(this , this.control , volumeOnBarPartsSetting , volumeOffBarPartsSetting);
 
         var timeParts = new BarPartsTimes(this , this.control , " / ");
@@ -138,7 +141,7 @@ class TSPlayer{
             timeParts.setDuration(this.getDuration());
         });
 
-        var fullscreenBarPartsSetting = new BarPartsSetting('../image/controls.svg' , 16 , 16 , -32  , 0 , 100 , 100 , new Margin(7 , 5 , 7 , 5));
+        var fullscreenBarPartsSetting = new BarPartsSetting(controlImage , 16 , 16 , -32  , 0 , 100 , 100 , new Margin(7 , 5 , 7 , 5));
         new BarPartsFullscreenButton(this , this.control , fullscreenBarPartsSetting);
 
         new BarPartsTitleString(this , this.title , createOption.titleString);
