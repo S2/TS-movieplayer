@@ -43,7 +43,7 @@ class CreateOption{
     height               : number;
     movieSrcURL          : number;
     imagePath            : string = '../image/';
-    controleButtons      : string = "controls.svg"
+    controlButtons      : string = "controls.svg"
     centerButton         : string = "largeButton.svg"
     viewControllBar      : Boolean = true;
     viewTitleBar         : Boolean = true;
@@ -126,7 +126,7 @@ class TSPlayer{
         if(!this.isIOSMobile){
             new BarPartsCenterPlayButton(this , this.control , centerBarPartsSetting);
         }
-        var controlImage = this.createOption.imagePath + this.createOption.controleButtons
+        var controlImage = this.createOption.imagePath + this.createOption.controlButtons
 
         var playBarPartsSetting = new BarPartsSetting(controlImage  , 16 , 16 , 0 , 0 , 100 , 100 , new Margin(7 , 5 , 7 , 5));
         var pauseBarPartsSetting = new BarPartsSetting(controlImage , 16 , 16 , 0 , -16  , 100 , 100 , new Margin(7 , 5 , 7 , 5));
