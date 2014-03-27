@@ -24,13 +24,18 @@ interface HTMLElement{
 interface HTMLVideoElement{
     webkitEnterFullScreen()
     webkitExitFullScreen()
+    exitFullscreen()
+    webkitCancelFullScreen()
+    webkitExitFullscreen()
+    mozCancelFullScreen()
 }
 
 interface HTMLDocument{
-    exitFullscreen();
-    mozCancelFullScreen();
-    webkitCancelFullScreen();
-    ontouchstart();
+    exitFullscreen()
+    mozCancelFullScreen()
+    webkitCancelFullScreen()
+    ontouchstart()
+    onwebkitfullscreenchange
 }
 
 class CreateOption{
