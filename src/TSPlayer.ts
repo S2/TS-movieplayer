@@ -1,5 +1,4 @@
-/// <reference path="jquery.d.ts" />
-/// <reference path="BarParts.ts" />
+
 /// <reference path="BarParts/PlayPauseButton.ts" />
 /// <reference path="BarParts/FullscreenButton.ts" />
 /// <reference path="BarParts/VolumeButton.ts" />
@@ -52,6 +51,7 @@ class CreateOption{
     titleString          : string = "";
     feedInTime           : number = 100;
     feedOutTime          : number = 100;
+    playWithFullscreen   : boolean = false;
 }
 
 class TSPlayer{
@@ -79,14 +79,14 @@ class TSPlayer{
     isChorome   : bool = false;
     isFirefox   : bool = false;
 
-    isPC        : bool = false;
-    canTouch    : bool = false;
-    version     : number;
+    isPC         : bool = false;
+    canTouch     : bool = false;
+    version      : number;
     majorVersion : number;
-    duration    : number;
-    volume      : number = 0.5;
-    enableSound : Boolean = true;
-    createOption:CreateOption;
+    duration     : number;
+    volume       : number = 0.5;
+    enableSound  : Boolean = true;
+    createOption :CreateOption;
 
     constructor(media:HTMLVideoElement ,  
             createOption:CreateOption      = new CreateOption(), 
@@ -145,6 +145,10 @@ class TSPlayer{
         new BarPartsFullscreenButton(this , this.control , fullscreenBarPartsSetting);
 
         new BarPartsTitleString(this , this.title , createOption.titleString);
+
+        if(this.createOption.playWithFullscreen){
+            this.hookFullscreenExit(() => {this.pause()});
+        }
 
         media.addEventListener('click' , () => {
             this.togglePauseRestart();
@@ -213,6 +217,22 @@ class TSPlayer{
                 displayControll  = false;
             }
         },false);
+
+        document.addEventListener("webkitfullscreenchange" , ()=> {
+            if(this.isFullscreen == true){
+                this.doMethodArray(this.fullscreenExit);
+                this.isFullscreen = false
+            }
+            if(this.createOption.playWithFullscreen){
+                this.togglePauseRestart();
+            }
+        });
+
+
+        document.addEventListener("webkitendfullscreen" , ()=> {
+            this.doMethodArray(this.fullscreenExit);
+            this.isFullscreen = false
+        });
 
         this.hookEnded((player:TSPlayer , video:HTMLVideoElement) => {
             this.title.feedIn(0 , createOption.feedInTime);
@@ -383,7 +403,7 @@ class TSPlayer{
             media.webkitEnterFullScreen();
         }
         this.isFullscreen = true;
-        this.doMethodArray(this.fullscreenExit);
+        this.doMethodArray(this.fullscreenEnter);
     }
 
     /**
@@ -414,7 +434,6 @@ class TSPlayer{
             media.webkitExitFullScreen()
         }
         this.isFullscreen = false;
-        this.doMethodArray(this.fullscreenEnter);
     }
 
     private beforePlay : Array = [];
@@ -571,13 +590,21 @@ class TSPlayer{
             this.doMethodArray(this.beforeRestart)
         }
         this.doMethodArray(this.beforePlay)
+        if(this.createOption.playWithFullscreen){
+            this.enterFullscreen();
+        }
         media.play()
         this.doMethodArray(this.afterPlay)
         if(this.isPaused){
             this.doMethodArray(this.afterRestart)
         }
-        this.isPlaying = true 
-        this.isPaused = false
+        if(this.createOption.playWithFullscreen){
+            this.isPlaying =false 
+            this.isPaused = true
+        }else{
+            this.isPlaying = true 
+            this.isPaused = false
+        }
     }
 
     /**
@@ -590,6 +617,9 @@ class TSPlayer{
     public pause():void{
         var media:HTMLVideoElement = this.media;
         this.doMethodArray(this.beforePause)
+        if(this.createOption.playWithFullscreen){
+            this.exitFullscreen();
+        }
         media.pause()
         this.isPaused = true;
         this.doMethodArray(this.afterPause)
@@ -601,13 +631,26 @@ class TSPlayer{
         if(!this.isPlaying && this.isPaused){
             this.doMethodArray(this.beforePlay)
             this.doMethodArray(this.beforeRestart)
+            if(this.createOption.playWithFullscreen){
+                this.exitFullscreen();
+                this.enterFullscreen();
+            }
             media.play()
             this.doMethodArray(this.afterPlay)
             this.doMethodArray(this.afterRestart)
-            this.isPlaying = true 
-            this.isPaused = false
+
+            if(this.createOption.playWithFullscreen){
+                this.isPlaying = false 
+                this.isPaused = true
+            }else{
+                this.isPlaying = true 
+                this.isPaused = false
+            }
         }else if(this.isPlaying){
             this.doMethodArray(this.beforePause)
+            if(this.createOption.playWithFullscreen){
+                this.exitFullscreen();
+            }
             media.pause()
             this.isPaused = true;
             this.doMethodArray(this.afterPause)
