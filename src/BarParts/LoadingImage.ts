@@ -5,7 +5,7 @@
 
 class BarPartsLoadingImage extends BarParts{
     loadingImage : HTMLDivElement
-    style : HTMLStyle
+    style : MSStyleCSSProperties
     constructor(player : TSPlayer , controlBar : Bar , imageSetting : BarPartsSetting){
         super(player , controlBar);
 
