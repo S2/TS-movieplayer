@@ -12,6 +12,7 @@
 /// <reference path="SeekBarOption.ts" />
 /// <reference path="ControlBar.ts" />
 /// <reference path="ControlBarOption.ts" />
+/// <reference path="CookieManager.ts" />
 
 // Add the missing definitions: 
 interface HTMLElement{
@@ -87,7 +88,7 @@ class TSPlayer{
     volume       : number = 0.5;
     enableSound  : Boolean = true;
     createOption :CreateOption;
-
+    
     constructor(media:HTMLVideoElement ,  
             createOption:CreateOption      = new CreateOption(), 
             controlOption:ControlBarOption = new ControlBarOption() ,
@@ -106,6 +107,7 @@ class TSPlayer{
         this.control = new ControlBar(controlOption , this.width);
         this.seekbar = new SeekBar(seekBarOption , this.width);
         
+        /* add bars */ 
         var controlBar = null
         var titleBar   = null
         var seekBar    = null
@@ -121,6 +123,9 @@ class TSPlayer{
                 this.seekbar.setMoveDownHeight(this.control.getHeight());
             }
         }
+        /* add bars end */ 
+
+        /* add buttons */ 
         var centerBarPartsSetting = new BarPartsSetting(this.createOption.imagePath + this.createOption.centerButton  , 240 , 240 , 30 , 30 , 80 , 80 , new Margin(0 , 0 , 0 , 0));
 
         if(!this.isIOSMobile){
@@ -149,7 +154,13 @@ class TSPlayer{
         if(this.createOption.playWithFullscreen){
             this.hookFullscreenExit(() => {this.pause()});
         }
+        /* add buttons end */ 
 
+        if(CookieManager.get("muted") == "true"){
+            this.setVolumeOff();
+        }
+
+        /* add events */ 
         media.addEventListener('click' , () => {
             this.togglePauseRestart();
         },false);
@@ -228,7 +239,6 @@ class TSPlayer{
             }
         });
 
-
         document.addEventListener("webkitendfullscreen" , ()=> {
             this.doMethodArray(this.fullscreenExit);
             this.isFullscreen = false
@@ -252,7 +262,6 @@ class TSPlayer{
     public setCurrentTime(moveToSec:number){
         var media = this.media;
         media.currentTime = moveToSec;
-        media.play();
     }
 
     public getCurrentTime() : number{
@@ -516,6 +525,7 @@ class TSPlayer{
     public setVolumeOn():void{
         this.volume = this.media.volume;
         this.media.muted = false;
+        CookieManager.set("muted" , "false");
         this.enableSound = true;
         this.doMethodArray(this.volumeOn)
     }
@@ -529,6 +539,7 @@ class TSPlayer{
     */
     public setVolumeOff():void{
         this.media.muted = true ;
+        CookieManager.set("muted" , "true");
         this.enableSound = false;
         this.doMethodArray(this.volumeOff)
     }
