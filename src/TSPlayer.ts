@@ -240,22 +240,30 @@ class TSPlayer{
             seekBar.addEventListener('mouseover' , barFeedIn ,false);
         }
 
-        media.addEventListener('mouseout' , () => {
-            if(this.isPlaying){
-                this.title.feedOut(0 , createOption.feedOutTime);
-                this.control.feedOut(0 , createOption.feedOutTime);
-                if(!this.createOption.displayAlwaysSeekBar){
-                    this.seekbar.feedOut(0 , createOption.feedOutTime);
-                }else{
-                    if(displayControll){
-                        this.control.setFeedOutHookOnce( () => {
-                            this.seekbar.moveDownBar();
-                        })
+        var barFeedOut = () => {
+                if(this.isPlaying){
+                    this.title.feedOut(0 , createOption.feedOutTime);
+                    this.control.feedOut(0 , createOption.feedOutTime);
+                    if(!this.createOption.displayAlwaysSeekBar){
+                        this.seekbar.feedOut(0 , createOption.feedOutTime);
+                    }else{
+                        if(displayControll){
+                            this.control.setFeedOutHookOnce( () => {
+                                this.seekbar.moveDownBar();
+                            })
+                        }
                     }
+                    displayControll  = false;
                 }
-                displayControll  = false;
-            }
-        },false);
+            };
+
+        media.addEventListener('mouseout' , barFeedOut , false);
+
+        if(this.isAndroid){
+            // if Android , we can get duration after play start
+            this.hookTimeupdate(barFeedOut);
+            this.hookAfterPause(barFeedIn);
+        }
 
         document.addEventListener("webkitfullscreenchange" , ()=> {
             if(this.isFullscreen == true){
