@@ -270,10 +270,7 @@ class TSPlayer{
     }
 
     public getDuration():number{
-        if(!this.duration){
-            this.duration = this.media.duration;
-        }
-        return this.duration;
+        return this.media.duration;
     }
 
     private setEnvironment(){
