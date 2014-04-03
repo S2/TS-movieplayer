@@ -73,12 +73,13 @@ class TSPlayer{
     isPaused            :bool = false;
     isFullscreen        :bool = false;
     
-    isIOSMobile : bool = false;
-    isIOS         : bool = false;
-    isIPad        : bool = false;
-    isIPod        : bool = false;
-    isIPhone      : bool = false;
-    isAndroid     : bool = false;
+    isIOSMobile     : bool = false;
+    isIOS           : bool = false;
+    isIPad          : bool = false;
+    isIPod          : bool = false;
+    isIPhone        : bool = false;
+    isAndroid       : bool = false;
+    isCellularPhone : bool = false;
 
     isWebkit    : bool = false;
     isChorome   : bool = false;
@@ -333,6 +334,9 @@ class TSPlayer{
         if(document.ontouchstart !== undefined){
             this.canTouch = true;
         }
+
+        this.isCellularPhone = this.isIOSMobile || this.isAndroid
+
     }
 
     private getSize(){
