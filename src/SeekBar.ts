@@ -60,7 +60,7 @@ class SeekBar extends Bar{
             player.setCurrentTime(moveToSec);
         } , false);
 
-        player.hookTimeUpdate((player:TSPlayer , video:HTMLVideoElement) => {
+        player.hookTimeupdate((player:TSPlayer , video:HTMLVideoElement) => {
             var current:number = video.currentTime;
             var duration:number = player.getDuration();
             var percent = current / duration;

@@ -5,6 +5,7 @@
 /// <reference path="BarParts/Times.ts" />
 /// <reference path="BarParts/CenterPlayButton.ts" />
 /// <reference path="BarParts/TitleString.ts" />
+/// <reference path="BarParts/LoadingImage.ts" />
 /// <reference path="Bar.ts" />
 /// <reference path="TitleBar.ts" />
 /// <reference path="TitleBarOption.ts" />
@@ -13,6 +14,7 @@
 /// <reference path="ControlBar.ts" />
 /// <reference path="ControlBarOption.ts" />
 /// <reference path="CookieManager.ts" />
+/// <reference path="DebugConsole.ts" />
 
 // Add the missing definitions: 
 interface HTMLElement{
@@ -43,8 +45,9 @@ class CreateOption{
     height               : number;
     movieSrcURL          : number;
     imagePath            : string = '../image/';
-    controlButtons      : string = "controls.svg"
+    controlButtons       : string = "controls.svg"
     centerButton         : string = "largeButton.svg"
+    loadingImage         : string = "loading.gif"
     viewControllBar      : Boolean = true;
     viewTitleBar         : Boolean = true;
     viewSeekBar          : Boolean = true;
@@ -52,6 +55,7 @@ class CreateOption{
     titleString          : string = "";
     feedInTime           : number = 100;
     feedOutTime          : number = 100;
+    separateString       : string = " / ";
     playWithFullscreen   : boolean = false;
 }
 
@@ -87,7 +91,8 @@ class TSPlayer{
     duration     : number;
     volume       : number = 0.5;
     enableSound  : Boolean = true;
-    createOption :CreateOption;
+    createOption : CreateOption;
+    console      = new Debug.Console();
     
     constructor(media:HTMLVideoElement ,  
             createOption:CreateOption      = new CreateOption(), 
@@ -141,11 +146,20 @@ class TSPlayer{
         var volumeOffBarPartsSetting = new BarPartsSetting(controlImage , 16 , 16 , -16 , 0    , 100 , 100 , new Margin(7 , 5 , 7 , 5));
         new BarPartsVolumeButton(this , this.control , volumeOnBarPartsSetting , volumeOffBarPartsSetting);
 
-        var timeParts = new BarPartsTimes(this , this.control , " / ");
-        this.hookLoadedmetadata(()=>{
-            timeParts.setDuration(this.getDuration());
-        });
-
+        var timeParts = new BarPartsTimes(this , this.control , this.createOption.separateString);
+        timeParts.setDuration(this.getDuration());
+        
+        if(this.isAndroid){
+            // if Android , we can get duration after play start
+            this.hookTimeupdate(()=>{
+                timeParts.setDuration(this.getDuration());
+            });
+        }else{
+            this.hookLoadedmetadata(()=>{
+                timeParts.setDuration(this.getDuration());
+            });
+        }
+        
         var fullscreenBarPartsSetting = new BarPartsSetting(controlImage , 16 , 16 , -32  , 0 , 100 , 100 , new Margin(7 , 5 , 7 , 5));
         new BarPartsFullscreenButton(this , this.control , fullscreenBarPartsSetting);
 
@@ -154,6 +168,19 @@ class TSPlayer{
         if(this.createOption.playWithFullscreen){
             this.hookFullscreenExit(() => {this.pause()});
         }
+
+        var centerLoadingImageSetting = new BarPartsSetting(this.createOption.imagePath + this.createOption.loadingImage , 100 , 100 , 0 , 0 , 100 , 100 , new Margin(0 , 0 , 0 , 0));
+
+        if(this.isAndroid){
+            var loading = new BarPartsLoadingImage(this , this.control , centerLoadingImageSetting);
+            this.hookBeforePlay(()=>{
+                loading.visible();
+            });
+            this.hookTimeupdate(()=>{
+                loading.invisible();
+            });
+        }
+
         /* add buttons end */ 
 
         if(CookieManager.get("muted") == "true"){
@@ -270,7 +297,11 @@ class TSPlayer{
     }
 
     public getDuration():number{
-        return this.media.duration;
+        var duration : number = this.media.duration
+        if(isNaN(duration)){
+            duration = 0
+        }
+        return duration
     }
 
     private setEnvironment(){
@@ -473,7 +504,7 @@ class TSPlayer{
     }
 
     private timeUpdate: Array = [];
-    public hookTimeUpdate(hookMethod:(player:TSPlayer , video:HTMLVideoElement)=>void){
+    public hookTimeupdate(hookMethod:(player:TSPlayer , video:HTMLVideoElement)=>void){
         this.timeUpdate.push(hookMethod);
     }
 
@@ -643,6 +674,7 @@ class TSPlayer{
                 this.exitFullscreen();
                 this.enterFullscreen();
             }
+            this.console.d("680")
             media.play()
             this.doMethodArray(this.afterPlay)
             this.doMethodArray(this.afterRestart)

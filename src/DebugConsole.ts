@@ -21,7 +21,7 @@ module Debug{
         public d(message : string){
             this.create();
             if(this.console.innerHTML){
-                this.console.innerHTML += "<br><span style='color:blue'>" + message + "</span>";
+                this.console.innerHTML = "<span style='color:blue'>" + message + "</span><br>" + this.console.innerHTML;
             }else{
                 this.console.innerHTML = "<span style='color:blue'>" + message + "</span>";
             }
@@ -30,7 +30,7 @@ module Debug{
         public e(message : string){
             this.create();
             if(this.console.innerHTML){
-                this.console.innerHTML += "<br><span style='color:red'>" + message + "</span>";
+                this.console.innerHTML = "<span style='color:red'>" + message + "</span><br>" + this.console.innerHTML;
             }else{
                 this.console.innerHTML = "<span style='color:red'>" + message + "</span>";
             }

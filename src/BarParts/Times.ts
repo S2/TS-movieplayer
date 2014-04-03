@@ -17,7 +17,7 @@ class BarPartsTimes extends BarParts{
         area.className = 'controllButtonLeft currentTime';
         this.controlBar.getElement().appendChild(area);
 
-        this.player.hookTimeUpdate((player:TSPlayer , video:HTMLVideoElement)=>{
+        this.player.hookTimeupdate((player:TSPlayer , video:HTMLVideoElement)=>{
             var currentTime = player.getCurrentTime();
             var currentTimeString = this.getTime(currentTime);
             area.innerHTML = currentTimeString;
@@ -25,16 +25,29 @@ class BarPartsTimes extends BarParts{
     }
 
     public setDuration(durationSeconds : number):void{
+        var className = 'controllButtonLeft duration';
+        var area : HTMLDivElement;
+        var areaExists = false;
+        var controllElements = (<Node>this.controlBar.getElement()).childNodes;
+        for( var i = 0 , arrayLength = controllElements.length ; i < arrayLength ; i++){
+            var element = <HTMLDivElement>controllElements[i];
+            if(element.className == className){
+                area = element
+                areaExists = true;
+                break
+            }
+        }
+        
         var barHeight : number = this.controlBar.getHeight();
-        var area : HTMLDivElement = document.createElement('div');
+        area = area || document.createElement('div');
         area.style.height = barHeight + "px";
         
         var durationString : string = this.getTime(durationSeconds)
 
         area.innerHTML = durationString;
-        area.className = 'controllButtonLeft duration';
+        area.className = className;
 
-        if(this.hasSetCurrentTime && this.separateString){
+        if(!areaExists && this.hasSetCurrentTime && this.separateString){
             // display separator
             var separator : HTMLDivElement = document.createElement('div');
             separator.style.height = barHeight + "px";
@@ -42,6 +55,8 @@ class BarPartsTimes extends BarParts{
             separator.className = 'controllButtonLeft';
             this.controlBar.getElement().appendChild(separator);
         }
-        this.controlBar.getElement().appendChild(area);
+        if(!areaExists){
+            this.controlBar.getElement().appendChild(area);
+        }
     }
 }
