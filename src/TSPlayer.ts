@@ -515,7 +515,7 @@ class TSPlayer{
     */
     public setVolumeOn():void{
         this.volume = this.media.volume;
-        this.media.muted = true;
+        this.media.muted = false;
         this.enableSound = true;
         this.doMethodArray(this.volumeOn)
     }
@@ -528,7 +528,7 @@ class TSPlayer{
         @return void
     */
     public setVolumeOff():void{
-        this.media.muted = false;
+        this.media.muted = true ;
         this.enableSound = false;
         this.doMethodArray(this.volumeOff)
     }
