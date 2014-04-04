@@ -94,6 +94,7 @@ class TSPlayer extends AddEvent{
     enableSound  : Boolean = true;
     createOption : CreateOption;
     console      = new Debug.Console();
+    isEnded      = false
     
     constructor(media:HTMLVideoElement ,  
             createOption:CreateOption      = new CreateOption(), 
@@ -210,8 +211,9 @@ class TSPlayer extends AddEvent{
 
         this.addEvent(media , 'ended' , () => {
             this.doMethodArray(this.ended)
-            this.isPlaying = false;
+            this.isPlaying = false
             this.isPaused = false
+            this.isEnded = true
         },false);
         
         this.addEvent(media , 'volumechange' , () => {
@@ -754,6 +756,10 @@ class TSPlayer extends AddEvent{
         @return void
     */
     public play():void{
+        if(this.isEnded){
+            this.setCurrentTime(0)
+            this.isEnded = false
+        }
         var media:HTMLVideoElement = this.media;
         if(this.isPaused){
             this.doMethodArray(this.beforeRestart)
@@ -798,13 +804,16 @@ class TSPlayer extends AddEvent{
     public togglePauseRestart(){
         var media:HTMLVideoElement = this.media;
         if(!this.isPlaying && this.isPaused){
+            if(this.isEnded){
+                this.setCurrentTime(0)
+                this.isEnded = false
+            }
             this.doMethodArray(this.beforePlay)
             this.doMethodArray(this.beforeRestart)
             if(this.createOption.playWithFullscreen){
                 this.exitFullscreen();
                 this.enterFullscreen();
             }
-            this.console.d("680")
             media.play()
             this.doMethodArray(this.afterPlay)
             this.doMethodArray(this.afterRestart)
