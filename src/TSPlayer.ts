@@ -368,12 +368,20 @@ class TSPlayer{
         var media:HTMLVideoElement = this.media;
         this.width = parseInt(media.style.width.replace('px',''));
         if(!this.width){
-            this.width = parseInt(getComputedStyle( media , '').width.replace('px', ''));
+            this.width = parseInt(this.getComputedStyle( media ).width.replace('px', ''));
         }
         
         this.height = parseInt(media.style.height.replace('px',''));
         if(!this.height){
-            this.height = parseInt(getComputedStyle( media , '').height.replace('px', ''));
+            this.height = parseInt(this.getComputedStyle( media ).height.replace('px', ''));
+        }
+    }
+
+    private getComputedStyle(element : HTMLElement) {
+        if(window.getComputedStyle){
+            return getComputedStyle( element , '');
+        }else{
+            return element.currentStyle
         }
     }
     
@@ -402,7 +410,7 @@ class TSPlayer{
         }
         var width = parseInt(mediaParent.style.width.replace('px',''));
         if(!width){
-            width = parseInt(getComputedStyle( mediaParent , '').width.replace('px', ''));
+            width = parseInt(this.getComputedStyle( mediaParent ).width.replace('px', ''));
         }
         
         var height = screen.height;
@@ -829,7 +837,7 @@ class TSPlayer{
         var height = parseInt(bar.style.height.replace('px',''));
         var setHeight = this.setHeight;
         if(!height){
-            height = parseInt(getComputedStyle( bar , '').height.replace('px', ''));
+            height = parseInt(this.getComputedStyle( bar ).height.replace('px', ''));
         }
         
         bar.style.top  = (this.height - height - setHeight) + "px";
@@ -858,7 +866,7 @@ class TSPlayer{
 
         var height = parseInt(bar.style.height.replace('px',''));
         if(!height){
-            height = parseInt(getComputedStyle( bar , '').height.replace('px', ''));
+            height = parseInt(this.getComputedStyle( bar ).height.replace('px', ''));
         }
 
         bar.style.top  = (screenHeight - height) + "px";

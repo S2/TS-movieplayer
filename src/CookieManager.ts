@@ -21,7 +21,7 @@ class CookieManager{
         return cookieValue;
     }
     
-    static delete(keyName : string) {
+    static remove(keyName : string) {
         var cookieString = keyName + "=; max-age=0; path=/; domain=" +  document.domain + ';';
         if (navigator.appName == 'Microsoft Internet Explorer') {
             cookieString += " expires=Thu, 01-Jan-1970 00:00:01 GMT;";
