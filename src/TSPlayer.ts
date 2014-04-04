@@ -241,6 +241,21 @@ class TSPlayer{
         if(seekBar){
             seekBar.addEventListener('mouseover' , barFeedIn ,false);
         }
+        
+        if(this.isIOSMobile){
+            media.addEventListener('play' , () => {
+                this.doMethodArray(this.beforePlay)
+                this.doMethodArray(this.afterPlay)
+            })
+            media.addEventListener('pause' , () => {
+                this.doMethodArray(this.beforePause)
+                this.doMethodArray(this.afterPause)
+            })
+            media.addEventListener('ended' , () => {
+                this.doMethodArray(this.ended)
+                this.exitFullscreen()
+            })
+        }
 
         var barFeedOut = () => {
                 if(this.isPlaying){
