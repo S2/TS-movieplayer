@@ -142,10 +142,12 @@ class TSPlayer{
         var playBarPartsSetting = new BarPartsSetting(controlImage  , 16 , 16 , 0 , 0 , 100 , 100 , new Margin(7 , 5 , 7 , 5));
         var pauseBarPartsSetting = new BarPartsSetting(controlImage , 16 , 16 , 0 , -16  , 100 , 100 , new Margin(7 , 5 , 7 , 5));
         new BarPartsPlayPauseButton(this , this.control , playBarPartsSetting , pauseBarPartsSetting );
-
-        var volumeOnBarPartsSetting  = new BarPartsSetting(controlImage , 16 , 16 , -16 , -16  , 100 , 100 , new Margin(7 , 5 , 7 , 5));
-        var volumeOffBarPartsSetting = new BarPartsSetting(controlImage , 16 , 16 , -16 , 0    , 100 , 100 , new Margin(7 , 5 , 7 , 5));
-        new BarPartsVolumeButton(this , this.control , volumeOnBarPartsSetting , volumeOffBarPartsSetting);
+        
+        if(!this.isCellularPhone){
+            var volumeOnBarPartsSetting  = new BarPartsSetting(controlImage , 16 , 16 , -16 , -16  , 100 , 100 , new Margin(7 , 5 , 7 , 5));
+            var volumeOffBarPartsSetting = new BarPartsSetting(controlImage , 16 , 16 , -16 , 0    , 100 , 100 , new Margin(7 , 5 , 7 , 5));
+            new BarPartsVolumeButton(this , this.control , volumeOnBarPartsSetting , volumeOffBarPartsSetting);
+        }
 
         var timeParts = new BarPartsTimes(this , this.control , this.createOption.separateString);
         timeParts.setDuration(this.getDuration());
