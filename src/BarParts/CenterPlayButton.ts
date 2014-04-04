@@ -26,11 +26,11 @@ class BarPartsCenterPlayButton extends BarParts{
 
         this.centerPlayButton = centerPlayButton;
         
-        centerPlayButton.addEventListener('click' , () => {
+        this.addEvent(centerPlayButton ,'click' , () => {
             this.player.togglePlayPause();
         },false);
 
-        centerPlayButton.addEventListener('touch' , () => {
+        this.addEvent(centerPlayButton , 'touch' , () => {
             this.player.togglePlayPause();
         },false);
 

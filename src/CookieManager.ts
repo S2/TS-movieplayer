@@ -1,5 +1,7 @@
 /// <reference path="jquery.d.ts" />
-
+interface Date{
+    toGMTString() : string;
+}
 class CookieManager{
     static get(keyName : string){
         var cookieValue = document.cookie;

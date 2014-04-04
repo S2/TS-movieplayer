@@ -9,7 +9,7 @@ class BarPartsFullscreenButton extends BarParts{
 
         var fullscreenButton  : HTMLDivElement = this.createButton(imageSetting)
         fullscreenButton.className = 'controllButtonRight playPauseButton';
-        fullscreenButton.addEventListener('click' , ()=>{
+        this.addEvent(fullscreenButton , 'click' , ()=>{
             this.player.toggleFullscreen()
         } , false);
         this.controlBar.getElement().appendChild(fullscreenButton);

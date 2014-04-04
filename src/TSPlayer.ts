@@ -1,4 +1,4 @@
-
+/// <reference path="AddEvent.ts" />
 /// <reference path="BarParts/PlayPauseButton.ts" />
 /// <reference path="BarParts/FullscreenButton.ts" />
 /// <reference path="BarParts/VolumeButton.ts" />
@@ -59,7 +59,7 @@ class CreateOption{
     playWithFullscreen   : boolean = false;
 }
 
-class TSPlayer{
+class TSPlayer extends AddEvent{
     title               :TitleBar;
     control             :ControlBar;
     seekbar             :SeekBar;
@@ -100,6 +100,7 @@ class TSPlayer{
             controlOption:ControlBarOption = new ControlBarOption() ,
             titleBarOption:TitleBarOption  = new TitleBarOption() ,
             seekBarOption:SeekBarOption    = new SeekBarOption()){
+        super();
         this.media = media;
         this.createOption = createOption;
         this.setEnvironment();
@@ -191,27 +192,29 @@ class TSPlayer{
         }
 
         /* add events */ 
-        media.addEventListener('click' , () => {
+        this.addEvent(media ,'click' , () => {
             this.togglePauseRestart();
         },false);
-        media.addEventListener('touch' , () => {
+
+        this.addEvent(media , 'touch' , () => {
             this.togglePauseRestart();
         },false);
         
-        media.addEventListener('timeupdate' , () => {
+        this.addEvent(media ,'timeupdate' , () => {
             this.doMethodArray(this.timeUpdate)
         },false);
-        media.addEventListener('loadedmetadata' , () => {
+
+        this.addEvent(media , 'loadedmetadata' , () => {
             this.doMethodArray(this.loadedmetadata);
         },false);
 
-        media.addEventListener('ended' , () => {
+        this.addEvent(media , 'ended' , () => {
             this.doMethodArray(this.ended)
             this.isPlaying = false;
             this.isPaused = false
         },false);
         
-        media.addEventListener('volumechange' , () => {
+        this.addEvent(media , 'volumechange' , () => {
             this.doMethodArray(this.volumeChange)
         },false);
  
@@ -231,27 +234,27 @@ class TSPlayer{
             }
         }
 
-        media.addEventListener('mouseover' , barFeedIn ,false);
+        this.addEvent(media , 'mouseover' , barFeedIn ,false);
         if(controlBar){
-            controlBar.addEventListener('mouseover' , barFeedIn ,false);
+            this.addEvent(controlBar , 'mouseover' , barFeedIn ,false);
         }
         if(titleBar){
-            titleBar.addEventListener('mouseover' , barFeedIn ,false);
+            this.addEvent(titleBar , 'mouseover' , barFeedIn ,false);
         }
         if(seekBar){
-            seekBar.addEventListener('mouseover' , barFeedIn ,false);
+            this.addEvent(seekBar , 'mouseover' , barFeedIn ,false);
         }
         
         if(this.isIOSMobile){
-            media.addEventListener('play' , () => {
+            this.addEvent(media , 'play' , () => {
                 this.doMethodArray(this.beforePlay)
                 this.doMethodArray(this.afterPlay)
             })
-            media.addEventListener('pause' , () => {
+            this.addEvent(media , 'pause' , () => {
                 this.doMethodArray(this.beforePause)
                 this.doMethodArray(this.afterPause)
             })
-            media.addEventListener('ended' , () => {
+            this.addEvent(media , 'ended' , () => {
                 this.doMethodArray(this.ended)
                 this.exitFullscreen()
             })
@@ -274,7 +277,7 @@ class TSPlayer{
                 }
             };
 
-        media.addEventListener('mouseout' , barFeedOut , false);
+        this.addEvent(media , 'mouseout' , barFeedOut , false);
 
         if(this.isAndroid){
             // if Android , we can get duration after play start
@@ -282,7 +285,7 @@ class TSPlayer{
             this.hookAfterPause(barFeedIn  , "display bar on pause");
         }
 
-        document.addEventListener("webkitfullscreenchange" , ()=> {
+        this.addDocumentEvent("webkitfullscreenchange" , ()=> {
             if(this.isFullscreen == true){
                 this.doMethodArray(this.fullscreenExit);
                 this.isFullscreen = false
@@ -292,7 +295,7 @@ class TSPlayer{
             }
         });
 
-        document.addEventListener("webkitendfullscreen" , ()=> {
+        this.addDocumentEvent("webkitendfullscreen" , ()=> {
             this.doMethodArray(this.fullscreenExit);
             this.isFullscreen = false
         });
@@ -897,4 +900,5 @@ class TSPlayer{
             throw "not yet set parent . ios will not set parent"
         }
     }
+
 }

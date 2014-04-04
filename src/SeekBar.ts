@@ -54,7 +54,7 @@ class SeekBar extends Bar{
 
         seekbar.appendChild(seekbarInner);
 
-        seekbar.addEventListener("click" , (e) => {
+        this.addEvent(seekbar , "click" , (e) => {
             var clickedX = e.pageX;
             var moveToSec = player.getDuration() * clickedX / width;
             player.setCurrentTime(moveToSec);

@@ -2,7 +2,11 @@
 /// <reference path="TSPlayer.ts" />
 /// <reference path="BarOption.ts" />
 
-class Bar{
+class Bar extends AddEvent{
+    constructor(){
+        super()
+    }
+    
     options : BarOption;
     public createdElement:HTMLElement;
     public maxAlpha:number = 1;
@@ -125,7 +129,7 @@ class Bar{
     }
    
     public setEvent(element:HTMLElement , eventName:string , eventFunction ){
-        element.addEventListener(eventName , () => {
+        this.addEvent(element , eventName , () => {
             if(this.eventEnable){
                 eventFunction();
             }

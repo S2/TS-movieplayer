@@ -34,10 +34,10 @@ class BarPartsPlayPauseButton extends BarParts{
             this.modifyButton(playPauseButton , playBarPartsSetting)
         });
 
-        playPauseButton.addEventListener('click' , () => {
+        this.addEvent(playPauseButton , 'click' , () => {
             this.player.togglePlayPause();
         },false);
-        playPauseButton.addEventListener('touch' , () => {
+        this.addEvent(playPauseButton , 'touch' , () => {
             this.player.togglePlayPause();
         },false);
     }

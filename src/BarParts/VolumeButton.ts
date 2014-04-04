@@ -15,8 +15,8 @@ class BarPartsVolumeButton extends BarParts{
         volumeButton.style.position = "relative"
         this.controlBar.getElement().appendChild(volumeButton);
         
-        volumeButton.addEventListener("click" , () => {this.player.toggleVolume()});
-        volumeButton.addEventListener("touch" , () => {this.player.toggleVolume()});
+        this.addEvent(volumeButton , "click" , () => {this.player.toggleVolume()});
+        this.addEvent(volumeButton , "touch" , () => {this.player.toggleVolume()});
         //  volume on
         this.player.hookVolumeOn(() => {
             this.modifyButton(volumeButton , volumeOnImageSetting)
@@ -54,20 +54,20 @@ class BarPartsVolumeButton extends BarParts{
         volumeArea.appendChild(volumeBarCurrent);
 
         volumeButton.appendChild(volumeArea);
-        volumeButton.addEventListener('mouseover' , () => {
+        this.addEvent(volumeButton , 'mouseover' , () => {
             volumeArea.style.visibility = "visible";
             volumeArea.style.display    = "block";
         }, false);
-        volumeArea.addEventListener('mouseover' , () => {
+        this.addEvent(volumeArea ,'mouseover' , () => {
             volumeArea.style.visibility = "visible";
             volumeArea.style.display    = "block";
         }, false);
-        volumeButton.addEventListener('mouseout' , () => {
+        this.addEvent(volumeButton , 'mouseout' , () => {
             volumeArea.style.visibility = "hidden";
             volumeArea.style.display    = "none";
         }, false);
 
-        volumeArea.addEventListener('click', (e) => {
+        this.addEvent(volumeArea , 'click', (e) => {
             var barTop = volumeSlider.getBoundingClientRect().top
             var dy = e.pageY - barTop
             var changeToBarTop = parseInt(volumeSlider.style.top.replace("px" , "")) + dy
@@ -82,11 +82,11 @@ class BarPartsVolumeButton extends BarParts{
         }, false);
         
         var moveStart = false;
-        volumeSlider.addEventListener('mousedown', (e) => {
+        this.addEvent(volumeSlider , 'mousedown', (e) => {
             moveStart = true;
         }, false);
 
-        volumeArea.addEventListener('mousemove', (e) => {
+        this.addEvent(volumeArea , 'mousemove', (e) => {
             if(!moveStart){
                 return;
             }
@@ -103,7 +103,7 @@ class BarPartsVolumeButton extends BarParts{
             this.player.setVolume(-1 * dy / 100)
         }, false);
 
-        document.addEventListener('mouseup', (e) => {
+        this.addDocumentEvent( 'mouseup', (e) => {
             moveStart = false;
         }, false);
     }

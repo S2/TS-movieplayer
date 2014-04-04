@@ -42,13 +42,18 @@ class Margin{
         }
     }
     public getMarginString():string{
-        return [this.top , this.right , this.bottom , this.left].map(function(value){
-            return value ? value + "px" : "0" ;
-        }).join(" ");
+        var returnArray = [this.top + "" , this.right + "" , this.bottom + "" , this.left + ""]
+        
+        for( var i = 0 , arrayLength = returnArray.length ; i < arrayLength ; i++){
+            returnArray[i] = returnArray[i] 
+                ? returnArray[i] + "px" 
+                : "0";
+        }
+        return returnArray.join(" ");
     }
 }
 
-class BarParts{
+class BarParts extends AddEvent{
     player : TSPlayer;
     controlBar : Bar;
     centerPlayButton     :HTMLDivElement
@@ -56,6 +61,7 @@ class BarParts{
     hasSetDuration      : Boolean = false
     hasSetCurrentTime   : Boolean = false
     constructor(player : TSPlayer , controlBar : Bar ){
+        super()
         this.player = player;
         this.controlBar = controlBar;
     }
