@@ -26,7 +26,8 @@ class TitleBar extends Bar{
         newElement.style.textOverflow = "ellipsis"
 
         this.createdElement = newElement;
-
+        
+        newElement.innerHTML = this.options.displayTitleString;
         return newElement;
     }
 }
