@@ -156,11 +156,11 @@ class TSPlayer{
             // if Android , we can get duration after play start
             this.hookTimeupdate(()=>{
                 timeParts.setDuration(this.getDuration());
-            });
+            } , "get duration for android");
         }else{
             this.hookLoadedmetadata(()=>{
                 timeParts.setDuration(this.getDuration());
-            });
+            } , "get duration");
         }
         
         var fullscreenBarPartsSetting = new BarPartsSetting(controlImage , 16 , 16 , -32  , 0 , 100 , 100 , new Margin(7 , 5 , 7 , 5));
@@ -169,7 +169,7 @@ class TSPlayer{
         new BarPartsTitleString(this , this.title , createOption.titleString);
 
         if(this.createOption.playWithFullscreen){
-            this.hookFullscreenExit(() => {this.pause()});
+            this.hookFullscreenExit(() => {this.pause() , "exit fullscreen on pause if play with fullscreen"});
         }
 
         var centerLoadingImageSetting = new BarPartsSetting(this.createOption.imagePath + this.createOption.loadingImage , 100 , 100 , 0 , 0 , 100 , 100 , new Margin(0 , 0 , 0 , 0));
@@ -178,10 +178,10 @@ class TSPlayer{
             var loading = new BarPartsLoadingImage(this , this.control , centerLoadingImageSetting);
             this.hookBeforePlay(()=>{
                 loading.visible();
-            });
+            } , "display android loading image");
             this.hookTimeupdate(()=>{
                 loading.invisible();
-            });
+            } , "hide android loading image");
         }
 
         /* add buttons end */ 
@@ -263,8 +263,8 @@ class TSPlayer{
 
         if(this.isAndroid){
             // if Android , we can get duration after play start
-            this.hookTimeupdate(barFeedOut);
-            this.hookAfterPause(barFeedIn);
+            this.hookTimeupdate(barFeedOut , "hide bar if playing");
+            this.hookAfterPause(barFeedIn  , "display bar on pause");
         }
 
         document.addEventListener("webkitfullscreenchange" , ()=> {
@@ -293,7 +293,7 @@ class TSPlayer{
                 }
             }
             displayControll  = true;
-        });
+        } , "display bar if ended");
         media.load();
     }
     
@@ -487,74 +487,163 @@ class TSPlayer{
         this.isFullscreen = false;
     }
 
+    hookComments = [];
+    /**
+        <br>
+        
+        @method getHookComments 
+        @param hookName {string}
+        @return Array
+    */
+    public getHookComments(hookName : string):Array{
+        var returnArray = [];
+        for( var i = 0 , arrayLength = this.hookComments.length ; i < arrayLength ; i++){
+            var row = this.hookComments[i]
+            if(row.name == hookName){
+                returnArray.push(row)
+            }
+        }
+        return returnArray
+    }
+
     private beforePlay : Array = [];
-    public hookBeforePlay(hookMethod:(player:TSPlayer , video:HTMLVideoElement)=>void){
+    public hookBeforePlay(hookMethod:(player:TSPlayer , video:HTMLVideoElement)=>void , comment? : string){
         this.beforePlay.push(hookMethod);
+        this.hookComments.push({
+            method : hookMethod ,
+            comment : comment || "" , 
+            name : "beforePlay" ,
+        });
     }
 
     private afterPlay : Array = [];
-    public hookAfterPlay(hookMethod:(player:TSPlayer , video:HTMLVideoElement)=>void){
+    public hookAfterPlay(hookMethod:(player:TSPlayer , video:HTMLVideoElement)=>void , comment? : string){
         this.afterPlay.push(hookMethod);
+        this.hookComments.push({
+            method : hookMethod ,
+            comment : comment || "" , 
+            name : "afterPlay" ,
+        });
     }
 
     private beforePause : Array = [];
-    public hookBeforePause(hookMethod:(player:TSPlayer , video:HTMLVideoElement)=>void){
+    public hookBeforePause(hookMethod:(player:TSPlayer , video:HTMLVideoElement)=>void , comment? : string){
         this.beforePause.push(hookMethod);
+        this.hookComments.push({
+            method : hookMethod ,
+            comment : comment || "" , 
+            name : "beforePause" ,
+        });
     }
 
     private afterPause : Array = [];
-    public hookAfterPause(hookMethod:(player:TSPlayer , video:HTMLVideoElement)=>void){
+    public hookAfterPause(hookMethod:(player:TSPlayer , video:HTMLVideoElement)=>void , comment? : string){
         this.afterPause.push(hookMethod);
+        this.hookComments.push({
+            method : hookMethod ,
+            comment : comment || "" , 
+            name : "afterPause" ,
+        });
     }
 
     private beforeRestart : Array = [];
-    public hookBeforeRestart(hookMethod:(player:TSPlayer , video:HTMLVideoElement)=>void){
+    public hookBeforeRestart(hookMethod:(player:TSPlayer , video:HTMLVideoElement)=>void , comment? : string){
         this.beforeRestart.push(hookMethod);
+        this.hookComments.push({
+            method : hookMethod ,
+            comment : comment || "" , 
+            name : "beforeRestart" ,
+        });
     }
 
     private afterRestart : Array = [];
-    public hookAfterRestart(hookMethod:(player:TSPlayer , video:HTMLVideoElement)=>void){
+    public hookAfterRestart(hookMethod:(player:TSPlayer , video:HTMLVideoElement)=>void , comment? : string){
         this.afterRestart.push(hookMethod);
+        this.hookComments.push({
+            method : hookMethod ,
+            comment : comment || "" , 
+            name : "afterRestart" ,
+        });
     }
 
     private timeUpdate: Array = [];
-    public hookTimeupdate(hookMethod:(player:TSPlayer , video:HTMLVideoElement)=>void){
+    public hookTimeupdate(hookMethod:(player:TSPlayer , video:HTMLVideoElement)=>void , comment? : string){
         this.timeUpdate.push(hookMethod);
+        this.hookComments.push({
+            method : hookMethod ,
+            comment : comment || "" , 
+            name : "timeUpdate" ,
+        });
     }
 
     private ended : Array = [];
-    public hookEnded(hookMethod:(player:TSPlayer , video:HTMLVideoElement)=>void){
+    public hookEnded(hookMethod:(player:TSPlayer , video:HTMLVideoElement)=>void , comment? : string){
         this.ended.push(hookMethod);
+        this.hookComments.push({
+            method : hookMethod ,
+            comment : comment || "" , 
+            name : "ended" ,
+        });
     }
     
     private fullscreenEnter : Array = [];
-    public hookFullscreenEnter(hookMethod:(player:TSPlayer , video:HTMLVideoElement)=>void){
+    public hookFullscreenEnter(hookMethod:(player:TSPlayer , video:HTMLVideoElement)=>void , comment? : string){
         this.fullscreenEnter.push(hookMethod);
+        this.hookComments.push({
+            method : hookMethod ,
+            comment : comment || "" , 
+            name : "fullscreenEnter" ,
+        });
     }
 
     private fullscreenExit : Array = [];
-    public hookFullscreenExit(hookMethod:(player:TSPlayer , video:HTMLVideoElement)=>void){
+    public hookFullscreenExit(hookMethod:(player:TSPlayer , video:HTMLVideoElement)=>void , comment? : string){
         this.fullscreenExit.push(hookMethod);
+        this.hookComments.push({
+            method : hookMethod ,
+            comment : comment || "" , 
+            name : "fullscreenExit" ,
+        });
     }
 
     private volumeChange : Array = [];
-    public hookVolumeChange(hookMethod:(player:TSPlayer , video:HTMLVideoElement)=>void){
+    public hookVolumeChange(hookMethod:(player:TSPlayer , video:HTMLVideoElement)=>void , comment? : string){
         this.volumeChange.push(hookMethod);
+        this.hookComments.push({
+            method : hookMethod ,
+            comment : comment || "" , 
+            name : "volumeChange" ,
+        });
     }
 
     private volumeOn : Array = [];
-    public hookVolumeOn(hookMethod:(player:TSPlayer , video:HTMLVideoElement)=>void){
+    public hookVolumeOn(hookMethod:(player:TSPlayer , video:HTMLVideoElement)=>void , comment? : string){
         this.volumeOn.push(hookMethod);
+        this.hookComments.push({
+            method : hookMethod ,
+            comment : comment || "" , 
+            name : "volumeOn" ,
+        });
     }
 
     private volumeOff : Array = [];
-    public hookVolumeOff(hookMethod:(player:TSPlayer , video:HTMLVideoElement)=>void){
+    public hookVolumeOff(hookMethod:(player:TSPlayer , video:HTMLVideoElement)=>void , comment? : string){
         this.volumeOff.push(hookMethod);
+        this.hookComments.push({
+            method : hookMethod ,
+            comment : comment || "" , 
+            name : "volumeOff" ,
+        });
     }
 
     private loadedmetadata : Array = [];
-    public hookLoadedmetadata(hookMethod:(player:TSPlayer , video:HTMLVideoElement)=>void){
+    public hookLoadedmetadata(hookMethod:(player:TSPlayer , video:HTMLVideoElement)=>void , comment? : string){
         this.loadedmetadata.push(hookMethod);
+        this.hookComments.push({
+            method : hookMethod ,
+            comment : comment || "" , 
+            name : "loadedmetadata" ,
+        });
     }
 
     /**
@@ -616,6 +705,7 @@ class TSPlayer{
         }
         this.media.volume + newVolume ;
     }
+
     private doMethodArray(methods:Array){
         for(var i = 0 ; i < methods.length ; i++){
             methods[i](this, this.media);
