@@ -4,6 +4,6 @@ class ControlBarOption extends BarOption{
     displayLeftButtons    : Array = ['play' , 'volume' , 'duration' , '::' , 'current'];
     displayRightButtons   : Array = ['fullscreen'];
     height            : number = 30;
-    zIndex            : number = 120;
+    zIndex            : number = null;
 }
 

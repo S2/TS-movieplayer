@@ -19,7 +19,6 @@ class ControlBar extends Bar{
         var newElement = super.createElement(player);
         newElement.style.width = this.width + "px";
         newElement.style.height = this.options.height + "px";
-        newElement.style.zIndex = this.options.zIndex + "";
         newElement.style.position = "absolute";
 
         var options : ControlBarOption = this.options;

@@ -19,7 +19,9 @@ class TitleBar extends Bar{
         newElement.className          = "bar titleBarString"
         newElement.style.width        = this.width + "px"
         newElement.style.height       = this.options.height + "px"
-        newElement.style.zIndex       = this.options.zIndex + "";
+        if(this.options.zIndex){
+            newElement.style.zIndex = this.options.zIndex + "";
+        }
         newElement.style.textAlign    = this.options.align;
         newElement.style.position     = "absolute";
 

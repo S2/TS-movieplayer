@@ -13,7 +13,9 @@ class BarPartsVolumeButton extends BarParts{
         var volumeButton  : HTMLDivElement = this.createButton(volumeOnImageSetting)
         volumeButton.className = 'controllButtonLeft volumeButton';
         volumeButton.style.position = "relative"
-        this.controlBar.getElement().appendChild(volumeButton);
+        
+        var controlBarElement : HTMLDivElement = this.controlBar.getElement();
+        controlBarElement.appendChild(volumeButton);
         
         this.addEvent(volumeButton , "click" , () => {this.player.toggleVolume()});
         this.addEvent(volumeButton , "touch" , () => {this.player.toggleVolume()});
@@ -54,17 +56,21 @@ class BarPartsVolumeButton extends BarParts{
         volumeArea.appendChild(volumeBarCurrent);
 
         volumeButton.appendChild(volumeArea);
+        var initZIndex = controlBarElement.style.zIndex
         this.addEvent(volumeButton , 'mouseover' , () => {
-            volumeArea.style.visibility = "visible";
-            volumeArea.style.display    = "block";
+            volumeArea.style.visibility = "visible"
+            volumeArea.style.display    = "block"
+            controlBarElement.style.zIndex = 2147483647
         }, false);
         this.addEvent(volumeArea ,'mouseover' , () => {
-            volumeArea.style.visibility = "visible";
-            volumeArea.style.display    = "block";
+            volumeArea.style.visibility = "visible"
+            volumeArea.style.display    = "block"
+            controlBarElement.style.zIndex = 2147483647
         }, false);
         this.addEvent(volumeButton , 'mouseout' , () => {
-            volumeArea.style.visibility = "hidden";
-            volumeArea.style.display    = "none";
+            volumeArea.style.visibility = "hidden"
+            volumeArea.style.display    = "none"
+            controlBarElement.style.zIndex = initZIndex
         }, false);
 
         this.addEvent(volumeArea , 'click', (e) => {
