@@ -57,6 +57,8 @@ class CreateOption{
     feedOutTime          : number = 100;
     separateString       : string = " / ";
     playWithFullscreen   : boolean = false;
+    timeFontSize         : number = 10 
+    timeMarginTop        : number = 6
 }
 
 class TSPlayer extends AddEvent{
@@ -155,7 +157,8 @@ class TSPlayer extends AddEvent{
             new BarPartsVolumeButton(this , this.control , volumeOnBarPartsSetting , volumeOffBarPartsSetting);
         }
 
-        var timeParts = new BarPartsTimes(this , this.control , this.createOption.separateString);
+        var timeParts = new BarPartsTimes(this , this.control , 
+                this.createOption.separateString , this.createOption.timeFontSize , this.createOption.timeMarginTop);
         timeParts.setDuration(this.getDuration());
         
         if(this.isAndroid){

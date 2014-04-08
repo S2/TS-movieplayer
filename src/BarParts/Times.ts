@@ -4,8 +4,13 @@
 /// <reference path="../Bar.ts" />
 
 class BarPartsTimes extends BarParts{
-    constructor(player : TSPlayer , controlBar : Bar , separateString? : string){
+    timeStringPx : number 
+    timeStringMarginTop : number
+    constructor(player : TSPlayer , controlBar : Bar , separateString : string = "/" , timeStringPx : number = null, timeStringMarginTop : number = 0){
         super(player , controlBar);
+
+        this.timeStringPx = timeStringPx
+        this.timeStringMarginTop = timeStringMarginTop
 
         this.separateString = separateString;
 
@@ -14,6 +19,10 @@ class BarPartsTimes extends BarParts{
         var area : HTMLDivElement = document.createElement('div');
         area.style.height = barHeight + "px";
         area.innerHTML = "00:00";
+        if(this.timeStringPx){
+            area.style.fontSize = this.timeStringPx + "px";
+        }
+        area.style.marginTop = this.timeStringMarginTop + "px";
         area.className = 'controllButtonLeft currentTime';
         this.controlBar.getElement().appendChild(area);
 
@@ -41,6 +50,10 @@ class BarPartsTimes extends BarParts{
         var barHeight : number = this.controlBar.getHeight();
         area = area || document.createElement('div');
         area.style.height = barHeight + "px";
+        if(this.timeStringPx){
+            area.style.fontSize = this.timeStringPx + "px";
+        }
+        area.style.marginTop = this.timeStringMarginTop + "px";
         
         var durationString : string = this.getTime(durationSeconds)
 
@@ -52,7 +65,11 @@ class BarPartsTimes extends BarParts{
             var separator : HTMLDivElement = document.createElement('div');
             separator.style.height = barHeight + "px";
             separator.innerHTML = this.separateString;
-            separator.className = 'controllButtonLeft';
+            if(this.timeStringPx){
+                separator.style.fontSize = this.timeStringPx + "px";
+            }
+            separator.style.marginTop = this.timeStringMarginTop + "px";
+            separator.className = 'controllButtonLeft separator';
             this.controlBar.getElement().appendChild(separator);
         }
         if(!areaExists){
