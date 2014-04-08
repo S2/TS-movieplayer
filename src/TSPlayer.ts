@@ -95,6 +95,10 @@ class TSPlayer extends AddEvent{
     createOption : CreateOption;
     console      = new Debug.Console();
     isEnded      = false
+
+    isInPauseEvent = false
+    isInPlayEvent  = false
+    isInEndedEvent = false
     
     constructor(media:HTMLVideoElement ,  
             createOption:CreateOption      = new CreateOption(), 
@@ -247,21 +251,6 @@ class TSPlayer extends AddEvent{
             this.addEvent(seekBar , 'mouseover' , barFeedIn ,false);
         }
         
-        if(this.isIOSMobile){
-            this.addEvent(media , 'play' , () => {
-                this.doMethodArray(this.beforePlay)
-                this.doMethodArray(this.afterPlay)
-            })
-            this.addEvent(media , 'pause' , () => {
-                this.doMethodArray(this.beforePause)
-                this.doMethodArray(this.afterPause)
-            })
-            this.addEvent(media , 'ended' , () => {
-                this.doMethodArray(this.ended)
-                this.exitFullscreen()
-            })
-        }
-
         var barFeedOut = () => {
                 if(this.isPlaying){
                     this.title.feedOut(0 , createOption.feedOutTime);
@@ -314,9 +303,32 @@ class TSPlayer extends AddEvent{
             }
             displayControll  = true;
         } , "display bar if ended");
+        this.setNoTSPlayerEvents();
         media.load();
     }
     
+    /**
+        TSPlayer以外のplay/pauseイベントにフックを書く<br>
+        @method setNoTSPlayerEvents
+        @return void
+    */
+    private setNoTSPlayerEvents(){
+        var media = this.media;
+        this.addEvent(media , 'play' , () => {
+            if(!this.isInPlayEvent){
+                this.doMethodArray(this.beforePlay)
+                this.doMethodArray(this.afterPlay)
+            }
+        })
+        this.addEvent(media , 'pause' , () => {
+            if(!this.isInPauseEvent){
+                this.doMethodArray(this.beforePause)
+                this.doMethodArray(this.afterPause)
+            }
+        })
+    }
+
+
     public setCurrentTime(moveToSec:number){
         var media = this.media;
         media.currentTime = moveToSec;
@@ -750,6 +762,7 @@ class TSPlayer extends AddEvent{
         if(this.createOption.playWithFullscreen){
             this.enterFullscreen();
         }
+        this.isInPlayEvent = true;
         media.play()
         this.doMethodArray(this.afterPlay)
         if(this.isPaused){
@@ -762,6 +775,10 @@ class TSPlayer extends AddEvent{
             this.isPlaying = true 
             this.isPaused = false
         }
+
+        setTimeout(() => {
+            this.isInPlayEvent = false;
+        } , 100);
     }
 
     /**
@@ -777,10 +794,15 @@ class TSPlayer extends AddEvent{
         if(this.createOption.playWithFullscreen){
             this.exitFullscreen();
         }
+        this.isInPauseEvent = true;
         media.pause()
         this.isPaused = true;
         this.doMethodArray(this.afterPause)
         this.isPlaying = false
+
+        setTimeout(() => {
+            this.isInPauseEvent = false;
+        } , 100);
     }
 
     public togglePauseRestart(){
@@ -796,6 +818,7 @@ class TSPlayer extends AddEvent{
                 this.exitFullscreen();
                 this.enterFullscreen();
             }
+            this.isInPlayEvent = true;
             media.play()
             this.doMethodArray(this.afterPlay)
             this.doMethodArray(this.afterRestart)
@@ -807,15 +830,22 @@ class TSPlayer extends AddEvent{
                 this.isPlaying = true 
                 this.isPaused = false
             }
+            setTimeout(() => {
+                this.isInPlayEvent = false;
+            } , 100);
         }else if(this.isPlaying){
             this.doMethodArray(this.beforePause)
             if(this.createOption.playWithFullscreen){
                 this.exitFullscreen();
             }
+            this.isInPauseEvent = true;
             media.pause()
             this.isPaused = true;
             this.doMethodArray(this.afterPause)
             this.isPlaying = false
+            setTimeout(() => {
+                this.isInPauseEvent = false;
+            } , 100);
         }
     }
 
