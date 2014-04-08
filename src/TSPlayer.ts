@@ -461,15 +461,6 @@ class TSPlayer extends AddEvent{
         @return void
     */
     public enterFullscreen():void{
-        if(this.title){
-            this.title.toggle();
-        }
-        if(this.control){
-            this.control.toggle();
-        }
-        if(this.seekbar){
-            this.seekbar.toggle();
-        }
         var mediaParent:HTMLDivElement = this.mediaParent
         var media:HTMLVideoElement = this.media
         if (media.requestFullscreen) {
@@ -493,15 +484,6 @@ class TSPlayer extends AddEvent{
         @return void
     */
     public exitFullscreen():void{
-        if(this.title){
-            this.title.toggle();
-        }
-        if(this.control){
-            this.control.toggle();
-        }
-        if(this.seekbar){
-            this.seekbar.toggle();
-        }
         var media:HTMLVideoElement = this.media
         if (document.exitFullscreen) {
             document.exitFullscreen()
