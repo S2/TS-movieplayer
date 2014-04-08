@@ -14,7 +14,7 @@ class BarPartsVolumeButton extends BarParts{
         volumeButton.className = 'controllButtonLeft volumeButton';
         volumeButton.style.position = "relative"
         
-        var controlBarElement : HTMLDivElement = this.controlBar.getElement();
+        var controlBarElement : HTMLElement = this.controlBar.getElement();
         controlBarElement.appendChild(volumeButton);
         
         this.addEvent(volumeButton , "click" , () => {this.player.toggleVolume()});
@@ -60,12 +60,12 @@ class BarPartsVolumeButton extends BarParts{
         this.addEvent(volumeButton , 'mouseover' , () => {
             volumeArea.style.visibility = "visible"
             volumeArea.style.display    = "block"
-            controlBarElement.style.zIndex = 2147483647
+            controlBarElement.style.zIndex = "2147483647"
         }, false);
         this.addEvent(volumeArea ,'mouseover' , () => {
             volumeArea.style.visibility = "visible"
             volumeArea.style.display    = "block"
-            controlBarElement.style.zIndex = 2147483647
+            controlBarElement.style.zIndex = "2147483647"
         }, false);
         this.addEvent(volumeButton , 'mouseout' , () => {
             volumeArea.style.visibility = "hidden"
