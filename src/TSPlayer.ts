@@ -48,10 +48,12 @@ class CreateOption{
     controlButtons       : string = "controls.svg"
     centerButton         : string = "largeButton.svg"
     loadingImage         : string = "loading.gif"
+
     viewControllBar      : Boolean = true;
     viewTitleBar         : Boolean = true;
     viewSeekBar          : Boolean = true;
     displayAlwaysSeekBar : Boolean = true;
+
     titleString          : string = "";
     feedInTime           : number = 100;
     feedOutTime          : number = 100;
@@ -117,84 +119,12 @@ class TSPlayer extends AddEvent{
 
         this.setInitialVolume(this.volume)
 
-        this.title = new TitleBar(titleBarOption , this.width);
-        this.control = new ControlBar(controlOption , this.width);
-        this.seekbar = new SeekBar(seekBarOption , this.width);
-        
-        /* add bars */ 
-        var controlBar = null
-        var titleBar   = null
-        var seekBar    = null
-        if(createOption.viewControllBar){
-            controlBar = this.setLowerBar(this.control);
-        }
-        if(createOption.viewTitleBar){
-            titleBar = this.setUpperBar(this.title);
-        }
-        if(createOption.viewSeekBar){
-            seekBar = this.setLowerBar(this.seekbar);
-            if(this.title){
-                this.seekbar.setMoveDownHeight(this.control.getHeight());
-            }
-        }
-        /* add bars end */ 
-
         /* add buttons */ 
-        var centerBarPartsSetting = new BarPartsSetting(this.createOption.imagePath + this.createOption.centerButton  , 100 , 100 , 0 , 0 , 100 , 100 , new Margin(0 , 0 , 0 , 0));
-
-        if(!this.isIOSMobile){
-            new BarPartsCenterPlayButton(this , this.control , centerBarPartsSetting);
-        }
-        var controlImage = this.createOption.imagePath + this.createOption.controlButtons
-
-        var playBarPartsSetting = new BarPartsSetting(controlImage  , 16 , 16 , 0 , 0 , 100 , 100 , new Margin(7 , 5 , 7 , 5));
-        var pauseBarPartsSetting = new BarPartsSetting(controlImage , 16 , 16 , 0 , -16  , 100 , 100 , new Margin(7 , 5 , 7 , 5));
-        new BarPartsPlayPauseButton(this , this.control , playBarPartsSetting , pauseBarPartsSetting );
-        
-        if(!this.isCellularPhone){
-            var volumeOnBarPartsSetting  = new BarPartsSetting(controlImage , 16 , 16 , -16 , -16  , 100 , 100 , new Margin(7 , 5 , 7 , 5));
-            var volumeOffBarPartsSetting = new BarPartsSetting(controlImage , 16 , 16 , -16 , 0    , 100 , 100 , new Margin(7 , 5 , 7 , 5));
-            new BarPartsVolumeButton(this , this.control , volumeOnBarPartsSetting , volumeOffBarPartsSetting);
-        }
-
-        var timeParts = new BarPartsTimes(this , this.control , 
-                this.createOption.separateString , this.createOption.timeFontSize , this.createOption.timeMarginTop);
-        timeParts.setDuration(this.getDuration());
-        
-        if(this.isAndroid){
-            // if Android , we can get duration after play start
-            this.hookTimeupdate(()=>{
-                timeParts.setDuration(this.getDuration());
-            } , "get duration for android");
-        }else{
-            this.hookLoadedmetadata(()=>{
-                timeParts.setDuration(this.getDuration());
-            } , "get duration");
-        }
-        
-        var fullscreenBarPartsSetting = new BarPartsSetting(controlImage , 16 , 16 , -32  , 0 , 100 , 100 , new Margin(7 , 5 , 7 , 5));
-        new BarPartsFullscreenButton(this , this.control , fullscreenBarPartsSetting);
-
-        new BarPartsTitleString(this , this.title , createOption.titleString);
-
         if(this.createOption.playWithFullscreen){
             this.hookFullscreenExit(() => {this.pause() , "exit fullscreen on pause if play with fullscreen"});
         }
 
-        var centerLoadingImageSetting = new BarPartsSetting(this.createOption.imagePath + this.createOption.loadingImage , 100 , 100 , 0 , 0 , 100 , 100 , new Margin(0 , 0 , 0 , 0));
-
-        if(this.isAndroid){
-            var loading = new BarPartsLoadingImage(this , this.control , centerLoadingImageSetting);
-            this.hookBeforePlay(()=>{
-                loading.visible();
-            } , "display android loading image");
-            this.hookTimeupdate(()=>{
-                loading.invisible();
-            } , "hide android loading image");
-        }
-
         /* add buttons end */ 
-
         if(CookieManager.get("muted") == "true"){
             this.setVolumeOff();
         }
@@ -227,58 +157,6 @@ class TSPlayer extends AddEvent{
             this.doMethodArray(this.volumeChange)
         },false);
  
-        var displayControll = true;
-        var barFeedIn = () => {
-            if(this.isPlaying){
-                this.title.feedIn(0 , createOption.feedInTime);
-                this.control.feedIn(0 , createOption.feedInTime);
-                if(!this.createOption.displayAlwaysSeekBar){
-                    this.seekbar.feedIn(0 , createOption.feedInTime);
-                }else{
-                    if(!displayControll){
-                        this.seekbar.moveUpBar();
-                    }
-                }
-                displayControll  = true;
-            }
-        }
-
-        this.addEvent(media , 'mouseover' , barFeedIn ,false);
-        if(controlBar){
-            this.addEvent(controlBar , 'mouseover' , barFeedIn ,false);
-        }
-        if(titleBar){
-            this.addEvent(titleBar , 'mouseover' , barFeedIn ,false);
-        }
-        if(seekBar){
-            this.addEvent(seekBar , 'mouseover' , barFeedIn ,false);
-        }
-        
-        var barFeedOut = () => {
-                if(this.isPlaying){
-                    this.title.feedOut(0 , createOption.feedOutTime);
-                    this.control.feedOut(0 , createOption.feedOutTime);
-                    if(!this.createOption.displayAlwaysSeekBar){
-                        this.seekbar.feedOut(0 , createOption.feedOutTime);
-                    }else{
-                        if(displayControll){
-                            this.control.setFeedOutHookOnce( () => {
-                                this.seekbar.moveDownBar();
-                            })
-                        }
-                    }
-                    displayControll  = false;
-                }
-            };
-
-        this.addEvent(media , 'mouseout' , barFeedOut , false);
-
-        if(this.isAndroid){
-            // if Android , we can get duration after play start
-            this.hookTimeupdate(barFeedOut , "hide bar if playing");
-            this.hookAfterPause(barFeedIn  , "display bar on pause");
-        }
-
         this.addDocumentEvent("webkitfullscreenchange" , ()=> {
             if(this.isFullscreen == true){
                 this.doMethodArray(this.fullscreenExit);
@@ -294,22 +172,180 @@ class TSPlayer extends AddEvent{
             this.isFullscreen = false
         });
 
-        this.hookEnded((player:TSPlayer , video:HTMLVideoElement) => {
-            this.title.feedIn(0 , createOption.feedInTime);
-            this.control.feedIn(0 , createOption.feedInTime);
-            if(!this.createOption.displayAlwaysSeekBar){
-                this.seekbar.feedIn(0 , createOption.feedInTime);
-            }else{
-                if(!displayControll){
-                    this.seekbar.moveUpBar();
-                }
-            }
-            displayControll  = true;
-        } , "display bar if ended");
         this.setNoTSPlayerEvents();
         media.load();
     }
+
+    private createControlBar(createOption : CreateOption , controlOption : ControlBarOption){
+        var controlBarObject = new ControlBar(controlOption , this.width);
+        var controlBar = this.setLowerBar(controlBarObject);
+
+        var barFeedIn = () => {
+            if(this.isPlaying){
+                controlBarObject.feedIn(0 , createOption.feedInTime);
+            }
+        }
+        var barFeedOut = () => {
+            if(this.isPlaying){
+                controlBarObject.feedOut(0 , createOption.feedOutTime);
+            }
+        };
+
+        this.hookEnded((player:TSPlayer , video:HTMLVideoElement) => {
+            controlBarObject.feedIn(0 , createOption.feedInTime);
+        } , "display bar if ended");
+
+        this.addEvent(this.media , 'mouseover' , barFeedIn ,false);
+        this.addEvent(controlBar , 'mouseover' , barFeedIn ,false);
+        this.addEvent(this.media , 'mouseout' , barFeedOut , false);
+
+        if(this.isAndroid){
+            // if Android , we can get duration after play start
+            this.hookTimeupdate(barFeedOut , "hide bar if playing");
+            this.hookAfterPause(barFeedIn  , "display bar on pause");
+        }
+
+        var centerBarPartsSetting = new BarPartsSetting(this.createOption.imagePath + this.createOption.centerButton  , 100 , 100 , 0 , 0 , 100 , 100 , new Margin(0 , 0 , 0 , 0));
+
+        if(!this.isIOSMobile){
+            new BarPartsCenterPlayButton(this , controlBarObject , centerBarPartsSetting);
+        }
+        var controlImage = this.createOption.imagePath + this.createOption.controlButtons
+
+        var playBarPartsSetting = new BarPartsSetting(controlImage  , 16 , 16 , 0 , 0 , 100 , 100 , new Margin(7 , 5 , 7 , 5));
+        var pauseBarPartsSetting = new BarPartsSetting(controlImage , 16 , 16 , 0 , -16  , 100 , 100 , new Margin(7 , 5 , 7 , 5));
+        new BarPartsPlayPauseButton(this , controlBarObject , playBarPartsSetting , pauseBarPartsSetting );
+        
+        if(!this.isCellularPhone){
+            var volumeOnBarPartsSetting  = new BarPartsSetting(controlImage , 16 , 16 , -16 , -16  , 100 , 100 , new Margin(7 , 5 , 7 , 5));
+            var volumeOffBarPartsSetting = new BarPartsSetting(controlImage , 16 , 16 , -16 , 0    , 100 , 100 , new Margin(7 , 5 , 7 , 5));
+            new BarPartsVolumeButton(this , controlBarObject , volumeOnBarPartsSetting , volumeOffBarPartsSetting);
+        }
+
+        var timeParts = new BarPartsTimes(this , controlBarObject , 
+                this.createOption.separateString , this.createOption.timeFontSize , this.createOption.timeMarginTop);
+        timeParts.setDuration(this.getDuration());
+        
+        if(this.isAndroid){
+            // if Android , we can get duration after play start
+            this.hookTimeupdate(()=>{
+                timeParts.setDuration(this.getDuration());
+            } , "get duration for android");
+        }else{
+            this.hookLoadedmetadata(()=>{
+                timeParts.setDuration(this.getDuration());
+            } , "get duration");
+        }
+        
+        var fullscreenBarPartsSetting = new BarPartsSetting(controlImage , 16 , 16 , -32  , 0 , 100 , 100 , new Margin(7 , 5 , 7 , 5));
+        new BarPartsFullscreenButton(this , controlBarObject , fullscreenBarPartsSetting);
+
+        if(this.isAndroid){
+            var centerLoadingImageSetting = new BarPartsSetting(this.createOption.imagePath + this.createOption.loadingImage , 100 , 100 , 0 , 0 , 100 , 100 , new Margin(0 , 0 , 0 , 0));
+
+            var loading = new BarPartsLoadingImage(this , controlBarObject , centerLoadingImageSetting);
+            this.hookBeforePlay(()=>{
+                loading.visible();
+            } , "display android loading image");
+            this.hookTimeupdate(()=>{
+                loading.invisible();
+            } , "hide android loading image");
+        }
+    }
+
+    private createsSeekBar(createOption : CreateOption , seekBarOption : SeekBarOption , controlBarObject = null){
+        var seekBarObject = new SeekBar(seekBarOption , this.width);
+        var seekBar    = null
+        if(createOption.viewSeekBar){
+            seekBar = this.setLowerBar(seekBarObject);
+
+            if(controlBarObject){
+                seekBarObject.setMoveDownHeight(controlBarObject.getHeight());
+            }
+        }
+
+        var displayControl = true;
+        var barFeedIn = () => {
+            if(this.isPlaying){
+                if(!this.createOption.displayAlwaysSeekBar){
+                    seekBarObject.feedIn(0 , createOption.feedInTime);
+                }else{
+                    if(!displayControl){
+                        seekBarObject.moveUpBar();
+                    }
+                }
+                displayControl  = true;
+            }
+        }
+        var barFeedOut = () => {
+            if(this.isPlaying){
+                if(!this.createOption.displayAlwaysSeekBar){
+                    seekBarObject.feedOut(0 , createOption.feedOutTime);
+                }else{
+                    if(displayControl){
+                        controlBarObject.setFeedOutHookOnce( () => {
+                            seekBarObject.moveDownBar();
+                        })
+                    }
+                }
+                displayControl  = false;
+            }
+        };
+        this.hookEnded((player:TSPlayer , video:HTMLVideoElement) => {
+            if(!this.createOption.displayAlwaysSeekBar){
+                seekBarObject.feedIn(0 , createOption.feedInTime);
+            }else{
+                if(!displayControl){
+                    seekBarObject.moveUpBar();
+                }
+            }
+            displayControl  = true;
+        } , "display bar if ended");
+
+        this.addEvent(this.media , 'mouseover' , barFeedIn ,false);
+        this.addEvent(seekBar , 'mouseover' , barFeedIn ,false);
+        this.addEvent(this.media , 'mouseout' , barFeedOut , false);
+
+        if(this.isAndroid){
+            // if Android , we can get duration after play start
+            this.hookTimeupdate(barFeedOut , "hide bar if playing");
+            this.hookAfterPause(barFeedIn  , "display bar on pause");
+        }
+    }
     
+
+
+    private createTitleBar(createOption : CreateOption , titleBarOption : TitleBarOption){
+        var titleBarObject = new TitleBar(titleBarOption , this.width);
+        var titleBar = this.setUpperBar(titleBarObject);
+
+        var barFeedIn = () => {
+            if(this.isPlaying){
+                titleBarObject.feedIn(0 , createOption.feedInTime);
+            }
+        }
+        var barFeedOut = () => {
+            if(this.isPlaying){
+                titleBarObject.feedOut(0 , createOption.feedOutTime);
+            }
+        };
+        this.hookEnded((player:TSPlayer , video:HTMLVideoElement) => {
+            titleBarObject.feedIn(0 , createOption.feedInTime);
+        } , "display bar if ended");
+
+        this.addEvent(this.media , 'mouseover' , barFeedIn ,false);
+        this.addEvent(titleBar , 'mouseover' , barFeedIn ,false);
+        this.addEvent(this.media , 'mouseout' , barFeedOut , false);
+
+        if(this.isAndroid){
+            // if Android , we can get duration after play start
+            this.hookTimeupdate(barFeedOut , "hide bar if playing");
+            this.hookAfterPause(barFeedIn  , "display bar on pause");
+        }
+
+        new BarPartsTitleString(this , titleBarObject , createOption.titleString);
+    }
+
     /**
         TSPlayer以外のplay/pauseイベントにフックを書く<br>
         @method setNoTSPlayerEvents
