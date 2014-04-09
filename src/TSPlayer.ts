@@ -58,6 +58,7 @@ class CreateOption{
     displayVolumeFlg   : boolean = true
     displayCurrentTime : boolean = true
     displayDuration    : boolean = true
+    displayFullscreen  : boolean = true
 
     titleString          : string = ""
     feedInTime           : number = 100
@@ -317,8 +318,10 @@ class TSPlayer extends AddEvent{
             }
         }
 
-        var fullscreenBarPartsSetting = new BarPartsSetting(controlImage , 16 , 16 , -32  , 0 , 100 , 100 , new Margin(7 , 5 , 7 , 5));
-        new BarPartsFullscreenButton(this , controlBarObject , fullscreenBarPartsSetting);
+        if(this.createOption.displayFullscreen){
+            var fullscreenBarPartsSetting = new BarPartsSetting(controlImage , 16 , 16 , -32  , 0 , 100 , 100 , new Margin(7 , 5 , 7 , 5));
+            new BarPartsFullscreenButton(this , controlBarObject , fullscreenBarPartsSetting);
+        }
 
         if(this.isAndroid){
             var centerLoadingImageSetting = new BarPartsSetting(this.createOption.imagePath + this.createOption.loadingImage , 100 , 100 , 0 , 0 , 100 , 100 , new Margin(0 , 0 , 0 , 0));
