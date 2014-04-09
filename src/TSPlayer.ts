@@ -140,7 +140,7 @@ class TSPlayer extends AddEvent{
         /* add bars end */ 
 
         /* add buttons */ 
-        var centerBarPartsSetting = new BarPartsSetting(this.createOption.imagePath + this.createOption.centerButton  , 240 , 240 , 30 , 30 , 80 , 80 , new Margin(0 , 0 , 0 , 0));
+        var centerBarPartsSetting = new BarPartsSetting(this.createOption.imagePath + this.createOption.centerButton  , 100 , 100 , 0 , 0 , 100 , 100 , new Margin(0 , 0 , 0 , 0));
 
         if(!this.isIOSMobile){
             new BarPartsCenterPlayButton(this , this.control , centerBarPartsSetting);
