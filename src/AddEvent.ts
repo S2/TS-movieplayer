@@ -1,4 +1,4 @@
-interface Element{
+interface MSEventAttachmentTarget{
     attachEvent(eventName : string , eventHandler)
     detachEvent(eventName : string , eventHandler)
 }

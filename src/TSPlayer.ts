@@ -32,7 +32,7 @@ interface HTMLVideoElement{
     mozCancelFullScreen()
 }
 
-interface HTMLDocument{
+interface Document{
     exitFullscreen()
     mozCancelFullScreen()
     webkitCancelFullScreen()
@@ -62,33 +62,33 @@ class CreateOption{
 }
 
 class TSPlayer extends AddEvent{
-    title               :TitleBar;
-    control             :ControlBar;
-    seekbar             :SeekBar;
-    controls            :BarParts;
-    width               :number;
-    height              :number;
-    setHeight           :number = 0;
-    media              :HTMLVideoElement;
-    mediaParent        :HTMLDivElement;
-    isPlaying           :bool = false;
-    isPaused            :bool = false;
-    isFullscreen        :bool = false;
+    title           : TitleBar;
+    control         : ControlBar;
+    seekbar         : SeekBar;
+    controls        : BarParts;
+    width           : number;
+    height          : number;
+    setHeight       : number = 0;
+    media           : HTMLVideoElement;
+    mediaParent     : HTMLDivElement;
+    isPlaying       : boolean = false;
+    isPaused        : boolean = false;
+    isFullscreen    : boolean = false;
     
-    isIOSMobile     : bool = false;
-    isIOS           : bool = false;
-    isIPad          : bool = false;
-    isIPod          : bool = false;
-    isIPhone        : bool = false;
-    isAndroid       : bool = false;
-    isCellularPhone : bool = false;
+    isIOSMobile     : boolean = false;
+    isIOS           : boolean = false;
+    isIPad          : boolean = false;
+    isIPod          : boolean = false;
+    isIPhone        : boolean = false;
+    isAndroid       : boolean = false;
+    isCellularPhone : boolean = false;
 
-    isWebkit    : bool = false;
-    isChorome   : bool = false;
-    isFirefox   : bool = false;
+    isWebkit     : boolean = false;
+    isChorome    : boolean = false;
+    isFirefox    : boolean = false;
 
-    isPC         : bool = false;
-    canTouch     : bool = false;
+    isPC         : boolean = false;
+    canTouch     : boolean = false;
     version      : number;
     majorVersion : number;
     duration     : number;
@@ -331,7 +331,6 @@ class TSPlayer extends AddEvent{
         })
     }
 
-
     public setCurrentTime(moveToSec:number){
         var media = this.media;
         media.currentTime = moveToSec;
@@ -520,7 +519,7 @@ class TSPlayer extends AddEvent{
         @param hookName {string}
         @return Array
     */
-    public getHookComments(hookName : string):Array{
+    public getHookComments(hookName : string):Array<string>{
         var returnArray = [];
         for( var i = 0 , arrayLength = this.hookComments.length ; i < arrayLength ; i++){
             var row = this.hookComments[i]
@@ -531,7 +530,7 @@ class TSPlayer extends AddEvent{
         return returnArray
     }
 
-    private beforePlay : Array = [];
+    private beforePlay : Array<(player:TSPlayer , video:HTMLVideoElement)=>void> = [];
     public hookBeforePlay(hookMethod:(player:TSPlayer , video:HTMLVideoElement)=>void , comment? : string){
         this.beforePlay.push(hookMethod);
         this.hookComments.push({
@@ -541,7 +540,7 @@ class TSPlayer extends AddEvent{
         });
     }
 
-    private afterPlay : Array = [];
+    private afterPlay : Array<(player:TSPlayer , video:HTMLVideoElement)=>void> = [];
     public hookAfterPlay(hookMethod:(player:TSPlayer , video:HTMLVideoElement)=>void , comment? : string){
         this.afterPlay.push(hookMethod);
         this.hookComments.push({
@@ -551,7 +550,7 @@ class TSPlayer extends AddEvent{
         });
     }
 
-    private beforePause : Array = [];
+    private beforePause : Array<(player:TSPlayer , video:HTMLVideoElement)=>void> = [];
     public hookBeforePause(hookMethod:(player:TSPlayer , video:HTMLVideoElement)=>void , comment? : string){
         this.beforePause.push(hookMethod);
         this.hookComments.push({
@@ -561,7 +560,7 @@ class TSPlayer extends AddEvent{
         });
     }
 
-    private afterPause : Array = [];
+    private afterPause : Array<(player:TSPlayer , video:HTMLVideoElement)=>void> = [];
     public hookAfterPause(hookMethod:(player:TSPlayer , video:HTMLVideoElement)=>void , comment? : string){
         this.afterPause.push(hookMethod);
         this.hookComments.push({
@@ -571,7 +570,7 @@ class TSPlayer extends AddEvent{
         });
     }
 
-    private beforeRestart : Array = [];
+    private beforeRestart : Array<(player:TSPlayer , video:HTMLVideoElement)=>void> = [];
     public hookBeforeRestart(hookMethod:(player:TSPlayer , video:HTMLVideoElement)=>void , comment? : string){
         this.beforeRestart.push(hookMethod);
         this.hookComments.push({
@@ -581,7 +580,7 @@ class TSPlayer extends AddEvent{
         });
     }
 
-    private afterRestart : Array = [];
+    private afterRestart : Array<(player:TSPlayer , video:HTMLVideoElement)=>void> = [];
     public hookAfterRestart(hookMethod:(player:TSPlayer , video:HTMLVideoElement)=>void , comment? : string){
         this.afterRestart.push(hookMethod);
         this.hookComments.push({
@@ -591,7 +590,7 @@ class TSPlayer extends AddEvent{
         });
     }
 
-    private timeUpdate: Array = [];
+    private timeUpdate: Array<(player:TSPlayer , video:HTMLVideoElement)=>void> = [];
     public hookTimeupdate(hookMethod:(player:TSPlayer , video:HTMLVideoElement)=>void , comment? : string){
         this.timeUpdate.push(hookMethod);
         this.hookComments.push({
@@ -601,7 +600,7 @@ class TSPlayer extends AddEvent{
         });
     }
 
-    private ended : Array = [];
+    private ended : Array<(player:TSPlayer , video:HTMLVideoElement)=>void> = [];
     public hookEnded(hookMethod:(player:TSPlayer , video:HTMLVideoElement)=>void , comment? : string){
         this.ended.push(hookMethod);
         this.hookComments.push({
@@ -611,7 +610,7 @@ class TSPlayer extends AddEvent{
         });
     }
     
-    private fullscreenEnter : Array = [];
+    private fullscreenEnter : Array<(player:TSPlayer , video:HTMLVideoElement)=>void> = [];
     public hookFullscreenEnter(hookMethod:(player:TSPlayer , video:HTMLVideoElement)=>void , comment? : string){
         this.fullscreenEnter.push(hookMethod);
         this.hookComments.push({
@@ -621,7 +620,7 @@ class TSPlayer extends AddEvent{
         });
     }
 
-    private fullscreenExit : Array = [];
+    private fullscreenExit : Array<(player:TSPlayer , video:HTMLVideoElement)=>void> = [];
     public hookFullscreenExit(hookMethod:(player:TSPlayer , video:HTMLVideoElement)=>void , comment? : string){
         this.fullscreenExit.push(hookMethod);
         this.hookComments.push({
@@ -631,7 +630,7 @@ class TSPlayer extends AddEvent{
         });
     }
 
-    private volumeChange : Array = [];
+    private volumeChange : Array<(player:TSPlayer , video:HTMLVideoElement)=>void> = [];
     public hookVolumeChange(hookMethod:(player:TSPlayer , video:HTMLVideoElement)=>void , comment? : string){
         this.volumeChange.push(hookMethod);
         this.hookComments.push({
@@ -641,7 +640,7 @@ class TSPlayer extends AddEvent{
         });
     }
 
-    private volumeOn : Array = [];
+    private volumeOn : Array<(player:TSPlayer , video:HTMLVideoElement)=>void> = [];
     public hookVolumeOn(hookMethod:(player:TSPlayer , video:HTMLVideoElement)=>void , comment? : string){
         this.volumeOn.push(hookMethod);
         this.hookComments.push({
@@ -651,7 +650,7 @@ class TSPlayer extends AddEvent{
         });
     }
 
-    private volumeOff : Array = [];
+    private volumeOff : Array<(player:TSPlayer , video:HTMLVideoElement)=>void> = [];
     public hookVolumeOff(hookMethod:(player:TSPlayer , video:HTMLVideoElement)=>void , comment? : string){
         this.volumeOff.push(hookMethod);
         this.hookComments.push({
@@ -661,7 +660,7 @@ class TSPlayer extends AddEvent{
         });
     }
 
-    private loadedmetadata : Array = [];
+    private loadedmetadata : Array<(player:TSPlayer , video:HTMLVideoElement)=>void> = [];
     public hookLoadedmetadata(hookMethod:(player:TSPlayer , video:HTMLVideoElement)=>void , comment? : string){
         this.loadedmetadata.push(hookMethod);
         this.hookComments.push({
@@ -731,7 +730,7 @@ class TSPlayer extends AddEvent{
         this.media.volume + newVolume ;
     }
 
-    private doMethodArray(methods:Array){
+    private doMethodArray(methods:Array<(player:TSPlayer , video:HTMLVideoElement)=>void>){
         for(var i = 0 ; i < methods.length ; i++){
             methods[i](this, this.media);
         }

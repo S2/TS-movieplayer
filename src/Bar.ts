@@ -101,12 +101,12 @@ class Bar extends AddEvent{
         @param {} 
         @return void
     */
-    private feedInHook : Array = [];
+    private feedInHook : Array<()=>void> = []
     public setFeedInHook(hookMethod:()=>void):void{
         this.feedInHook.push(hookMethod)
     }
 
-    private feedInHookOnce : Array = [];
+    private feedInHookOnce : Array<()=>void> = []
     public setFeedInHookOnce(hookMethod:()=>void):void{
         this.feedInHookOnce.push(hookMethod)
     }
@@ -118,12 +118,12 @@ class Bar extends AddEvent{
         @param {} 
         @return void
     */
-    private feedOutHook : Array = [];
+    private feedOutHook : Array<()=>void> = []
     public setFeedOutHook(hookMethod:()=>void):void{
         this.feedOutHook.push(hookMethod)
     }
 
-    private feedOutHookOnce : Array = [];
+    private feedOutHookOnce : Array<()=>void> = [];
     public setFeedOutHookOnce(hookMethod:()=>void):void{
         this.feedOutHookOnce.push(hookMethod)
     }
