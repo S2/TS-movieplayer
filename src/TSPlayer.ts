@@ -88,8 +88,8 @@ class TSPlayer extends AddEvent{
     isWebkit     : boolean = false;
     isChorome    : boolean = false;
     isFirefox    : boolean = false;
-
     isPC         : boolean = false;
+
     canTouch     : boolean = false;
     version      : number;
     majorVersion : number;
@@ -118,13 +118,30 @@ class TSPlayer extends AddEvent{
         this.createParentDiv();
 
         this.setInitialVolume(this.volume)
+        
 
-        /* add buttons */ 
+        if(createOption.viewControllBar){
+            this.createControlBar(createOption , controlOption)
+        }
+        var titleBar = null
+        if(createOption.viewTitleBar){
+            titleBar = this.createTitleBar(createOption , titleBarOption)
+        }
+        if(createOption.viewSeekBar){
+            this.createSeekBar(createOption , seekBarOption , titleBar)
+        }
+
+        this.setNoTSPlayerEvents();
+        this.setTSPlayerEvents(createOption);
+        media.load();
+    }
+
+    private setTSPlayerEvents(createOption:CreateOption){
+        var media = this.media
         if(this.createOption.playWithFullscreen){
             this.hookFullscreenExit(() => {this.pause() , "exit fullscreen on pause if play with fullscreen"});
         }
 
-        /* add buttons end */ 
         if(CookieManager.get("muted") == "true"){
             this.setVolumeOff();
         }
@@ -172,8 +189,7 @@ class TSPlayer extends AddEvent{
             this.isFullscreen = false
         });
 
-        this.setNoTSPlayerEvents();
-        media.load();
+
     }
 
     private createControlBar(createOption : CreateOption , controlOption : ControlBarOption){
@@ -251,9 +267,10 @@ class TSPlayer extends AddEvent{
                 loading.invisible();
             } , "hide android loading image");
         }
+        return controlBarObject
     }
 
-    private createsSeekBar(createOption : CreateOption , seekBarOption : SeekBarOption , controlBarObject = null){
+    private createSeekBar(createOption : CreateOption , seekBarOption : SeekBarOption , controlBarObject = null){
         var seekBarObject = new SeekBar(seekBarOption , this.width);
         var seekBar    = null
         if(createOption.viewSeekBar){
@@ -311,10 +328,9 @@ class TSPlayer extends AddEvent{
             this.hookTimeupdate(barFeedOut , "hide bar if playing");
             this.hookAfterPause(barFeedIn  , "display bar on pause");
         }
+        return seekBarObject
     }
     
-
-
     private createTitleBar(createOption : CreateOption , titleBarOption : TitleBarOption){
         var titleBarObject = new TitleBar(titleBarOption , this.width);
         var titleBar = this.setUpperBar(titleBarObject);
@@ -344,6 +360,7 @@ class TSPlayer extends AddEvent{
         }
 
         new BarPartsTitleString(this , titleBarObject , createOption.titleString);
+        return titleBarObject
     }
 
     /**
