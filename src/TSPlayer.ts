@@ -49,25 +49,35 @@ class CreateOption{
     centerButton         : string = "largeButton.svg"
     loadingImage         : string = "loading.gif"
 
-    viewControllBar      : Boolean = true;
-    viewTitleBar         : Boolean = true;
-    viewSeekBar          : Boolean = true;
-    displayAlwaysSeekBar : Boolean = true;
+    viewControlBar       : Boolean = true
+    viewTitleBar         : Boolean = true
+    viewSeekBar          : Boolean = true
+    displayAlwaysSeekBar : Boolean = true
 
-    titleString          : string = "";
-    feedInTime           : number = 100;
-    feedOutTime          : number = 100;
-    separateString       : string = " / ";
-    playWithFullscreen   : boolean = false;
+    separateString     : string = " / "
+    displayVolumeFlg   : boolean = true
+    displayCurrentTime : boolean = true
+    displayDuration    : boolean = true
+
+    titleString          : string = ""
+    feedInTime           : number = 100
+    feedOutTime          : number = 100
+    playWithFullscreen   : boolean = false
+
     timeFontSize         : number = 10 
     timeMarginTop        : number = 6
 }
 
+class BarPair{
+    barObject : Bar
+    bar : HTMLElement
+    constructor(barObject : Bar , bar : HTMLElement){
+        this.barObject = barObject
+        this.bar = bar
+    }
+}
+
 class TSPlayer extends AddEvent{
-    title           : TitleBar;
-    control         : ControlBar;
-    seekbar         : SeekBar;
-    controls        : BarParts;
     width           : number;
     height          : number;
     setHeight       : number = 0;
@@ -120,20 +130,92 @@ class TSPlayer extends AddEvent{
         this.setInitialVolume(this.volume)
         
 
-        if(createOption.viewControllBar){
-            this.createControlBar(createOption , controlOption)
-        }
-        var titleBar = null
-        if(createOption.viewTitleBar){
-            titleBar = this.createTitleBar(createOption , titleBarOption)
-        }
-        if(createOption.viewSeekBar){
-            this.createSeekBar(createOption , seekBarOption , titleBar)
-        }
-
+        var controlBarPair = this.createControlBar(createOption , controlOption)
+        var titleBarPair   = this.createTitleBar(createOption , titleBarOption)
+        var seekBarPair    = this.createSeekBar(createOption , seekBarOption , titleBarPair.barObject)
+        
+        this.setBarEvents(controlBarPair , titleBarPair , seekBarPair)
         this.setNoTSPlayerEvents();
         this.setTSPlayerEvents(createOption);
         media.load();
+    }
+
+    private setBarEvents(controlBarPair : BarPair , titleBarPair  : BarPair, seekBarPair : BarPair){
+        var createOption = this.createOption
+        var media = this.media
+
+        var displayControl = true;
+        var barFeedIn = () => {
+            if(this.isPlaying){
+                titleBarPair.barObject.feedIn(0 , createOption.feedInTime);
+                controlBarPair.barObject.feedIn(0 , createOption.feedInTime);
+                if(seekBarPair){
+                    if(!this.createOption.displayAlwaysSeekBar){
+                        seekBarPair.barObject.feedIn(0 , createOption.feedInTime);
+                    }else{
+                        if(!displayControl){
+                            (<SeekBar>seekBarPair.barObject).moveUpBar();
+                        }
+                    }
+                }
+                displayControl  = true;
+            }
+        }
+
+        media.addEventListener('mouseover' , barFeedIn ,false);
+        if(controlBarPair){
+            controlBarPair.bar.addEventListener('mouseover' , barFeedIn ,false);
+        }
+        if(titleBarPair){
+            titleBarPair.bar.addEventListener('mouseover' , barFeedIn ,false);
+        }
+        if(seekBarPair){
+            seekBarPair.bar.addEventListener('mouseover' , barFeedIn ,false);
+        }
+
+        var barFeedOut = () => {
+            if(this.isPlaying){
+                titleBarPair.barObject.feedOut(0 , createOption.feedOutTime);
+                controlBarPair.barObject.feedOut(0 , createOption.feedOutTime);
+                if(seekBarPair){
+                    if(!this.createOption.displayAlwaysSeekBar){
+                        seekBarPair.barObject.feedOut(0 , createOption.feedOutTime);
+                    }else{
+                        if(displayControl){
+                            controlBarPair.barObject.setFeedOutHookOnce( () => {
+                                (<SeekBar>seekBarPair.barObject).moveDownBar();
+                            })
+                        }
+                    }
+                }
+                displayControl  = false;
+            }
+        }
+        media.addEventListener('mouseout' , barFeedOut)
+        if(controlBarPair){
+            controlBarPair.bar.addEventListener('mouseout' , barFeedOut ,false);
+        }
+        if(titleBarPair){
+            titleBarPair.bar.addEventListener('mouseout' , barFeedOut ,false);
+        }
+        if(seekBarPair){
+            seekBarPair.bar.addEventListener('mouseout' , barFeedOut,false);
+        }
+
+        this.hookEnded((player:TSPlayer , video:HTMLVideoElement) => {
+            titleBarPair.barObject.feedIn(0 , createOption.feedInTime);
+            controlBarPair.barObject.feedIn(0 , createOption.feedInTime);
+            if(seekBarPair){
+                if(!this.createOption.displayAlwaysSeekBar){
+                    seekBarPair.barObject.feedIn(0 , createOption.feedInTime);
+                }else{
+                    if(!displayControl){
+                        (<SeekBar>seekBarPair.barObject).moveDownBar();
+                    }
+                }
+            }
+            displayControl  = true;
+        });
     }
 
     private setTSPlayerEvents(createOption:CreateOption){
@@ -188,39 +270,14 @@ class TSPlayer extends AddEvent{
             this.doMethodArray(this.fullscreenExit);
             this.isFullscreen = false
         });
-
-
     }
 
-    private createControlBar(createOption : CreateOption , controlOption : ControlBarOption){
+    private createControlBar(createOption : CreateOption , controlOption : ControlBarOption) : BarPair{
+        if(!createOption.viewControlBar){
+            return null
+        }
         var controlBarObject = new ControlBar(controlOption , this.width);
         var controlBar = this.setLowerBar(controlBarObject);
-
-        var barFeedIn = () => {
-            if(this.isPlaying){
-                controlBarObject.feedIn(0 , createOption.feedInTime);
-            }
-        }
-        var barFeedOut = () => {
-            if(this.isPlaying){
-                controlBarObject.feedOut(0 , createOption.feedOutTime);
-            }
-        };
-
-        this.hookEnded((player:TSPlayer , video:HTMLVideoElement) => {
-            controlBarObject.feedIn(0 , createOption.feedInTime);
-        } , "display bar if ended");
-
-        this.addEvent(this.media , 'mouseover' , barFeedIn ,false);
-        this.addEvent(controlBar , 'mouseover' , barFeedIn ,false);
-        this.addEvent(this.media , 'mouseout' , barFeedOut , false);
-
-        if(this.isAndroid){
-            // if Android , we can get duration after play start
-            this.hookTimeupdate(barFeedOut , "hide bar if playing");
-            this.hookAfterPause(barFeedIn  , "display bar on pause");
-        }
-
         var centerBarPartsSetting = new BarPartsSetting(this.createOption.imagePath + this.createOption.centerButton  , 100 , 100 , 0 , 0 , 100 , 100 , new Margin(0 , 0 , 0 , 0));
 
         if(!this.isIOSMobile){
@@ -240,19 +297,26 @@ class TSPlayer extends AddEvent{
 
         var timeParts = new BarPartsTimes(this , controlBarObject , 
                 this.createOption.separateString , this.createOption.timeFontSize , this.createOption.timeMarginTop);
-        timeParts.setDuration(this.getDuration());
-        
-        if(this.isAndroid){
-            // if Android , we can get duration after play start
-            this.hookTimeupdate(()=>{
-                timeParts.setDuration(this.getDuration());
-            } , "get duration for android");
-        }else{
-            this.hookLoadedmetadata(()=>{
-                timeParts.setDuration(this.getDuration());
-            } , "get duration");
+
+        if(this.createOption.displayCurrentTime){
+            timeParts.setCurrentTime()
         }
+
+        if(this.createOption.displayDuration){
+            timeParts.setDuration(this.getDuration())
         
+            if(this.isAndroid){
+                // if Android , we can get duration after play start
+                this.hookTimeupdate(()=>{
+                    timeParts.setDuration(this.getDuration());
+                } , "get duration for android");
+            }else{
+                this.hookLoadedmetadata(()=>{
+                    timeParts.setDuration(this.getDuration());
+                } , "get duration");
+            }
+        }
+
         var fullscreenBarPartsSetting = new BarPartsSetting(controlImage , 16 , 16 , -32  , 0 , 100 , 100 , new Margin(7 , 5 , 7 , 5));
         new BarPartsFullscreenButton(this , controlBarObject , fullscreenBarPartsSetting);
 
@@ -267,100 +331,32 @@ class TSPlayer extends AddEvent{
                 loading.invisible();
             } , "hide android loading image");
         }
-        return controlBarObject
+        return new BarPair(controlBarObject , controlBar)
     }
 
-    private createSeekBar(createOption : CreateOption , seekBarOption : SeekBarOption , controlBarObject = null){
+    private createSeekBar(createOption : CreateOption , seekBarOption : SeekBarOption , controlBarObject = null) : BarPair{
+        if(!createOption.viewSeekBar){
+            return null
+        }
         var seekBarObject = new SeekBar(seekBarOption , this.width);
-        var seekBar    = null
-        if(createOption.viewSeekBar){
-            seekBar = this.setLowerBar(seekBarObject);
+        var seekBar = this.setLowerBar(seekBarObject);
 
-            if(controlBarObject){
-                seekBarObject.setMoveDownHeight(controlBarObject.getHeight());
-            }
+        if(controlBarObject){
+            seekBarObject.setMoveDownHeight(controlBarObject.getHeight());
         }
 
-        var displayControl = true;
-        var barFeedIn = () => {
-            if(this.isPlaying){
-                if(!this.createOption.displayAlwaysSeekBar){
-                    seekBarObject.feedIn(0 , createOption.feedInTime);
-                }else{
-                    if(!displayControl){
-                        seekBarObject.moveUpBar();
-                    }
-                }
-                displayControl  = true;
-            }
-        }
-        var barFeedOut = () => {
-            if(this.isPlaying){
-                if(!this.createOption.displayAlwaysSeekBar){
-                    seekBarObject.feedOut(0 , createOption.feedOutTime);
-                }else{
-                    if(displayControl){
-                        controlBarObject.setFeedOutHookOnce( () => {
-                            seekBarObject.moveDownBar();
-                        })
-                    }
-                }
-                displayControl  = false;
-            }
-        };
-        this.hookEnded((player:TSPlayer , video:HTMLVideoElement) => {
-            if(!this.createOption.displayAlwaysSeekBar){
-                seekBarObject.feedIn(0 , createOption.feedInTime);
-            }else{
-                if(!displayControl){
-                    seekBarObject.moveUpBar();
-                }
-            }
-            displayControl  = true;
-        } , "display bar if ended");
-
-        this.addEvent(this.media , 'mouseover' , barFeedIn ,false);
-        this.addEvent(seekBar , 'mouseover' , barFeedIn ,false);
-        this.addEvent(this.media , 'mouseout' , barFeedOut , false);
-
-        if(this.isAndroid){
-            // if Android , we can get duration after play start
-            this.hookTimeupdate(barFeedOut , "hide bar if playing");
-            this.hookAfterPause(barFeedIn  , "display bar on pause");
-        }
-        return seekBarObject
+        return new BarPair(seekBarObject , seekBar)
     }
     
-    private createTitleBar(createOption : CreateOption , titleBarOption : TitleBarOption){
+    private createTitleBar(createOption : CreateOption , titleBarOption : TitleBarOption) : BarPair{
+        if(!createOption.viewTitleBar){
+            return null
+        }
         var titleBarObject = new TitleBar(titleBarOption , this.width);
         var titleBar = this.setUpperBar(titleBarObject);
 
-        var barFeedIn = () => {
-            if(this.isPlaying){
-                titleBarObject.feedIn(0 , createOption.feedInTime);
-            }
-        }
-        var barFeedOut = () => {
-            if(this.isPlaying){
-                titleBarObject.feedOut(0 , createOption.feedOutTime);
-            }
-        };
-        this.hookEnded((player:TSPlayer , video:HTMLVideoElement) => {
-            titleBarObject.feedIn(0 , createOption.feedInTime);
-        } , "display bar if ended");
-
-        this.addEvent(this.media , 'mouseover' , barFeedIn ,false);
-        this.addEvent(titleBar , 'mouseover' , barFeedIn ,false);
-        this.addEvent(this.media , 'mouseout' , barFeedOut , false);
-
-        if(this.isAndroid){
-            // if Android , we can get duration after play start
-            this.hookTimeupdate(barFeedOut , "hide bar if playing");
-            this.hookAfterPause(barFeedIn  , "display bar on pause");
-        }
-
         new BarPartsTitleString(this , titleBarObject , createOption.titleString);
-        return titleBarObject
+        return new BarPair(titleBarObject , titleBar)
     }
 
     /**

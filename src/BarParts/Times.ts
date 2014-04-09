@@ -15,6 +15,9 @@ class BarPartsTimes extends BarParts{
         this.separateString = separateString;
 
         this.hasSetCurrentTime = true;
+    }
+
+    public setCurrentTime():void{
         var barHeight : number = this.controlBar.getHeight();
         var area : HTMLDivElement = document.createElement('div');
         area.style.height = barHeight + "px";
