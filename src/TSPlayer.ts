@@ -60,10 +60,11 @@ class CreateOption{
     displayDuration    : boolean = true
     displayFullscreen  : boolean = true
 
-    titleString          : string = ""
-    feedInTime           : number = 100
-    feedOutTime          : number = 100
-    playWithFullscreen   : boolean = false
+    titleString                : string = ""
+    feedInTime                 : number = 100
+    feedOutTime                : number = 100
+    playWithFullscreen         : boolean = false
+    automaticCloseFullscreen   : boolean = true
 
     timeFontSize         : number = 10 
     timeMarginTop        : number = 6
@@ -138,6 +139,12 @@ class TSPlayer extends AddEvent{
         this.setBarEvents(controlBarPair , titleBarPair , seekBarPair)
         this.setNoTSPlayerEvents();
         this.setTSPlayerEvents(createOption);
+
+        if(this.createOption.automaticCloseFullscreen){
+            this.hookEnded((player:TSPlayer , video:HTMLVideoElement) => {
+                this.exitFullscreen()
+            } , "exit full screen if ended:147")
+        }
         media.load();
     }
 
