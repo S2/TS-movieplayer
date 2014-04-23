@@ -38,7 +38,10 @@
     var target = document.getElementById('hoge');
     var player = new TSPlayer(target , new CreateOption());
     document.getElementById("fuga").addEventListener('click' , function(){
-        player.toggleFullscreen();
+//        player.toggleFullscreen();
         player.togglePlayPause();
+        setTimeout(function(){
+            player.resize(800 , 450)
+        } , 1000)
     });
 </script>

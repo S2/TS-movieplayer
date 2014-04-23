@@ -176,4 +176,8 @@ class Bar extends AddEvent{
     public getZIndex():number{
         return this.options.zIndex;
     }
+
+    public resize(width : number , height : number){
+        this.createdElement.style.width = width + "px"
+    }
 }

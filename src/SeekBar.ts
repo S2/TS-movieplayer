@@ -23,6 +23,7 @@ class SeekBar extends Bar{
         if(this.options.height){
             newElement.style.height = this.options.height + "px";
         }
+
         if(this.options.zIndex){
             newElement.style.zIndex = this.options.zIndex + "";
         }
@@ -56,7 +57,7 @@ class SeekBar extends Bar{
 
         this.addEvent(seekbar , "click" , (e) => {
             var clickedX = e.pageX;
-            var moveToSec = player.getDuration() * clickedX / width;
+            var moveToSec = player.getDuration() * clickedX / this.width;
             player.setCurrentTime(moveToSec);
         } , false);
 
@@ -64,7 +65,7 @@ class SeekBar extends Bar{
             var current:number = video.currentTime;
             var duration:number = player.getDuration();
             var percent = current / duration;
-            var filledWidth = width * percent;
+            var filledWidth = this.width * percent;
             seekbarInner.style.width = filledWidth + "px";
         });
         newElement.appendChild(seekbar);
@@ -109,5 +110,11 @@ class SeekBar extends Bar{
             this.initTop = parseInt(this.createdElement.style.top.replace("px" ,""));
         }
         this.createdElement.style.top = this.initTop + "px";
+    }
+
+    public resize(width : number , height : number){
+        this.createdElement.style.width = width + "px"
+        this.seekbar.style.width = width + "px"
+        this.width = width;
     }
 }

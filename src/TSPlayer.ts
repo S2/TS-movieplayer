@@ -112,6 +112,10 @@ class TSPlayer extends AddEvent{
     console      = new Debug.Console();
     isEnded      = false
 
+    controlBarPair : BarPair
+    seekBarPair : BarPair
+    titleBarPair : BarPair
+
     isInPauseEvent = false
     isInPlayEvent  = false
     isInEndedEvent = false
@@ -136,6 +140,10 @@ class TSPlayer extends AddEvent{
         var titleBarPair   = this.createTitleBar(createOption , titleBarOption)
         var seekBarPair    = this.createSeekBar(createOption , seekBarOption , titleBarPair.barObject)
         
+        this.controlBarPair = controlBarPair
+        this.titleBarPair   = titleBarPair
+        this.seekBarPair    = seekBarPair
+
         this.setBarEvents(controlBarPair , titleBarPair , seekBarPair)
         this.setNoTSPlayerEvents();
         this.setTSPlayerEvents(createOption);
@@ -148,7 +156,7 @@ class TSPlayer extends AddEvent{
         media.load();
     }
 
-    private setBarEvents(controlBarPair : BarPair , titleBarPair  : BarPair, seekBarPair : BarPair){
+    private setBarEvents(controlBarPair : BarPair , titleBarPair  : BarPair , seekBarPair : BarPair){
         var createOption = this.createOption
         var media = this.media
 
@@ -917,7 +925,10 @@ class TSPlayer extends AddEvent{
     }
 
     private setLowerBar(barObject:Bar) : HTMLElement{
-        var bar:HTMLElement = barObject.createElement(this);
+        var bar:HTMLElement = barObject.getElement();
+        if(bar == null){
+            bar = barObject.createElement(this);
+        }
 
         var height = parseInt(bar.style.height.replace('px',''));
         var setHeight = this.setHeight;
@@ -932,6 +943,13 @@ class TSPlayer extends AddEvent{
         var parentNode = media.parentNode;
         parentNode.appendChild(bar);
         return bar;
+    }
+
+    private clearLowerBar(barObject:Bar) : void {
+        var bar:HTMLElement = barObject.getElement();
+        var media:HTMLVideoElement = this.media;
+        var parentNode = media.parentNode;
+        parentNode.removeChild(bar);
     }
 
     private setUpperBar(barObject:Bar) : HTMLElement{
@@ -983,4 +1001,30 @@ class TSPlayer extends AddEvent{
         }
     }
 
+    /**
+        <br>
+        
+        @method  resize
+        @param {} 
+        @return void
+    */
+    public resize(width : number , height : number):void{
+        this.media.style.width = width + "px"
+        this.media.style.height = height + "px"
+        this.mediaParent.style.width = width + "px"
+        this.mediaParent.style.height = height + "px"
+
+        this.controlBarPair.barObject.resize(width , height )
+        this.titleBarPair.barObject.resize(width , height )
+        this.seekBarPair.barObject.resize(width , height )
+
+        this.setHeight = 0
+        this.width = width 
+        this.height = height 
+
+        this.clearLowerBar(this.controlBarPair.barObject);
+        this.clearLowerBar(this.seekBarPair.barObject);
+        this.setLowerBar(this.controlBarPair.barObject);
+        this.setLowerBar(this.seekBarPair.barObject);
+    }
 }

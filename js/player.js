@@ -1,19 +1,118 @@
+var AddEvent = (function () {
+    function AddEvent() {
+    }
+    /**
+    <br>
+    
+    @method addDocumentEvent
+    @param eventName {string}
+    @param eventHandler {function}
+    @return void
+    */
+    AddEvent.prototype.addDocumentEvent = function (eventName, eventHandler, useCapture) {
+        if (typeof useCapture === "undefined") { useCapture = false; }
+        if (document.addEventListener) {
+            document.addEventListener(eventName, eventHandler, useCapture);
+        } else {
+            document.attachEvent("on" + eventName, eventHandler);
+        }
+    };
+
+    /**
+    <br>
+    
+    @method removeDocumentEvent
+    @param eventName {string}
+    @param eventHandler {function}
+    @return void
+    */
+    AddEvent.prototype.removeDocumentEvent = function (eventName, eventHandler, useCapture) {
+        if (typeof useCapture === "undefined") { useCapture = false; }
+        if (document.removeEventListener) {
+            document.removeEventListener(eventName, eventHandler, useCapture);
+        } else {
+            document.detachEvent("on" + eventName, eventHandler);
+        }
+    };
+
+    /**
+    <br>
+    
+    @method addEvent
+    @param element {HTMLElement}
+    @param eventName {string}
+    @param eventHandler {function}
+    @return void
+    */
+    AddEvent.prototype.addEvent = function (element, eventName, eventHandler, useCapture) {
+        if (typeof useCapture === "undefined") { useCapture = false; }
+        if (element.addEventListener) {
+            element.addEventListener(eventName, eventHandler, useCapture);
+        } else {
+            element.attachEvent("on" + eventName, eventHandler);
+        }
+    };
+
+    /**
+    <br>
+    
+    @method removeEvent
+    @param element {HTMLElement}
+    @param eventName {string}
+    @param eventHandler {function}
+    @return void
+    */
+    AddEvent.prototype.removeEvent = function (element, eventName, eventHandler, useCapture) {
+        if (typeof useCapture === "undefined") { useCapture = false; }
+        if (element.removeEventListener) {
+            element.removeEventListener(eventName, eventHandler, useCapture);
+        } else {
+            element.detachEvent("on" + eventName, eventHandler);
+        }
+    };
+    return AddEvent;
+})();
 var BarOption = (function () {
     function BarOption() {
         this.zIndex = 100;
     }
     return BarOption;
 })();
-var Bar = (function () {
+/// <reference path="jquery.d.ts" />
+/// <reference path="TSPlayer.ts" />
+/// <reference path="BarOption.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Bar = (function (_super) {
+    __extends(Bar, _super);
     function Bar() {
+        _super.call(this);
         this.maxAlpha = 1;
         this.eventEnable = true;
         this.className = "bar";
         this.displayed = true;
         this.inFeedOut = false;
         this.inFeedIn = false;
+        /**
+        <br>
+        
+        @method setFeedInHook
+        @param {}
+        @return void
+        */
         this.feedInHook = [];
         this.feedInHookOnce = [];
+        /**
+        <br>
+        
+        @method setFeedOutHook
+        @param {}
+        @return void
+        */
         this.feedOutHook = [];
         this.feedOutHookOnce = [];
     }
@@ -120,13 +219,20 @@ var Bar = (function () {
 
     Bar.prototype.setEvent = function (element, eventName, eventFunction) {
         var _this = this;
-        element.addEventListener(eventName, function () {
+        this.addEvent(element, eventName, function () {
             if (_this.eventEnable) {
                 eventFunction();
             }
         }, false);
     };
 
+    /**
+    <br>
+    
+    @method getHeight
+    @param {}
+    @return number
+    */
     Bar.prototype.getHeight = function () {
         var element = this.createdElement;
         return parseInt(element.style.height.replace("px", ""));
@@ -136,6 +242,13 @@ var Bar = (function () {
         return this.createdElement;
     };
 
+    /**
+    <br>
+    
+    @method toggle
+    @param {}
+    @return void
+    */
     Bar.prototype.toggle = function () {
         if (this.createdElement) {
             var style = this.createdElement.style;
@@ -154,8 +267,15 @@ var Bar = (function () {
     Bar.prototype.getZIndex = function () {
         return this.options.zIndex;
     };
+
+    Bar.prototype.resize = function (width, height) {
+        this.createdElement.style.width = width + "px";
+    };
     return Bar;
-})();
+})(AddEvent);
+/// <reference path="jquery.d.ts" />
+/// <reference path="TSPlayer.ts" />
+/// <reference path="Bar.ts" />
 var BarPartsSetting = (function () {
     function BarPartsSetting(src, width, height, top, left, scaleWidth, scaleHeight, margin) {
         if (typeof top === "undefined") { top = 0; }
@@ -192,15 +312,20 @@ var Margin = (function () {
         }
     }
     Margin.prototype.getMarginString = function () {
-        return [this.top, this.right, this.bottom, this.left].map(function (value) {
-            return value ? value + "px" : "0";
-        }).join(" ");
+        var returnArray = [this.top + "", this.right + "", this.bottom + "", this.left + ""];
+
+        for (var i = 0, arrayLength = returnArray.length; i < arrayLength; i++) {
+            returnArray[i] = returnArray[i] ? returnArray[i] + "px" : "0";
+        }
+        return returnArray.join(" ");
     };
     return Margin;
 })();
 
-var BarParts = (function () {
+var BarParts = (function (_super) {
+    __extends(BarParts, _super);
     function BarParts(player, controlBar) {
+        _super.call(this);
         this.hasSetDuration = false;
         this.hasSetCurrentTime = false;
         this.player = player;
@@ -260,15 +385,20 @@ var BarParts = (function () {
         return timeString;
     };
     return BarParts;
-})();
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
+})(AddEvent);
+/// <reference path="../jquery.d.ts" />
+/// <reference path="../BarParts.ts" />
+/// <reference path="../TSPlayer.ts" />
+/// <reference path="../Bar.ts" />
 var BarPartsPlayPauseButton = (function (_super) {
     __extends(BarPartsPlayPauseButton, _super);
+    /**
+    <br>
+    
+    @method setPlayButton
+    @param {}
+    @return void
+    */
     function BarPartsPlayPauseButton(player, controlBar, playBarPartsSetting, pauseBarPartsSetting) {
         var _this = this;
         _super.call(this, player, controlBar);
@@ -277,6 +407,7 @@ var BarPartsPlayPauseButton = (function (_super) {
         playPauseButton.className = 'controllButtonLeft playPauseButton';
         this.controlBar.getElement().appendChild(playPauseButton);
 
+        // play
         this.player.hookAfterRestart(function () {
             _this.modifyButton(playPauseButton, pauseBarPartsSetting);
         });
@@ -284,6 +415,7 @@ var BarPartsPlayPauseButton = (function (_super) {
             _this.modifyButton(playPauseButton, pauseBarPartsSetting);
         });
 
+        // pause/end
         this.player.hookAfterPause(function () {
             _this.modifyButton(playPauseButton, playBarPartsSetting);
         });
@@ -291,15 +423,19 @@ var BarPartsPlayPauseButton = (function (_super) {
             _this.modifyButton(playPauseButton, playBarPartsSetting);
         });
 
-        playPauseButton.addEventListener('click', function () {
+        this.addEvent(playPauseButton, 'click', function () {
             _this.player.togglePlayPause();
         }, false);
-        playPauseButton.addEventListener('touch', function () {
+        this.addEvent(playPauseButton, 'touch', function () {
             _this.player.togglePlayPause();
         }, false);
     }
     return BarPartsPlayPauseButton;
 })(BarParts);
+/// <reference path="../jquery.d.ts" />
+/// <reference path="../BarParts.ts" />
+/// <reference path="../TSPlayer.ts" />
+/// <reference path="../Bar.ts" />
 var BarPartsFullscreenButton = (function (_super) {
     __extends(BarPartsFullscreenButton, _super);
     function BarPartsFullscreenButton(player, controlBar, imageSetting) {
@@ -308,13 +444,17 @@ var BarPartsFullscreenButton = (function (_super) {
 
         var fullscreenButton = this.createButton(imageSetting);
         fullscreenButton.className = 'controllButtonRight playPauseButton';
-        fullscreenButton.addEventListener('click', function () {
+        this.addEvent(fullscreenButton, 'click', function () {
             _this.player.toggleFullscreen();
         }, false);
         this.controlBar.getElement().appendChild(fullscreenButton);
     }
     return BarPartsFullscreenButton;
 })(BarParts);
+/// <reference path="../jquery.d.ts" />
+/// <reference path="../BarParts.ts" />
+/// <reference path="../TSPlayer.ts" />
+/// <reference path="../Bar.ts" />
 var BarPartsVolumeButton = (function (_super) {
     __extends(BarPartsVolumeButton, _super);
     function BarPartsVolumeButton(player, controlBar, volumeOnImageSetting, volumeOffImageSetting) {
@@ -324,19 +464,23 @@ var BarPartsVolumeButton = (function (_super) {
         var volumeButton = this.createButton(volumeOnImageSetting);
         volumeButton.className = 'controllButtonLeft volumeButton';
         volumeButton.style.position = "relative";
-        this.controlBar.getElement().appendChild(volumeButton);
 
-        volumeButton.addEventListener("click", function () {
+        var controlBarElement = this.controlBar.getElement();
+        controlBarElement.appendChild(volumeButton);
+
+        this.addEvent(volumeButton, "click", function () {
             _this.player.toggleVolume();
         });
-        volumeButton.addEventListener("touch", function () {
+        this.addEvent(volumeButton, "touch", function () {
             _this.player.toggleVolume();
         });
 
+        //  volume on
         this.player.hookVolumeOn(function () {
             _this.modifyButton(volumeButton, volumeOnImageSetting);
         });
 
+        // volume off
         this.player.hookVolumeOff(function () {
             _this.modifyButton(volumeButton, volumeOffImageSetting);
         });
@@ -369,20 +513,24 @@ var BarPartsVolumeButton = (function (_super) {
         volumeArea.appendChild(volumeBarCurrent);
 
         volumeButton.appendChild(volumeArea);
-        volumeButton.addEventListener('mouseover', function () {
+        var initZIndex = controlBarElement.style.zIndex;
+        this.addEvent(volumeButton, 'mouseover', function () {
             volumeArea.style.visibility = "visible";
             volumeArea.style.display = "block";
+            controlBarElement.style.zIndex = "2147483647";
         }, false);
-        volumeArea.addEventListener('mouseover', function () {
+        this.addEvent(volumeArea, 'mouseover', function () {
             volumeArea.style.visibility = "visible";
             volumeArea.style.display = "block";
+            controlBarElement.style.zIndex = "2147483647";
         }, false);
-        volumeButton.addEventListener('mouseout', function () {
+        this.addEvent(volumeButton, 'mouseout', function () {
             volumeArea.style.visibility = "hidden";
             volumeArea.style.display = "none";
+            controlBarElement.style.zIndex = initZIndex;
         }, false);
 
-        volumeArea.addEventListener('click', function (e) {
+        this.addEvent(volumeArea, 'click', function (e) {
             var barTop = volumeSlider.getBoundingClientRect().top;
             var dy = e.pageY - barTop;
             var changeToBarTop = parseInt(volumeSlider.style.top.replace("px", "")) + dy;
@@ -397,11 +545,11 @@ var BarPartsVolumeButton = (function (_super) {
         }, false);
 
         var moveStart = false;
-        volumeSlider.addEventListener('mousedown', function (e) {
+        this.addEvent(volumeSlider, 'mousedown', function (e) {
             moveStart = true;
         }, false);
 
-        volumeArea.addEventListener('mousemove', function (e) {
+        this.addEvent(volumeArea, 'mousemove', function (e) {
             if (!moveStart) {
                 return;
             }
@@ -418,57 +566,109 @@ var BarPartsVolumeButton = (function (_super) {
             _this.player.setVolume(-1 * dy / 100);
         }, false);
 
-        document.addEventListener('mouseup', function (e) {
+        this.addDocumentEvent('mouseup', function (e) {
             moveStart = false;
         }, false);
     }
     return BarPartsVolumeButton;
 })(BarParts);
+/// <reference path="../jquery.d.ts" />
+/// <reference path="../BarParts.ts" />
+/// <reference path="../TSPlayer.ts" />
+/// <reference path="../Bar.ts" />
 var BarPartsTimes = (function (_super) {
     __extends(BarPartsTimes, _super);
-    function BarPartsTimes(player, controlBar, separateString) {
-        var _this = this;
+    function BarPartsTimes(player, controlBar, separateString, timeStringPx, timeStringMarginTop) {
+        if (typeof separateString === "undefined") { separateString = "/"; }
+        if (typeof timeStringPx === "undefined") { timeStringPx = null; }
+        if (typeof timeStringMarginTop === "undefined") { timeStringMarginTop = 0; }
         _super.call(this, player, controlBar);
+
+        this.timeStringPx = timeStringPx;
+        this.timeStringMarginTop = timeStringMarginTop;
 
         this.separateString = separateString;
 
         this.hasSetCurrentTime = true;
+    }
+    BarPartsTimes.prototype.setCurrentTime = function () {
+        var _this = this;
         var barHeight = this.controlBar.getHeight();
         var area = document.createElement('div');
         area.style.height = barHeight + "px";
         area.innerHTML = "00:00";
+        if (this.timeStringPx) {
+            area.style.fontSize = this.timeStringPx + "px";
+        }
+        area.style.marginTop = this.timeStringMarginTop + "px";
         area.className = 'controllButtonLeft currentTime';
         this.controlBar.getElement().appendChild(area);
 
-        this.player.hookTimeUpdate(function (player, video) {
+        this.player.hookTimeupdate(function (player, video) {
             var currentTime = player.getCurrentTime();
             var currentTimeString = _this.getTime(currentTime);
             area.innerHTML = currentTimeString;
         });
-    }
+    };
+
     BarPartsTimes.prototype.setDuration = function (durationSeconds) {
+        var className = 'controllButtonLeft duration';
+        var area;
+        var areaExists = false;
+        var controllElements = this.controlBar.getElement().childNodes;
+        for (var i = 0, arrayLength = controllElements.length; i < arrayLength; i++) {
+            var element = controllElements[i];
+            if (element.className == className) {
+                area = element;
+                areaExists = true;
+                break;
+            }
+        }
+
         var barHeight = this.controlBar.getHeight();
-        var area = document.createElement('div');
+        area = area || document.createElement('div');
         area.style.height = barHeight + "px";
+        if (this.timeStringPx) {
+            area.style.fontSize = this.timeStringPx + "px";
+        }
+        area.style.marginTop = this.timeStringMarginTop + "px";
 
         var durationString = this.getTime(durationSeconds);
 
         area.innerHTML = durationString;
-        area.className = 'controllButtonLeft duration';
+        area.className = className;
 
-        if (this.hasSetCurrentTime && this.separateString) {
+        if (!areaExists && this.hasSetCurrentTime && this.separateString) {
+            // display separator
             var separator = document.createElement('div');
             separator.style.height = barHeight + "px";
             separator.innerHTML = this.separateString;
-            separator.className = 'controllButtonLeft';
+            if (this.timeStringPx) {
+                separator.style.fontSize = this.timeStringPx + "px";
+            }
+            separator.style.marginTop = this.timeStringMarginTop + "px";
+            separator.className = 'controllButtonLeft separator';
             this.controlBar.getElement().appendChild(separator);
         }
-        this.controlBar.getElement().appendChild(area);
+        if (!areaExists) {
+            this.controlBar.getElement().appendChild(area);
+        }
     };
     return BarPartsTimes;
 })(BarParts);
+/// <reference path="../jquery.d.ts" />
+/// <reference path="../BarParts.ts" />
+/// <reference path="../TSPlayer.ts" />
+/// <reference path="../Bar.ts" />
 var BarPartsCenterPlayButton = (function (_super) {
     __extends(BarPartsCenterPlayButton, _super);
+    /**
+    <br>
+    
+    @method setPlayButton
+    @param {}
+    @return void
+    */
     function BarPartsCenterPlayButton(player, controlBar, backgroundImageSetting) {
         var _this = this;
         _super.call(this, player, controlBar);
@@ -485,14 +685,15 @@ var BarPartsCenterPlayButton = (function (_super) {
 
         this.centerPlayButton = centerPlayButton;
 
-        centerPlayButton.addEventListener('click', function () {
+        this.addEvent(centerPlayButton, 'click', function () {
             _this.player.togglePlayPause();
         }, false);
 
-        centerPlayButton.addEventListener('touch', function () {
+        this.addEvent(centerPlayButton, 'touch', function () {
             _this.player.togglePlayPause();
         }, false);
 
+        // hide
         this.player.hookAfterRestart(function () {
             style.visibility = "hidden";
             style.display = "none";
@@ -502,6 +703,7 @@ var BarPartsCenterPlayButton = (function (_super) {
             style.display = "none";
         });
 
+        // view
         this.player.hookAfterPause(function () {
             style.visibility = "visible";
             style.display = "block";
@@ -513,6 +715,10 @@ var BarPartsCenterPlayButton = (function (_super) {
     }
     return BarPartsCenterPlayButton;
 })(BarParts);
+/// <reference path="../jquery.d.ts" />
+/// <reference path="../BarParts.ts" />
+/// <reference path="../TSPlayer.ts" />
+/// <reference path="../Bar.ts" />
 var BarPartsTitleString = (function (_super) {
     __extends(BarPartsTitleString, _super);
     function BarPartsTitleString(player, titleBar, titleString) {
@@ -528,16 +734,62 @@ var BarPartsTitleString = (function (_super) {
     }
     return BarPartsTitleString;
 })(BarParts);
+/// <reference path="../jquery.d.ts" />
+/// <reference path="../BarParts.ts" />
+/// <reference path="../TSPlayer.ts" />
+/// <reference path="../Bar.ts" />
+var BarPartsLoadingImage = (function (_super) {
+    __extends(BarPartsLoadingImage, _super);
+    function BarPartsLoadingImage(player, controlBar, imageSetting) {
+        _super.call(this, player, controlBar);
+
+        var loadingImage = this.createButton(imageSetting);
+        loadingImage.className = 'loadingImage';
+        var style = loadingImage.style;
+        style.visibility = "hidden";
+        style.display = "none";
+        style.position = 'absolute';
+        style.left = (this.player.width - imageSetting.width) / 2 + "px";
+        style.top = (this.player.height - imageSetting.height) / 2 + "px";
+
+        var targetParent = this.player.getMediaParent();
+        targetParent.appendChild(loadingImage);
+        this.loadingImage = loadingImage;
+        this.style = this.loadingImage.style;
+    }
+    BarPartsLoadingImage.prototype.visible = function () {
+        this.style.visibility = "visible";
+        this.style.display = "block";
+    };
+
+    BarPartsLoadingImage.prototype.invisible = function () {
+        this.style.visibility = "hidden";
+        this.style.display = "none";
+    };
+    return BarPartsLoadingImage;
+})(BarParts);
+/// <reference path="BarOption.ts" />
+var TitlePosition;
+(function (TitlePosition) {
+    TitlePosition[TitlePosition["Left"] = 0] = "Left";
+    TitlePosition[TitlePosition["Center"] = 1] = "Center";
+    TitlePosition[TitlePosition["Right"] = 2] = "Right";
+})(TitlePosition || (TitlePosition = {}));
 var TitleBarOption = (function (_super) {
     __extends(TitleBarOption, _super);
     function TitleBarOption() {
         _super.apply(this, arguments);
+        this.displayTitlePosition = 1 /* Center */;
         this.height = 30;
         this.zIndex = 100;
         this.align = "center";
     }
     return TitleBarOption;
 })(BarOption);
+/// <reference path="jquery.d.ts" />
+/// <reference path="Bar.ts" />
+/// <reference path="TitleBarOption.ts" />
+/// <reference path="TSPlayer.ts" />
 var TitleBar = (function (_super) {
     __extends(TitleBar, _super);
     function TitleBar(options, width) {
@@ -552,7 +804,9 @@ var TitleBar = (function (_super) {
         newElement.className = "bar titleBarString";
         newElement.style.width = this.width + "px";
         newElement.style.height = this.options.height + "px";
-        newElement.style.zIndex = this.options.zIndex + "";
+        if (this.options.zIndex) {
+            newElement.style.zIndex = this.options.zIndex + "";
+        }
         newElement.style.textAlign = this.options.align;
         newElement.style.position = "absolute";
 
@@ -560,10 +814,12 @@ var TitleBar = (function (_super) {
 
         this.createdElement = newElement;
 
+        newElement.innerHTML = this.options.displayTitleString;
         return newElement;
     };
     return TitleBar;
 })(Bar);
+/// <reference path="BarOption.ts" />
 var SeekBarOption = (function (_super) {
     __extends(SeekBarOption, _super);
     function SeekBarOption() {
@@ -572,10 +828,13 @@ var SeekBarOption = (function (_super) {
         this.zIndex = 100;
         this.railColor = "#000000";
         this.filledColor = "#FF0000";
-        this.class = "seekBar";
     }
     return SeekBarOption;
 })(BarOption);
+/// <reference path="jquery.d.ts" />
+/// <reference path="Bar.ts" />
+/// <reference path="SeekBarOption.ts" />
+/// <reference path="TSPlayer.ts" />
 var SeekBar = (function (_super) {
     __extends(SeekBar, _super);
     function SeekBar(options, width) {
@@ -586,11 +845,13 @@ var SeekBar = (function (_super) {
         this.className = "bar seekBar";
     }
     SeekBar.prototype.createElement = function (player) {
+        var _this = this;
         var newElement = _super.prototype.createElement.call(this, player);
         newElement.style.width = this.width + "px";
         if (this.options.height) {
             newElement.style.height = this.options.height + "px";
         }
+
         if (this.options.zIndex) {
             newElement.style.zIndex = this.options.zIndex + "";
         }
@@ -622,17 +883,17 @@ var SeekBar = (function (_super) {
 
         seekbar.appendChild(seekbarInner);
 
-        seekbar.addEventListener("click", function (e) {
+        this.addEvent(seekbar, "click", function (e) {
             var clickedX = e.pageX;
-            var moveToSec = player.getDuration() * clickedX / width;
+            var moveToSec = player.getDuration() * clickedX / _this.width;
             player.setCurrentTime(moveToSec);
         }, false);
 
-        player.hookTimeUpdate(function (player, video) {
+        player.hookTimeupdate(function (player, video) {
             var current = video.currentTime;
             var duration = player.getDuration();
             var percent = current / duration;
-            var filledWidth = width * percent;
+            var filledWidth = _this.width * percent;
             seekbarInner.style.width = filledWidth + "px";
         });
         newElement.appendChild(seekbar);
@@ -640,10 +901,24 @@ var SeekBar = (function (_super) {
         return newElement;
     };
 
+    /**
+    <br>
+    
+    @method setMoveDownHeight
+    @param moveDownHeight {number}
+    @return void
+    */
     SeekBar.prototype.setMoveDownHeight = function (moveDownHeight) {
         this.moveDownHeight = moveDownHeight;
     };
 
+    /**
+    <br>
+    
+    @method moveUpBar
+    @param {}
+    @return void
+    */
     SeekBar.prototype.moveDownBar = function () {
         if (this.initTop == null) {
             this.initTop = parseInt(this.createdElement.style.top.replace("px", ""));
@@ -651,14 +926,28 @@ var SeekBar = (function (_super) {
         this.createdElement.style.top = this.initTop + this.moveDownHeight + "px";
     };
 
+    /**
+    <br>
+    
+    @method moveDownBar
+    @param {}
+    @return void
+    */
     SeekBar.prototype.moveUpBar = function () {
         if (this.initTop == null) {
             this.initTop = parseInt(this.createdElement.style.top.replace("px", ""));
         }
         this.createdElement.style.top = this.initTop + "px";
     };
+
+    SeekBar.prototype.resize = function (width, height) {
+        this.createdElement.style.width = width + "px";
+        this.seekbar.style.width = width + "px";
+        this.width = width;
+    };
     return SeekBar;
 })(Bar);
+/// <reference path="BarOption.ts" />
 var ControlBarOption = (function (_super) {
     __extends(ControlBarOption, _super);
     function ControlBarOption() {
@@ -666,10 +955,14 @@ var ControlBarOption = (function (_super) {
         this.displayLeftButtons = ['play', 'volume', 'duration', '::', 'current'];
         this.displayRightButtons = ['fullscreen'];
         this.height = 30;
-        this.zIndex = 120;
+        this.zIndex = null;
     }
     return ControlBarOption;
 })(BarOption);
+/// <reference path="jquery.d.ts" />
+/// <reference path="Bar.ts" />
+/// <reference path="ControlBarOption.ts" />
+/// <reference path="TSPlayer.ts" />
 var ControlBar = (function (_super) {
     __extends(ControlBar, _super);
     function ControlBar(options, width) {
@@ -683,7 +976,6 @@ var ControlBar = (function (_super) {
         var newElement = _super.prototype.createElement.call(this, player);
         newElement.style.width = this.width + "px";
         newElement.style.height = this.options.height + "px";
-        newElement.style.zIndex = this.options.zIndex + "";
         newElement.style.position = "absolute";
 
         var options = this.options;
@@ -697,29 +989,156 @@ var ControlBar = (function (_super) {
     };
     return ControlBar;
 })(Bar);
+/// <reference path="jquery.d.ts" />
+var CookieManager = (function () {
+    function CookieManager() {
+    }
+    CookieManager.get = function (keyName) {
+        var cookieValue = document.cookie;
+        var cookieStart = cookieValue.indexOf(" " + keyName + "=");
+        if (cookieStart == -1) {
+            cookieStart = cookieValue.indexOf(keyName + "=");
+        }
+
+        if (cookieStart == -1) {
+            cookieValue = null;
+        } else {
+            cookieStart = cookieValue.indexOf("=", cookieStart) + 1;
+            var cookieEnd = cookieValue.indexOf(";", cookieStart);
+            if (cookieEnd == -1) {
+                cookieEnd = cookieValue.length;
+            }
+            cookieValue = unescape(cookieValue.substring(cookieStart, cookieEnd));
+        }
+        return cookieValue;
+    };
+
+    CookieManager.remove = function (keyName) {
+        var cookieString = keyName + "=; max-age=0; path=/; domain=" + document.domain + ';';
+        if (navigator.appName == 'Microsoft Internet Explorer') {
+            cookieString += " expires=Thu, 01-Jan-1970 00:00:01 GMT;";
+        }
+        document.cookie = cookieString;
+    };
+
+    CookieManager.set = function (keyName, cookieValue, expireTime) {
+        var cookieString = keyName + '=' + cookieValue + ((expireTime) ? '; max-age=' + expireTime : '') + "; path=/; domain=" + document.domain + ";";
+        if (expireTime && navigator.appName == 'Microsoft Internet Explorer') {
+            var expireTimeMillseconds = expireTime * 1000;
+            var today = new Date();
+            var expireDate = new Date(today.getTime() + (expireTimeMillseconds));
+            cookieString += " expires=" + expireDate.toGMTString() + ";";
+        }
+        document.cookie = cookieString;
+    };
+    return CookieManager;
+})();
+var Debug;
+(function (Debug) {
+    var Console = (function () {
+        function Console() {
+        }
+        Console.prototype.create = function () {
+            if (!this.console) {
+                this.console = document.createElement("Div");
+                var style = this.console.style;
+                style.width = "200px";
+                style.height = "200px";
+                style.top = "20px";
+                style.left = "20px";
+                style.zIndex = "1000000";
+                style.border = "solid 1px black";
+                style.position = "absolute";
+            }
+            document.body.appendChild(this.console);
+        };
+
+        Console.prototype.d = function (message) {
+            this.create();
+            if (this.console.innerHTML) {
+                this.console.innerHTML = "<span style='color:blue'>" + message + "</span><br>" + this.console.innerHTML;
+            } else {
+                this.console.innerHTML = "<span style='color:blue'>" + message + "</span>";
+            }
+        };
+
+        Console.prototype.e = function (message) {
+            this.create();
+            if (this.console.innerHTML) {
+                this.console.innerHTML = "<span style='color:red'>" + message + "</span><br>" + this.console.innerHTML;
+            } else {
+                this.console.innerHTML = "<span style='color:red'>" + message + "</span>";
+            }
+        };
+
+        Console.prototype.clear = function () {
+            this.console.innerHTML = "";
+        };
+        return Console;
+    })();
+    Debug.Console = Console;
+})(Debug || (Debug = {}));
+/// <reference path="AddEvent.ts" />
+/// <reference path="BarParts/PlayPauseButton.ts" />
+/// <reference path="BarParts/FullscreenButton.ts" />
+/// <reference path="BarParts/VolumeButton.ts" />
+/// <reference path="BarParts/Times.ts" />
+/// <reference path="BarParts/CenterPlayButton.ts" />
+/// <reference path="BarParts/TitleString.ts" />
+/// <reference path="BarParts/LoadingImage.ts" />
+/// <reference path="Bar.ts" />
+/// <reference path="TitleBar.ts" />
+/// <reference path="TitleBarOption.ts" />
+/// <reference path="SeekBar.ts" />
+/// <reference path="SeekBarOption.ts" />
+/// <reference path="ControlBar.ts" />
+/// <reference path="ControlBarOption.ts" />
+/// <reference path="CookieManager.ts" />
+/// <reference path="DebugConsole.ts" />
+
 var CreateOption = (function () {
     function CreateOption() {
         this.imagePath = '../image/';
-        this.controleButtons = "controls.svg";
+        this.controlButtons = "controls.svg";
         this.centerButton = "largeButton.svg";
-        this.viewControllBar = true;
+        this.loadingImage = "loading.gif";
+        this.viewControlBar = true;
         this.viewTitleBar = true;
         this.viewSeekBar = true;
         this.displayAlwaysSeekBar = true;
+        this.separateString = " / ";
+        this.displayVolumeFlg = true;
+        this.displayCurrentTime = true;
+        this.displayDuration = true;
+        this.displayFullscreen = true;
         this.titleString = "";
         this.feedInTime = 100;
         this.feedOutTime = 100;
+        this.playWithFullscreen = false;
+        this.automaticCloseFullscreen = true;
+        this.timeFontSize = 10;
+        this.timeMarginTop = 6;
     }
     return CreateOption;
 })();
 
-var TSPlayer = (function () {
+var BarPair = (function () {
+    function BarPair(barObject, bar) {
+        this.barObject = barObject;
+        this.bar = bar;
+    }
+    return BarPair;
+})();
+
+var TSPlayer = (function (_super) {
+    __extends(TSPlayer, _super);
     function TSPlayer(media, createOption, controlOption, titleBarOption, seekBarOption) {
         if (typeof createOption === "undefined") { createOption = new CreateOption(); }
         if (typeof controlOption === "undefined") { controlOption = new ControlBarOption(); }
         if (typeof titleBarOption === "undefined") { titleBarOption = new TitleBarOption(); }
         if (typeof seekBarOption === "undefined") { seekBarOption = new SeekBarOption(); }
         var _this = this;
+        _super.call(this);
         this.setHeight = 0;
         this.isPlaying = false;
         this.isPaused = false;
@@ -730,6 +1149,7 @@ var TSPlayer = (function () {
         this.isIPod = false;
         this.isIPhone = false;
         this.isAndroid = false;
+        this.isCellularPhone = false;
         this.isWebkit = false;
         this.isChorome = false;
         this.isFirefox = false;
@@ -737,6 +1157,12 @@ var TSPlayer = (function () {
         this.canTouch = false;
         this.volume = 0.5;
         this.enableSound = true;
+        this.console = new Debug.Console();
+        this.isEnded = false;
+        this.isInPauseEvent = false;
+        this.isInPlayEvent = false;
+        this.isInEndedEvent = false;
+        this.hookComments = [];
         this.beforePlay = [];
         this.afterPlay = [];
         this.beforePause = [];
@@ -760,136 +1186,275 @@ var TSPlayer = (function () {
 
         this.setInitialVolume(this.volume);
 
-        this.title = new TitleBar(titleBarOption, this.width);
-        this.control = new ControlBar(controlOption, this.width);
-        this.seekbar = new SeekBar(seekBarOption, this.width);
+        var controlBarPair = this.createControlBar(createOption, controlOption);
+        var titleBarPair = this.createTitleBar(createOption, titleBarOption);
+        var seekBarPair = this.createSeekBar(createOption, seekBarOption, titleBarPair.barObject);
 
-        var controlBar = null;
-        var titleBar = null;
-        var seekBar = null;
-        if (createOption.viewControllBar) {
-            controlBar = this.setLowerBar(this.control);
+        this.controlBarPair = controlBarPair;
+        this.titleBarPair = titleBarPair;
+        this.seekBarPair = seekBarPair;
+
+        this.setBarEvents(controlBarPair, titleBarPair, seekBarPair);
+        this.setNoTSPlayerEvents();
+        this.setTSPlayerEvents(createOption);
+
+        if (this.createOption.automaticCloseFullscreen) {
+            this.hookEnded(function (player, video) {
+                _this.exitFullscreen();
+            }, "exit full screen if ended:147");
         }
-        if (createOption.viewTitleBar) {
-            titleBar = this.setUpperBar(this.title);
-        }
-        if (createOption.viewSeekBar) {
-            seekBar = this.setLowerBar(this.seekbar);
-            if (this.title) {
-                this.seekbar.setMoveDownHeight(this.control.getHeight());
-            }
-        }
-        var centerBarPartsSetting = new BarPartsSetting(this.createOption.imagePath + this.createOption.centerButton, 240, 240, 30, 30, 80, 80, new Margin(0, 0, 0, 0));
+        media.load();
+    }
+    TSPlayer.prototype.setBarEvents = function (controlBarPair, titleBarPair, seekBarPair) {
+        var _this = this;
+        var createOption = this.createOption;
+        var media = this.media;
 
-        if (!this.isIOSMobile) {
-            new BarPartsCenterPlayButton(this, this.control, centerBarPartsSetting);
-        }
-        var controlImage = this.createOption.imagePath + this.createOption.controleButtons;
-
-        var playBarPartsSetting = new BarPartsSetting(controlImage, 16, 16, 0, 0, 100, 100, new Margin(7, 5, 7, 5));
-        var pauseBarPartsSetting = new BarPartsSetting(controlImage, 16, 16, 0, -16, 100, 100, new Margin(7, 5, 7, 5));
-        new BarPartsPlayPauseButton(this, this.control, playBarPartsSetting, pauseBarPartsSetting);
-
-        var volumeOnBarPartsSetting = new BarPartsSetting(controlImage, 16, 16, -16, -16, 100, 100, new Margin(7, 5, 7, 5));
-        var volumeOffBarPartsSetting = new BarPartsSetting(controlImage, 16, 16, -16, 0, 100, 100, new Margin(7, 5, 7, 5));
-        new BarPartsVolumeButton(this, this.control, volumeOnBarPartsSetting, volumeOffBarPartsSetting);
-
-        var timeParts = new BarPartsTimes(this, this.control, " / ");
-        this.hookLoadedmetadata(function () {
-            timeParts.setDuration(_this.getDuration());
-        });
-
-        var fullscreenBarPartsSetting = new BarPartsSetting(controlImage, 16, 16, -32, 0, 100, 100, new Margin(7, 5, 7, 5));
-        new BarPartsFullscreenButton(this, this.control, fullscreenBarPartsSetting);
-
-        new BarPartsTitleString(this, this.title, createOption.titleString);
-
-        media.addEventListener('click', function () {
-            _this.togglePauseRestart();
-        }, false);
-        media.addEventListener('touch', function () {
-            _this.togglePauseRestart();
-        }, false);
-
-        media.addEventListener('timeupdate', function () {
-            _this.doMethodArray(_this.timeUpdate);
-        }, false);
-        media.addEventListener('loadedmetadata', function () {
-            _this.doMethodArray(_this.loadedmetadata);
-        }, false);
-
-        media.addEventListener('ended', function () {
-            _this.doMethodArray(_this.ended);
-            _this.isPlaying = false;
-            _this.isPaused = false;
-        }, false);
-
-        media.addEventListener('volumechange', function () {
-            _this.doMethodArray(_this.volumeChange);
-        }, false);
-
-        var displayControll = true;
+        var displayControl = true;
         var barFeedIn = function () {
             if (_this.isPlaying) {
-                _this.title.feedIn(0, createOption.feedInTime);
-                _this.control.feedIn(0, createOption.feedInTime);
-                if (!_this.createOption.displayAlwaysSeekBar) {
-                    _this.seekbar.feedIn(0, createOption.feedInTime);
-                } else {
-                    if (!displayControll) {
-                        _this.seekbar.moveUpBar();
+                titleBarPair.barObject.feedIn(0, createOption.feedInTime);
+                controlBarPair.barObject.feedIn(0, createOption.feedInTime);
+                if (seekBarPair) {
+                    if (!_this.createOption.displayAlwaysSeekBar) {
+                        seekBarPair.barObject.feedIn(0, createOption.feedInTime);
+                    } else {
+                        if (!displayControl) {
+                            seekBarPair.barObject.moveUpBar();
+                        }
                     }
                 }
-                displayControll = true;
+                displayControl = true;
             }
         };
 
         media.addEventListener('mouseover', barFeedIn, false);
-        if (controlBar) {
-            controlBar.addEventListener('mouseover', barFeedIn, false);
+        if (controlBarPair) {
+            controlBarPair.bar.addEventListener('mouseover', barFeedIn, false);
         }
-        if (titleBar) {
-            titleBar.addEventListener('mouseover', barFeedIn, false);
+        if (titleBarPair) {
+            titleBarPair.bar.addEventListener('mouseover', barFeedIn, false);
         }
-        if (seekBar) {
-            seekBar.addEventListener('mouseover', barFeedIn, false);
+        if (seekBarPair) {
+            seekBarPair.bar.addEventListener('mouseover', barFeedIn, false);
         }
 
-        media.addEventListener('mouseout', function () {
+        var barFeedOut = function () {
             if (_this.isPlaying) {
-                _this.title.feedOut(0, createOption.feedOutTime);
-                _this.control.feedOut(0, createOption.feedOutTime);
-                if (!_this.createOption.displayAlwaysSeekBar) {
-                    _this.seekbar.feedOut(0, createOption.feedOutTime);
-                } else {
-                    if (displayControll) {
-                        _this.control.setFeedOutHookOnce(function () {
-                            _this.seekbar.moveDownBar();
-                        });
+                titleBarPair.barObject.feedOut(0, createOption.feedOutTime);
+                controlBarPair.barObject.feedOut(0, createOption.feedOutTime);
+                if (seekBarPair) {
+                    if (!_this.createOption.displayAlwaysSeekBar) {
+                        seekBarPair.barObject.feedOut(0, createOption.feedOutTime);
+                    } else {
+                        if (displayControl) {
+                            controlBarPair.barObject.setFeedOutHookOnce(function () {
+                                seekBarPair.barObject.moveDownBar();
+                            });
+                        }
                     }
                 }
-                displayControll = false;
+                displayControl = false;
             }
-        }, false);
+        };
+        media.addEventListener('mouseout', barFeedOut);
+        if (controlBarPair) {
+            controlBarPair.bar.addEventListener('mouseout', barFeedOut, false);
+        }
+        if (titleBarPair) {
+            titleBarPair.bar.addEventListener('mouseout', barFeedOut, false);
+        }
+        if (seekBarPair) {
+            seekBarPair.bar.addEventListener('mouseout', barFeedOut, false);
+        }
 
         this.hookEnded(function (player, video) {
-            _this.title.feedIn(0, createOption.feedInTime);
-            _this.control.feedIn(0, createOption.feedInTime);
-            if (!_this.createOption.displayAlwaysSeekBar) {
-                _this.seekbar.feedIn(0, createOption.feedInTime);
-            } else {
-                if (!displayControll) {
-                    _this.seekbar.moveUpBar();
+            titleBarPair.barObject.feedIn(0, createOption.feedInTime);
+            controlBarPair.barObject.feedIn(0, createOption.feedInTime);
+            if (seekBarPair) {
+                if (!_this.createOption.displayAlwaysSeekBar) {
+                    seekBarPair.barObject.feedIn(0, createOption.feedInTime);
+                } else {
+                    if (!displayControl) {
+                        seekBarPair.barObject.moveDownBar();
+                    }
                 }
             }
-            displayControll = true;
+            displayControl = true;
         });
-        media.load();
-    }
+    };
+
+    TSPlayer.prototype.setTSPlayerEvents = function (createOption) {
+        var _this = this;
+        var media = this.media;
+        if (this.createOption.playWithFullscreen) {
+            this.hookFullscreenExit(function () {
+                _this.pause(), "exit fullscreen on pause if play with fullscreen";
+            });
+        }
+
+        if (CookieManager.get("muted") == "true") {
+            this.setVolumeOff();
+        }
+
+        /* add events */ this.addEvent(media, 'click', function () {
+            _this.togglePauseRestart();
+        }, false);
+
+        this.addEvent(media, 'touch', function () {
+            _this.togglePauseRestart();
+        }, false);
+
+        this.addEvent(media, 'timeupdate', function () {
+            _this.doMethodArray(_this.timeUpdate);
+        }, false);
+
+        this.addEvent(media, 'loadedmetadata', function () {
+            _this.doMethodArray(_this.loadedmetadata);
+        }, false);
+
+        this.addEvent(media, 'ended', function () {
+            _this.doMethodArray(_this.ended);
+            _this.isPlaying = false;
+            _this.isPaused = false;
+            _this.isEnded = true;
+        }, false);
+
+        this.addEvent(media, 'volumechange', function () {
+            _this.doMethodArray(_this.volumeChange);
+        }, false);
+
+        this.addDocumentEvent("webkitfullscreenchange", function () {
+            if (_this.isFullscreen == true) {
+                _this.doMethodArray(_this.fullscreenExit);
+                _this.isFullscreen = false;
+            }
+            if (_this.createOption.playWithFullscreen) {
+                _this.togglePauseRestart();
+            }
+        });
+
+        this.addDocumentEvent("webkitendfullscreen", function () {
+            _this.doMethodArray(_this.fullscreenExit);
+            _this.isFullscreen = false;
+        });
+    };
+
+    TSPlayer.prototype.createControlBar = function (createOption, controlOption) {
+        var _this = this;
+        if (!createOption.viewControlBar) {
+            return null;
+        }
+        var controlBarObject = new ControlBar(controlOption, this.width);
+        var controlBar = this.setLowerBar(controlBarObject);
+        var centerBarPartsSetting = new BarPartsSetting(this.createOption.imagePath + this.createOption.centerButton, 100, 100, 0, 0, 100, 100, new Margin(0, 0, 0, 0));
+
+        if (!this.isIOSMobile) {
+            new BarPartsCenterPlayButton(this, controlBarObject, centerBarPartsSetting);
+        }
+        var controlImage = this.createOption.imagePath + this.createOption.controlButtons;
+
+        var playBarPartsSetting = new BarPartsSetting(controlImage, 16, 16, 0, 0, 100, 100, new Margin(7, 5, 7, 5));
+        var pauseBarPartsSetting = new BarPartsSetting(controlImage, 16, 16, 0, -16, 100, 100, new Margin(7, 5, 7, 5));
+        new BarPartsPlayPauseButton(this, controlBarObject, playBarPartsSetting, pauseBarPartsSetting);
+
+        if (!this.isCellularPhone) {
+            var volumeOnBarPartsSetting = new BarPartsSetting(controlImage, 16, 16, -16, -16, 100, 100, new Margin(7, 5, 7, 5));
+            var volumeOffBarPartsSetting = new BarPartsSetting(controlImage, 16, 16, -16, 0, 100, 100, new Margin(7, 5, 7, 5));
+            new BarPartsVolumeButton(this, controlBarObject, volumeOnBarPartsSetting, volumeOffBarPartsSetting);
+        }
+
+        var timeParts = new BarPartsTimes(this, controlBarObject, this.createOption.separateString, this.createOption.timeFontSize, this.createOption.timeMarginTop);
+
+        if (this.createOption.displayCurrentTime) {
+            timeParts.setCurrentTime();
+        }
+
+        if (this.createOption.displayDuration) {
+            timeParts.setDuration(this.getDuration());
+
+            if (this.isAndroid) {
+                // if Android , we can get duration after play start
+                this.hookTimeupdate(function () {
+                    timeParts.setDuration(_this.getDuration());
+                }, "get duration for android");
+            } else {
+                this.hookLoadedmetadata(function () {
+                    timeParts.setDuration(_this.getDuration());
+                }, "get duration");
+            }
+        }
+
+        if (this.createOption.displayFullscreen) {
+            var fullscreenBarPartsSetting = new BarPartsSetting(controlImage, 16, 16, -32, 0, 100, 100, new Margin(7, 5, 7, 5));
+            new BarPartsFullscreenButton(this, controlBarObject, fullscreenBarPartsSetting);
+        }
+
+        if (this.isAndroid) {
+            var centerLoadingImageSetting = new BarPartsSetting(this.createOption.imagePath + this.createOption.loadingImage, 100, 100, 0, 0, 100, 100, new Margin(0, 0, 0, 0));
+
+            var loading = new BarPartsLoadingImage(this, controlBarObject, centerLoadingImageSetting);
+            this.hookBeforePlay(function () {
+                loading.visible();
+            }, "display android loading image");
+            this.hookTimeupdate(function () {
+                loading.invisible();
+            }, "hide android loading image");
+        }
+        return new BarPair(controlBarObject, controlBar);
+    };
+
+    TSPlayer.prototype.createSeekBar = function (createOption, seekBarOption, controlBarObject) {
+        if (typeof controlBarObject === "undefined") { controlBarObject = null; }
+        if (!createOption.viewSeekBar) {
+            return null;
+        }
+        var seekBarObject = new SeekBar(seekBarOption, this.width);
+        var seekBar = this.setLowerBar(seekBarObject);
+
+        if (controlBarObject) {
+            seekBarObject.setMoveDownHeight(controlBarObject.getHeight());
+        }
+
+        return new BarPair(seekBarObject, seekBar);
+    };
+
+    TSPlayer.prototype.createTitleBar = function (createOption, titleBarOption) {
+        if (!createOption.viewTitleBar) {
+            return null;
+        }
+        var titleBarObject = new TitleBar(titleBarOption, this.width);
+        var titleBar = this.setUpperBar(titleBarObject);
+
+        new BarPartsTitleString(this, titleBarObject, createOption.titleString);
+        return new BarPair(titleBarObject, titleBar);
+    };
+
+    /**
+    TSPlayer以外のplay/pauseイベントにフックを書く<br>
+    @method setNoTSPlayerEvents
+    @return void
+    */
+    TSPlayer.prototype.setNoTSPlayerEvents = function () {
+        var _this = this;
+        var media = this.media;
+        this.addEvent(media, 'play', function () {
+            if (!_this.isInPlayEvent) {
+                _this.doMethodArray(_this.beforePlay);
+                _this.doMethodArray(_this.afterPlay);
+            }
+        });
+        this.addEvent(media, 'pause', function () {
+            if (!_this.isInPauseEvent) {
+                _this.doMethodArray(_this.beforePause);
+                _this.doMethodArray(_this.afterPause);
+            }
+        });
+    };
+
     TSPlayer.prototype.setCurrentTime = function (moveToSec) {
         var media = this.media;
         media.currentTime = moveToSec;
-        media.play();
     };
 
     TSPlayer.prototype.getCurrentTime = function () {
@@ -898,10 +1463,11 @@ var TSPlayer = (function () {
     };
 
     TSPlayer.prototype.getDuration = function () {
-        if (!this.duration) {
-            this.duration = this.media.duration;
+        var duration = this.media.duration;
+        if (isNaN(duration)) {
+            duration = 0;
         }
-        return this.duration;
+        return duration;
     };
 
     TSPlayer.prototype.setEnvironment = function () {
@@ -927,23 +1493,34 @@ var TSPlayer = (function () {
             this.isIPhone = true;
         }
         if (this.isIOS == false && this.isAndroid == false) {
+            // Windows Phone and others , not implemented
             this.isPC = true;
         }
         if (document.ontouchstart !== undefined) {
             this.canTouch = true;
         }
+
+        this.isCellularPhone = this.isIOSMobile || this.isAndroid;
     };
 
     TSPlayer.prototype.getSize = function () {
         var media = this.media;
         this.width = parseInt(media.style.width.replace('px', ''));
         if (!this.width) {
-            this.width = parseInt(getComputedStyle(media, '').width.replace('px', ''));
+            this.width = parseInt(this.getComputedStyle(media).width.replace('px', ''));
         }
 
         this.height = parseInt(media.style.height.replace('px', ''));
         if (!this.height) {
-            this.height = parseInt(getComputedStyle(media, '').height.replace('px', ''));
+            this.height = parseInt(this.getComputedStyle(media).height.replace('px', ''));
+        }
+    };
+
+    TSPlayer.prototype.getComputedStyle = function (element) {
+        if (window.getComputedStyle) {
+            return getComputedStyle(element, '');
+        } else {
+            return element.currentStyle;
         }
     };
 
@@ -972,7 +1549,7 @@ var TSPlayer = (function () {
         }
         var width = parseInt(mediaParent.style.width.replace('px', ''));
         if (!width) {
-            width = parseInt(getComputedStyle(mediaParent, '').width.replace('px', ''));
+            width = parseInt(this.getComputedStyle(mediaParent).width.replace('px', ''));
         }
 
         var height = screen.height;
@@ -988,6 +1565,13 @@ var TSPlayer = (function () {
         media.volume = volume;
     };
 
+    /**
+    <br>
+    
+    @method getVolume
+    @param {}
+    @return number
+    */
     TSPlayer.prototype.getVolume = function () {
         var media = this.media;
         return media.volume;
@@ -1003,16 +1587,14 @@ var TSPlayer = (function () {
         }
     };
 
+    /**
+    <br>
+    
+    @method enterFullscreen
+    @param {}
+    @return void
+    */
     TSPlayer.prototype.enterFullscreen = function () {
-        if (this.title) {
-            this.title.toggle();
-        }
-        if (this.control) {
-            this.control.toggle();
-        }
-        if (this.seekbar) {
-            this.seekbar.toggle();
-        }
         var mediaParent = this.mediaParent;
         var media = this.media;
         if (media.requestFullscreen) {
@@ -1025,19 +1607,17 @@ var TSPlayer = (function () {
             media.webkitEnterFullScreen();
         }
         this.isFullscreen = true;
-        this.doMethodArray(this.fullscreenExit);
+        this.doMethodArray(this.fullscreenEnter);
     };
 
+    /**
+    <br>
+    
+    @method exitFullscreen
+    @param {}
+    @return void
+    */
     TSPlayer.prototype.exitFullscreen = function () {
-        if (this.title) {
-            this.title.toggle();
-        }
-        if (this.control) {
-            this.control.toggle();
-        }
-        if (this.seekbar) {
-            this.seekbar.toggle();
-        }
         var media = this.media;
         if (document.exitFullscreen) {
             document.exitFullscreen();
@@ -1049,82 +1629,199 @@ var TSPlayer = (function () {
             media.webkitExitFullScreen();
         }
         this.isFullscreen = false;
-        this.doMethodArray(this.fullscreenEnter);
     };
 
-    TSPlayer.prototype.hookBeforePlay = function (hookMethod) {
+    /**
+    <br>
+    
+    @method getHookComments
+    @param hookName {string}
+    @return Array
+    */
+    TSPlayer.prototype.getHookComments = function (hookName) {
+        var returnArray = [];
+        for (var i = 0, arrayLength = this.hookComments.length; i < arrayLength; i++) {
+            var row = this.hookComments[i];
+            if (row.name == hookName) {
+                returnArray.push(row);
+            }
+        }
+        return returnArray;
+    };
+
+    TSPlayer.prototype.hookBeforePlay = function (hookMethod, comment) {
         this.beforePlay.push(hookMethod);
+        this.hookComments.push({
+            method: hookMethod,
+            comment: comment || "",
+            name: "beforePlay"
+        });
     };
 
-    TSPlayer.prototype.hookAfterPlay = function (hookMethod) {
+    TSPlayer.prototype.hookAfterPlay = function (hookMethod, comment) {
         this.afterPlay.push(hookMethod);
+        this.hookComments.push({
+            method: hookMethod,
+            comment: comment || "",
+            name: "afterPlay"
+        });
     };
 
-    TSPlayer.prototype.hookBeforePause = function (hookMethod) {
+    TSPlayer.prototype.hookBeforePause = function (hookMethod, comment) {
         this.beforePause.push(hookMethod);
+        this.hookComments.push({
+            method: hookMethod,
+            comment: comment || "",
+            name: "beforePause"
+        });
     };
 
-    TSPlayer.prototype.hookAfterPause = function (hookMethod) {
+    TSPlayer.prototype.hookAfterPause = function (hookMethod, comment) {
         this.afterPause.push(hookMethod);
+        this.hookComments.push({
+            method: hookMethod,
+            comment: comment || "",
+            name: "afterPause"
+        });
     };
 
-    TSPlayer.prototype.hookBeforeRestart = function (hookMethod) {
+    TSPlayer.prototype.hookBeforeRestart = function (hookMethod, comment) {
         this.beforeRestart.push(hookMethod);
+        this.hookComments.push({
+            method: hookMethod,
+            comment: comment || "",
+            name: "beforeRestart"
+        });
     };
 
-    TSPlayer.prototype.hookAfterRestart = function (hookMethod) {
+    TSPlayer.prototype.hookAfterRestart = function (hookMethod, comment) {
         this.afterRestart.push(hookMethod);
+        this.hookComments.push({
+            method: hookMethod,
+            comment: comment || "",
+            name: "afterRestart"
+        });
     };
 
-    TSPlayer.prototype.hookTimeUpdate = function (hookMethod) {
+    TSPlayer.prototype.hookTimeupdate = function (hookMethod, comment) {
         this.timeUpdate.push(hookMethod);
+        this.hookComments.push({
+            method: hookMethod,
+            comment: comment || "",
+            name: "timeUpdate"
+        });
     };
 
-    TSPlayer.prototype.hookEnded = function (hookMethod) {
+    TSPlayer.prototype.hookEnded = function (hookMethod, comment) {
         this.ended.push(hookMethod);
+        this.hookComments.push({
+            method: hookMethod,
+            comment: comment || "",
+            name: "ended"
+        });
     };
 
-    TSPlayer.prototype.hookFullscreenEnter = function (hookMethod) {
+    TSPlayer.prototype.hookFullscreenEnter = function (hookMethod, comment) {
         this.fullscreenEnter.push(hookMethod);
+        this.hookComments.push({
+            method: hookMethod,
+            comment: comment || "",
+            name: "fullscreenEnter"
+        });
     };
 
-    TSPlayer.prototype.hookFullscreenExit = function (hookMethod) {
+    TSPlayer.prototype.hookFullscreenExit = function (hookMethod, comment) {
         this.fullscreenExit.push(hookMethod);
+        this.hookComments.push({
+            method: hookMethod,
+            comment: comment || "",
+            name: "fullscreenExit"
+        });
     };
 
-    TSPlayer.prototype.hookVolumeChange = function (hookMethod) {
+    TSPlayer.prototype.hookVolumeChange = function (hookMethod, comment) {
         this.volumeChange.push(hookMethod);
+        this.hookComments.push({
+            method: hookMethod,
+            comment: comment || "",
+            name: "volumeChange"
+        });
     };
 
-    TSPlayer.prototype.hookVolumeOn = function (hookMethod) {
+    TSPlayer.prototype.hookVolumeOn = function (hookMethod, comment) {
         this.volumeOn.push(hookMethod);
+        this.hookComments.push({
+            method: hookMethod,
+            comment: comment || "",
+            name: "volumeOn"
+        });
     };
 
-    TSPlayer.prototype.hookVolumeOff = function (hookMethod) {
+    TSPlayer.prototype.hookVolumeOff = function (hookMethod, comment) {
         this.volumeOff.push(hookMethod);
+        this.hookComments.push({
+            method: hookMethod,
+            comment: comment || "",
+            name: "volumeOff"
+        });
     };
 
-    TSPlayer.prototype.hookLoadedmetadata = function (hookMethod) {
+    TSPlayer.prototype.hookLoadedmetadata = function (hookMethod, comment) {
         this.loadedmetadata.push(hookMethod);
+        this.hookComments.push({
+            method: hookMethod,
+            comment: comment || "",
+            name: "loadedmetadata"
+        });
     };
 
+    /**
+    <br>
+    
+    @method setVolumeOn
+    @param {}
+    @return void
+    */
     TSPlayer.prototype.setVolumeOn = function () {
         this.volume = this.media.volume;
-        this.media.muted = true;
+        this.media.muted = false;
+        CookieManager.set("muted", "false");
         this.enableSound = true;
         this.doMethodArray(this.volumeOn);
     };
 
+    /**
+    <br>
+    
+    @method setVolumeOff
+    @param {}
+    @return void
+    */
     TSPlayer.prototype.setVolumeOff = function () {
-        this.media.muted = false;
+        this.media.muted = true;
+        CookieManager.set("muted", "true");
         this.enableSound = false;
         this.doMethodArray(this.volumeOff);
     };
 
+    /**
+    <br>
+    
+    @method toggleVolume
+    @param {}
+    @return void
+    */
     TSPlayer.prototype.toggleVolume = function () {
         this.enableSound ? this.setVolumeOff() : this.setVolumeOn();
     };
 
+    /**
+    <br>
+    
+    @method setVolume
+    @param {}
+    @return void
+    */
     TSPlayer.prototype.setVolume = function (dVolume) {
         var newVolume = this.media.volume + dVolume;
         if (newVolume < 0) {
@@ -1135,6 +1832,7 @@ var TSPlayer = (function () {
         }
         this.media.volume + newVolume;
     };
+
     TSPlayer.prototype.doMethodArray = function (methods) {
         for (var i = 0; i < methods.length; i++) {
             methods[i](this, this.media);
@@ -1149,46 +1847,113 @@ var TSPlayer = (function () {
         }
     };
 
+    /**
+    <br>
+    
+    @method play
+    @param {}
+    @return void
+    */
     TSPlayer.prototype.play = function () {
+        var _this = this;
+        if (this.isEnded) {
+            this.setCurrentTime(0);
+            this.isEnded = false;
+        }
         var media = this.media;
         if (this.isPaused) {
             this.doMethodArray(this.beforeRestart);
         }
         this.doMethodArray(this.beforePlay);
+        if (this.createOption.playWithFullscreen) {
+            this.enterFullscreen();
+        }
+        this.isInPlayEvent = true;
         media.play();
         this.doMethodArray(this.afterPlay);
         if (this.isPaused) {
             this.doMethodArray(this.afterRestart);
         }
-        this.isPlaying = true;
-        this.isPaused = false;
+        if (this.createOption.playWithFullscreen) {
+            this.isPlaying = false;
+            this.isPaused = true;
+        } else {
+            this.isPlaying = true;
+            this.isPaused = false;
+        }
+
+        setTimeout(function () {
+            _this.isInPlayEvent = false;
+        }, 100);
     };
 
+    /**
+    <br>
+    
+    @method pause
+    @param {}
+    @return void
+    */
     TSPlayer.prototype.pause = function () {
+        var _this = this;
         var media = this.media;
         this.doMethodArray(this.beforePause);
+        if (this.createOption.playWithFullscreen) {
+            this.exitFullscreen();
+        }
+        this.isInPauseEvent = true;
         media.pause();
         this.isPaused = true;
         this.doMethodArray(this.afterPause);
         this.isPlaying = false;
+
+        setTimeout(function () {
+            _this.isInPauseEvent = false;
+        }, 100);
     };
 
     TSPlayer.prototype.togglePauseRestart = function () {
+        var _this = this;
         var media = this.media;
         if (!this.isPlaying && this.isPaused) {
+            if (this.isEnded) {
+                this.setCurrentTime(0);
+                this.isEnded = false;
+            }
             this.doMethodArray(this.beforePlay);
             this.doMethodArray(this.beforeRestart);
+            if (this.createOption.playWithFullscreen) {
+                this.exitFullscreen();
+                this.enterFullscreen();
+            }
+            this.isInPlayEvent = true;
             media.play();
             this.doMethodArray(this.afterPlay);
             this.doMethodArray(this.afterRestart);
-            this.isPlaying = true;
-            this.isPaused = false;
+
+            if (this.createOption.playWithFullscreen) {
+                this.isPlaying = false;
+                this.isPaused = true;
+            } else {
+                this.isPlaying = true;
+                this.isPaused = false;
+            }
+            setTimeout(function () {
+                _this.isInPlayEvent = false;
+            }, 100);
         } else if (this.isPlaying) {
             this.doMethodArray(this.beforePause);
+            if (this.createOption.playWithFullscreen) {
+                this.exitFullscreen();
+            }
+            this.isInPauseEvent = true;
             media.pause();
             this.isPaused = true;
             this.doMethodArray(this.afterPause);
             this.isPlaying = false;
+            setTimeout(function () {
+                _this.isInPauseEvent = false;
+            }, 100);
         }
     };
 
@@ -1197,12 +1962,15 @@ var TSPlayer = (function () {
     };
 
     TSPlayer.prototype.setLowerBar = function (barObject) {
-        var bar = barObject.createElement(this);
+        var bar = barObject.getElement();
+        if (bar == null) {
+            bar = barObject.createElement(this);
+        }
 
         var height = parseInt(bar.style.height.replace('px', ''));
         var setHeight = this.setHeight;
         if (!height) {
-            height = parseInt(getComputedStyle(bar, '').height.replace('px', ''));
+            height = parseInt(this.getComputedStyle(bar).height.replace('px', ''));
         }
 
         bar.style.top = (this.height - height - setHeight) + "px";
@@ -1212,6 +1980,13 @@ var TSPlayer = (function () {
         var parentNode = media.parentNode;
         parentNode.appendChild(bar);
         return bar;
+    };
+
+    TSPlayer.prototype.clearLowerBar = function (barObject) {
+        var bar = barObject.getElement();
+        var media = this.media;
+        var parentNode = media.parentNode;
+        parentNode.removeChild(bar);
     };
 
     TSPlayer.prototype.setUpperBar = function (barObject) {
@@ -1231,16 +2006,30 @@ var TSPlayer = (function () {
 
         var height = parseInt(bar.style.height.replace('px', ''));
         if (!height) {
-            height = parseInt(getComputedStyle(bar, '').height.replace('px', ''));
+            height = parseInt(this.getComputedStyle(bar).height.replace('px', ''));
         }
 
         bar.style.top = (screenHeight - height) + "px";
     };
 
+    /**
+    <br>
+    
+    @method getMedia
+    @param {}
+    @return HTMLVideoElement
+    */
     TSPlayer.prototype.getMedia = function () {
         return this.media;
     };
 
+    /**
+    <br>
+    
+    @method getMediaParent
+    @param {}
+    @return HTMLDivElement
+    */
     TSPlayer.prototype.getMediaParent = function () {
         if (this.mediaParent) {
             return this.mediaParent;
@@ -1248,5 +2037,32 @@ var TSPlayer = (function () {
             throw "not yet set parent . ios will not set parent";
         }
     };
+
+    /**
+    <br>
+    
+    @method  resize
+    @param {}
+    @return void
+    */
+    TSPlayer.prototype.resize = function (width, height) {
+        this.media.style.width = width + "px";
+        this.media.style.height = height + "px";
+        this.mediaParent.style.width = width + "px";
+        this.mediaParent.style.height = height + "px";
+
+        this.controlBarPair.barObject.resize(width, height);
+        this.titleBarPair.barObject.resize(width, height);
+        this.seekBarPair.barObject.resize(width, height);
+
+        this.setHeight = 0;
+        this.width = width;
+        this.height = height;
+
+        this.clearLowerBar(this.controlBarPair.barObject);
+        this.clearLowerBar(this.seekBarPair.barObject);
+        this.setLowerBar(this.controlBarPair.barObject);
+        this.setLowerBar(this.seekBarPair.barObject);
+    };
     return TSPlayer;
-})();
+})(AddEvent);
