@@ -1016,19 +1016,28 @@ class TSPlayer extends AddEvent{
         this.mediaParent.style.width = width + "px"
         this.mediaParent.style.height = height + "px"
 
-        this.controlBarPair.barObject.resize(width , height )
-        this.titleBarPair.barObject.resize(width , height )
-        this.seekBarPair.barObject.resize(width , height )
+        if(this.titleBarPair){
+            this.titleBarPair.barObject.resize(width , height )
+        }
 
         this.setHeight = 0
         this.width = width 
         this.height = height 
-
-        this.clearLowerBar(this.controlBarPair.barObject);
-        this.clearLowerBar(this.seekBarPair.barObject);
-        this.setLowerBar(this.controlBarPair.barObject);
-        this.setLowerBar(this.seekBarPair.barObject);
         
-        this.centerButton.resize(width , height)
+        if(this.controlBarPair){
+            this.controlBarPair.barObject.resize(width , height )
+            this.clearLowerBar(this.controlBarPair.barObject);
+            this.setLowerBar(this.controlBarPair.barObject);
+        }
+
+        if(this.seekBarPair){
+            this.seekBarPair.barObject.resize(width , height )
+            this.clearLowerBar(this.seekBarPair.barObject);
+            this.setLowerBar(this.seekBarPair.barObject);
+        }
+        
+        if(this.centerButton){
+            this.centerButton.resize(width , height)
+        }
     }
 }
