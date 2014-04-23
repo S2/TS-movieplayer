@@ -66,8 +66,6 @@ class CreateOption{
     playWithFullscreen         : boolean = false
     automaticCloseFullscreen   : boolean = true
 
-    centerButton : BarPartsCenterPlayButton
-
     timeFontSize         : number = 10 
     timeMarginTop        : number = 6
 }
@@ -117,6 +115,8 @@ class TSPlayer extends AddEvent{
     controlBarPair : BarPair
     seekBarPair : BarPair
     titleBarPair : BarPair
+
+    barPartsCenterButton : BarPartsCenterPlayButton
 
     isInPauseEvent = false
     isInPlayEvent  = false
@@ -299,7 +299,7 @@ class TSPlayer extends AddEvent{
         var centerBarPartsSetting = new BarPartsSetting(this.createOption.imagePath + this.createOption.centerButton  , 100 , 100 , 0 , 0 , 100 , 100 , new Margin(0 , 0 , 0 , 0));
 
         if(!this.isIOSMobile){
-            this.centerButton = new BarPartsCenterPlayButton(this , controlBarObject , centerBarPartsSetting);
+            this.barPartsCenterButton = new BarPartsCenterPlayButton(this , controlBarObject , centerBarPartsSetting);
         }
         var controlImage = this.createOption.imagePath + this.createOption.controlButtons
 
@@ -1036,8 +1036,8 @@ class TSPlayer extends AddEvent{
             this.setLowerBar(this.seekBarPair.barObject);
         }
         
-        if(this.centerButton){
-            this.centerButton.resize(width , height)
+        if(this.barPartsCenterButton){
+            this.barPartsCenterButton.resize(width , height)
         }
     }
 }
