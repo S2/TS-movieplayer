@@ -276,22 +276,66 @@ var Bar = (function (_super) {
 /// <reference path="jquery.d.ts" />
 /// <reference path="TSPlayer.ts" />
 /// <reference path="Bar.ts" />
-var BarPartsSetting = (function () {
-    function BarPartsSetting(src, width, height, top, left, scaleWidth, scaleHeight, margin) {
-        if (typeof top === "undefined") { top = 0; }
-        if (typeof left === "undefined") { left = 0; }
-        if (typeof scaleWidth === "undefined") { scaleWidth = 100; }
-        if (typeof scaleHeight === "undefined") { scaleHeight = 100; }
-        if (typeof margin === "undefined") { margin = new Margin(0, 0); }
-        this.src = src;
+var Size = (function () {
+    function Size(width, height) {
+        if (typeof width === "undefined") { width = 0; }
+        if (typeof height === "undefined") { height = 0; }
         this.width = width;
         this.height = height;
+    }
+    return Size;
+})();
+
+var BannerPosition = (function () {
+    function BannerPosition(top, left) {
+        if (typeof top === "undefined") { top = 0; }
+        if (typeof left === "undefined") { left = 0; }
         this.top = top;
         this.left = left;
-        this.scaleWidth = scaleWidth;
-        this.scaleHeight = scaleHeight;
+    }
+    return BannerPosition;
+})();
+
+var Scale = (function () {
+    function Scale(scaleWidthPercent, scaleHeightPercent) {
+        if (typeof scaleWidthPercent === "undefined") { scaleWidthPercent = 0; }
+        if (typeof scaleHeightPercent === "undefined") { scaleHeightPercent = 0; }
+        if (scaleWidthPercent > 100) {
+            throw ("scaleWidthPercent must be < 100");
+        }
+        if (scaleHeightPercent > 100) {
+            throw ("scaleHeightPercent must be < 100");
+        }
+        this.scaleWidthPercent = scaleWidthPercent;
+        this.scaleHeightPercent = scaleHeightPercent;
+    }
+    return Scale;
+})();
+
+var BarPartsSetting = (function () {
+    function BarPartsSetting(size, position, scale, margin) {
+        if (typeof size === "undefined") { size = new Size(); }
+        if (typeof position === "undefined") { position = new BannerPosition(); }
+        if (typeof scale === "undefined") { scale = new Scale(); }
+        if (typeof margin === "undefined") { margin = new Margin(0, 0); }
+        this.width = size.width;
+        this.height = size.height;
+        this.top = position.top;
+        this.left = position.left;
+        this.scaleWidth = scale.scaleWidthPercent;
+        this.scaleHeight = scale.scaleHeightPercent;
         this.margin = margin;
     }
+    /**
+    <br>
+    
+    @method setSrc
+    @param {}
+    @return void
+    */
+    BarPartsSetting.prototype.setSrc = function (src) {
+        this.src = src;
+    };
     return BarPartsSetting;
 })();
 
@@ -1162,6 +1206,13 @@ var TSPlayer = (function (_super) {
         this.isInPauseEvent = false;
         this.isInPlayEvent = false;
         this.isInEndedEvent = false;
+        this.centerBarPartsSetting = new BarPartsSetting(new Size(100, 100), new BannerPosition(0, 0), new Scale(100, 100), new Margin(0, 0, 0, 0));
+        this.playBarPartsSetting = new BarPartsSetting(new Size(16, 16), new BannerPosition(0, 0), new Scale(100, 100), new Margin(7, 5, 7, 5));
+        this.pauseBarPartsSetting = new BarPartsSetting(new Size(16, 16), new BannerPosition(0, -16), new Scale(100, 100), new Margin(7, 5, 7, 5));
+        this.volumeOnBarPartsSetting = new BarPartsSetting(new Size(16, 16), new BannerPosition(-16, -16), new Scale(100, 100), new Margin(7, 5, 7, 5));
+        this.volumeOffBarPartsSetting = new BarPartsSetting(new Size(16, 16), new BannerPosition(-16, 0), new Scale(100, 100), new Margin(7, 5, 7, 5));
+        this.fullscreenBarPartsSetting = new BarPartsSetting(new Size(16, 16), new BannerPosition(-32, 0), new Scale(100, 100), new Margin(7, 5, 7, 5));
+        this.centerLoadingImageSetting = new BarPartsSetting(new Size(100, 100), new BannerPosition(0, 0), new Scale(100, 100), new Margin(0, 0, 0, 0));
         this.hookComments = [];
         this.beforePlay = [];
         this.afterPlay = [];
@@ -1347,21 +1398,24 @@ var TSPlayer = (function (_super) {
         }
         var controlBarObject = new ControlBar(controlOption, this.width);
         var controlBar = this.setLowerBar(controlBarObject);
-        var centerBarPartsSetting = new BarPartsSetting(this.createOption.imagePath + this.createOption.centerButton, 100, 100, 0, 0, 100, 100, new Margin(0, 0, 0, 0));
-
-        if (!this.isIOSMobile) {
-            this.barPartsCenterButton = new BarPartsCenterPlayButton(this, controlBarObject, centerBarPartsSetting);
-        }
         var controlImage = this.createOption.imagePath + this.createOption.controlButtons;
 
-        var playBarPartsSetting = new BarPartsSetting(controlImage, 16, 16, 0, 0, 100, 100, new Margin(7, 5, 7, 5));
-        var pauseBarPartsSetting = new BarPartsSetting(controlImage, 16, 16, 0, -16, 100, 100, new Margin(7, 5, 7, 5));
-        new BarPartsPlayPauseButton(this, controlBarObject, playBarPartsSetting, pauseBarPartsSetting);
+        this.centerBarPartsSetting.setSrc(this.createOption.imagePath + this.createOption.centerButton);
+        this.playBarPartsSetting.setSrc(controlImage);
+        this.pauseBarPartsSetting.setSrc(controlImage);
+        this.volumeOnBarPartsSetting.setSrc(controlImage);
+        this.volumeOffBarPartsSetting.setSrc(controlImage);
+        this.fullscreenBarPartsSetting.setSrc(controlImage);
+        this.centerLoadingImageSetting.setSrc(this.createOption.imagePath + this.createOption.loadingImage);
+
+        if (!this.isIOSMobile) {
+            this.barPartsCenterButton = new BarPartsCenterPlayButton(this, controlBarObject, this.centerBarPartsSetting);
+        }
+
+        new BarPartsPlayPauseButton(this, controlBarObject, this.playBarPartsSetting, this.pauseBarPartsSetting);
 
         if (!this.isCellularPhone) {
-            var volumeOnBarPartsSetting = new BarPartsSetting(controlImage, 16, 16, -16, -16, 100, 100, new Margin(7, 5, 7, 5));
-            var volumeOffBarPartsSetting = new BarPartsSetting(controlImage, 16, 16, -16, 0, 100, 100, new Margin(7, 5, 7, 5));
-            new BarPartsVolumeButton(this, controlBarObject, volumeOnBarPartsSetting, volumeOffBarPartsSetting);
+            new BarPartsVolumeButton(this, controlBarObject, this.volumeOnBarPartsSetting, this.volumeOffBarPartsSetting);
         }
 
         var timeParts = new BarPartsTimes(this, controlBarObject, this.createOption.separateString, this.createOption.timeFontSize, this.createOption.timeMarginTop);
@@ -1386,14 +1440,11 @@ var TSPlayer = (function (_super) {
         }
 
         if (this.createOption.displayFullscreen) {
-            var fullscreenBarPartsSetting = new BarPartsSetting(controlImage, 16, 16, -32, 0, 100, 100, new Margin(7, 5, 7, 5));
-            new BarPartsFullscreenButton(this, controlBarObject, fullscreenBarPartsSetting);
+            new BarPartsFullscreenButton(this, controlBarObject, this.fullscreenBarPartsSetting);
         }
 
         if (this.isAndroid) {
-            var centerLoadingImageSetting = new BarPartsSetting(this.createOption.imagePath + this.createOption.loadingImage, 100, 100, 0, 0, 100, 100, new Margin(0, 0, 0, 0));
-
-            var loading = new BarPartsLoadingImage(this, controlBarObject, centerLoadingImageSetting);
+            var loading = new BarPartsLoadingImage(this, controlBarObject, this.centerLoadingImageSetting);
             this.hookBeforePlay(function () {
                 loading.visible();
             }, "display android loading image");

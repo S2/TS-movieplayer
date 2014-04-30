@@ -122,6 +122,14 @@ class TSPlayer extends AddEvent{
     isInPlayEvent  = false
     isInEndedEvent = false
     
+    centerBarPartsSetting     = new BarPartsSetting(new Size(100 , 100) , new BannerPosition(0 , 0)     , new Scale(100 , 100) , new Margin(0 , 0 , 0 , 0));
+    playBarPartsSetting       = new BarPartsSetting(new Size(16 , 16)   , new BannerPosition(0 , 0)     , new Scale(100 , 100) , new Margin(7 , 5 , 7 , 5));
+    pauseBarPartsSetting      = new BarPartsSetting(new Size(16 , 16)   , new BannerPosition(0 , -16)   , new Scale(100 , 100) , new Margin(7 , 5 , 7 , 5));
+    volumeOnBarPartsSetting   = new BarPartsSetting(new Size(16 , 16)   , new BannerPosition(-16 , -16) , new Scale(100 , 100) , new Margin(7 , 5 , 7 , 5));
+    volumeOffBarPartsSetting  = new BarPartsSetting(new Size(16 , 16)   , new BannerPosition(-16 , 0)   , new Scale(100 , 100) , new Margin(7 , 5 , 7 , 5));
+    fullscreenBarPartsSetting = new BarPartsSetting(new Size(16 , 16)   , new BannerPosition(-32  , 0)  , new Scale(100 , 100) , new Margin(7 , 5 , 7 , 5));
+    centerLoadingImageSetting = new BarPartsSetting(new Size(100 , 100) , new BannerPosition(0 , 0)     , new Scale(100 , 100) , new Margin(0 , 0 , 0 , 0));
+
     constructor(media:HTMLVideoElement ,  
             createOption:CreateOption      = new CreateOption(), 
             controlOption:ControlBarOption = new ControlBarOption() ,
@@ -289,28 +297,31 @@ class TSPlayer extends AddEvent{
             this.isFullscreen = false
         });
     }
-
+    
     private createControlBar(createOption : CreateOption , controlOption : ControlBarOption) : BarPair{
         if(!createOption.viewControlBar){
             return null
         }
         var controlBarObject = new ControlBar(controlOption , this.width);
         var controlBar = this.setLowerBar(controlBarObject);
-        var centerBarPartsSetting = new BarPartsSetting(this.createOption.imagePath + this.createOption.centerButton  , 100 , 100 , 0 , 0 , 100 , 100 , new Margin(0 , 0 , 0 , 0));
-
-        if(!this.isIOSMobile){
-            this.barPartsCenterButton = new BarPartsCenterPlayButton(this , controlBarObject , centerBarPartsSetting);
-        }
         var controlImage = this.createOption.imagePath + this.createOption.controlButtons
 
-        var playBarPartsSetting = new BarPartsSetting(controlImage  , 16 , 16 , 0 , 0 , 100 , 100 , new Margin(7 , 5 , 7 , 5));
-        var pauseBarPartsSetting = new BarPartsSetting(controlImage , 16 , 16 , 0 , -16  , 100 , 100 , new Margin(7 , 5 , 7 , 5));
-        new BarPartsPlayPauseButton(this , controlBarObject , playBarPartsSetting , pauseBarPartsSetting );
+        this.centerBarPartsSetting.setSrc(this.createOption.imagePath + this.createOption.centerButton);
+        this.playBarPartsSetting.setSrc(controlImage);
+        this.pauseBarPartsSetting.setSrc(controlImage);
+        this.volumeOnBarPartsSetting.setSrc(controlImage);
+        this.volumeOffBarPartsSetting.setSrc(controlImage);
+        this.fullscreenBarPartsSetting.setSrc(controlImage);
+        this.centerLoadingImageSetting.setSrc(this.createOption.imagePath + this.createOption.loadingImage);
+
+        if(!this.isIOSMobile){
+            this.barPartsCenterButton = new BarPartsCenterPlayButton(this , controlBarObject , this.centerBarPartsSetting);
+        }
+
+        new BarPartsPlayPauseButton(this , controlBarObject , this.playBarPartsSetting , this.pauseBarPartsSetting );
         
         if(!this.isCellularPhone){
-            var volumeOnBarPartsSetting  = new BarPartsSetting(controlImage , 16 , 16 , -16 , -16  , 100 , 100 , new Margin(7 , 5 , 7 , 5));
-            var volumeOffBarPartsSetting = new BarPartsSetting(controlImage , 16 , 16 , -16 , 0    , 100 , 100 , new Margin(7 , 5 , 7 , 5));
-            new BarPartsVolumeButton(this , controlBarObject , volumeOnBarPartsSetting , volumeOffBarPartsSetting);
+            new BarPartsVolumeButton(this , controlBarObject , this.volumeOnBarPartsSetting , this.volumeOffBarPartsSetting);
         }
 
         var timeParts = new BarPartsTimes(this , controlBarObject , 
@@ -336,14 +347,12 @@ class TSPlayer extends AddEvent{
         }
 
         if(this.createOption.displayFullscreen){
-            var fullscreenBarPartsSetting = new BarPartsSetting(controlImage , 16 , 16 , -32  , 0 , 100 , 100 , new Margin(7 , 5 , 7 , 5));
-            new BarPartsFullscreenButton(this , controlBarObject , fullscreenBarPartsSetting);
+            new BarPartsFullscreenButton(this , controlBarObject , this.fullscreenBarPartsSetting);
         }
 
         if(this.isAndroid){
-            var centerLoadingImageSetting = new BarPartsSetting(this.createOption.imagePath + this.createOption.loadingImage , 100 , 100 , 0 , 0 , 100 , 100 , new Margin(0 , 0 , 0 , 0));
 
-            var loading = new BarPartsLoadingImage(this , controlBarObject , centerLoadingImageSetting);
+            var loading = new BarPartsLoadingImage(this , controlBarObject , this.centerLoadingImageSetting);
             this.hookBeforePlay(()=>{
                 loading.visible();
             } , "display android loading image");

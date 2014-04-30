@@ -2,6 +2,39 @@
 /// <reference path="TSPlayer.ts" />
 /// <reference path="Bar.ts" />
 
+class Size{
+    width : number
+    height : number
+    constructor(width : number = 0 , height : number = 0){
+        this.width = width
+        this.height = height
+    }
+}
+
+class BannerPosition{
+    top   : number
+    left : number
+    constructor(top : number = 0 , left : number = 0){
+        this.top = top
+        this.left = left
+    }
+}
+
+class Scale{
+    scaleWidthPercent  : number
+    scaleHeightPercent : number
+    constructor(scaleWidthPercent : number = 0 , scaleHeightPercent : number = 0){
+        if(scaleWidthPercent > 100){
+            throw("scaleWidthPercent must be < 100")
+        }
+        if(scaleHeightPercent > 100){
+            throw("scaleHeightPercent must be < 100")
+        }
+        this.scaleWidthPercent = scaleWidthPercent;
+        this.scaleHeightPercent = scaleHeightPercent;
+    }
+}
+
 class BarPartsSetting{
     src         :  string;
     width       :  number;
@@ -11,15 +44,25 @@ class BarPartsSetting{
     scaleWidth  :  number;
     scaleHeight :  number;
     margin      :  Margin;
-    constructor(src , width , height , top = 0 , left = 0, scaleWidth = 100 , scaleHeight = 100 , margin : Margin = new Margin(0 , 0)){
-        this.src         = src
-        this.width       = width
-        this.height      = height
-        this.top         = top
-        this.left        = left
-        this.scaleWidth  = scaleWidth
-        this.scaleHeight = scaleHeight
+    constructor(size : Size = new Size() , position : BannerPosition = new BannerPosition() , scale : Scale = new Scale() , margin : Margin = new Margin(0 , 0)){
+        this.width       = size.width
+        this.height      = size.height
+        this.top         = position.top
+        this.left        = position.left
+        this.scaleWidth  = scale.scaleWidthPercent
+        this.scaleHeight = scale.scaleHeightPercent
         this.margin      = margin;
+    }
+
+    /**
+        <br>
+        
+        @method setSrc 
+        @param {} 
+        @return void
+    */
+    public setSrc(src):void{
+        this.src         = src
     }
 }
 
