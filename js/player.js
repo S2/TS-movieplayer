@@ -662,13 +662,6 @@ var BarPartsTimes = (function (_super) {
 /// <reference path="../Bar.ts" />
 var BarPartsCenterPlayButton = (function (_super) {
     __extends(BarPartsCenterPlayButton, _super);
-    /**
-    <br>
-    
-    @method setPlayButton
-    @param {}
-    @return void
-    */
     function BarPartsCenterPlayButton(player, controlBar, backgroundImageSetting) {
         var _this = this;
         _super.call(this, player, controlBar);
@@ -712,7 +705,14 @@ var BarPartsCenterPlayButton = (function (_super) {
             style.visibility = "visible";
             style.display = "block";
         });
+        this.centerPlayButton = centerPlayButton;
+        this.backgroundImageSetting = backgroundImageSetting;
     }
+    BarPartsCenterPlayButton.prototype.resize = function (width, height) {
+        var style = this.centerPlayButton.style;
+        style.left = (width - this.backgroundImageSetting.width) / 2 + "px";
+        style.top = (height - this.backgroundImageSetting.height) / 2 + "px";
+    };
     return BarPartsCenterPlayButton;
 })(BarParts);
 /// <reference path="../jquery.d.ts" />
@@ -1350,7 +1350,7 @@ var TSPlayer = (function (_super) {
         var centerBarPartsSetting = new BarPartsSetting(this.createOption.imagePath + this.createOption.centerButton, 100, 100, 0, 0, 100, 100, new Margin(0, 0, 0, 0));
 
         if (!this.isIOSMobile) {
-            new BarPartsCenterPlayButton(this, controlBarObject, centerBarPartsSetting);
+            this.barPartsCenterButton = new BarPartsCenterPlayButton(this, controlBarObject, centerBarPartsSetting);
         }
         var controlImage = this.createOption.imagePath + this.createOption.controlButtons;
 
@@ -2051,18 +2051,29 @@ var TSPlayer = (function (_super) {
         this.mediaParent.style.width = width + "px";
         this.mediaParent.style.height = height + "px";
 
-        this.controlBarPair.barObject.resize(width, height);
-        this.titleBarPair.barObject.resize(width, height);
-        this.seekBarPair.barObject.resize(width, height);
+        if (this.titleBarPair) {
+            this.titleBarPair.barObject.resize(width, height);
+        }
 
         this.setHeight = 0;
         this.width = width;
         this.height = height;
 
-        this.clearLowerBar(this.controlBarPair.barObject);
-        this.clearLowerBar(this.seekBarPair.barObject);
-        this.setLowerBar(this.controlBarPair.barObject);
-        this.setLowerBar(this.seekBarPair.barObject);
+        if (this.controlBarPair) {
+            this.controlBarPair.barObject.resize(width, height);
+            this.clearLowerBar(this.controlBarPair.barObject);
+            this.setLowerBar(this.controlBarPair.barObject);
+        }
+
+        if (this.seekBarPair) {
+            this.seekBarPair.barObject.resize(width, height);
+            this.clearLowerBar(this.seekBarPair.barObject);
+            this.setLowerBar(this.seekBarPair.barObject);
+        }
+
+        if (this.barPartsCenterButton) {
+            this.barPartsCenterButton.resize(width, height);
+        }
     };
     return TSPlayer;
 })(AddEvent);
