@@ -236,7 +236,7 @@ class TSPlayer extends AddEvent{
                     seekBarPair.barObject.feedIn(0 , createOption.feedInTime);
                 }else{
                     if(!displayControl){
-                        (<SeekBar>seekBarPair.barObject).moveDownBar();
+                        (<SeekBar>seekBarPair.barObject).moveUpBar();
                     }
                 }
             }

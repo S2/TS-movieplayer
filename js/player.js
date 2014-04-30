@@ -1327,7 +1327,7 @@ var TSPlayer = (function (_super) {
                     seekBarPair.barObject.feedIn(0, createOption.feedInTime);
                 } else {
                     if (!displayControl) {
-                        seekBarPair.barObject.moveDownBar();
+                        seekBarPair.barObject.moveUpBar();
                     }
                 }
             }
