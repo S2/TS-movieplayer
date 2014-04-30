@@ -20,44 +20,44 @@ class Bar extends AddEvent{
         return element;
     }
     
-    private inFeedOut : boolean = false;
-    public feedOut(waitSeconds:number , feedOutSeconds:number){
+    private inFadeOut : boolean = false;
+    public fadeOut(waitSeconds:number , fadeOutSeconds:number){
         if(this.createdElement){
             var element:HTMLElement = this.createdElement;
             var currentAlpha = Number(element.style.opacity);
-            var unitGradAlpha = currentAlpha / feedOutSeconds;
+            var unitGradAlpha = currentAlpha / fadeOutSeconds;
             var setGradAlpha = () => {
-                if(!this.inFeedOut){return;}
+                if(!this.inFadeOut){return;}
                 currentAlpha -= unitGradAlpha;
                 element.style.opacity = currentAlpha.toString();
                 if(currentAlpha > 0){
                     setTimeout(setGradAlpha , 1);
                 }else{
                     element.style.opacity = "0";
-                    this.inFeedOut = false;
+                    this.inFadeOut = false;
                     this.eventEnable = false;
                     element.style.opacity = "0";
-                    for( var i = 0 , arrayLength = this.feedOutHook.length ; i < arrayLength ; i++){
-                        var method = this.feedOutHook[i];
+                    for( var i = 0 , arrayLength = this.fadeOutHook.length ; i < arrayLength ; i++){
+                        var method = this.fadeOutHook[i];
                         method();
                     }
-                    for( var i = 0 , arrayLength = this.feedOutHookOnce.length ; i < arrayLength ; i++){
-                        var method = this.feedOutHookOnce[i];
+                    for( var i = 0 , arrayLength = this.fadeOutHookOnce.length ; i < arrayLength ; i++){
+                        var method = this.fadeOutHookOnce[i];
                         method();
                     }
-                    this.feedOutHookOnce = [];
+                    this.fadeOutHookOnce = [];
                 }
             };
-            this.inFeedOut = true;
-            this.inFeedIn = false;
+            this.inFadeOut = true;
+            this.inFadeIn = false;
             setTimeout(() => {
                 setGradAlpha()
             } , waitSeconds);
         }
     }
 
-    private inFeedIn : boolean = false;
-    public feedIn(waitSeconds:number , feedOutSeconds:number){
+    private inFadeIn : boolean = false;
+    public fadeIn(waitSeconds:number , fadeOutSeconds:number){
         if(this.createdElement){
             var element:HTMLElement = this.createdElement;
             var currentAlpha = Number(element.style.opacity);
@@ -65,27 +65,27 @@ class Bar extends AddEvent{
             if(currentAlpha > maxAlpha ){
                 return;
             }
-            var unitGradAlpha = maxAlpha - currentAlpha / feedOutSeconds;
+            var unitGradAlpha = maxAlpha - currentAlpha / fadeOutSeconds;
             var setGradAlpha = () => {
                 currentAlpha += unitGradAlpha;
                 element.style.opacity = currentAlpha.toString();
-                if(!this.inFeedIn){return}
+                if(!this.inFadeIn){return}
                 if(currentAlpha < maxAlpha){
                     setTimeout(setGradAlpha , 1);
                 }else{
                     element.style.opacity = maxAlpha + "";
-                    for( var i = 0 , arrayLength = this.feedInHook.length ; i < arrayLength ; i++){
-                        var method = this.feedInHook[i];
+                    for( var i = 0 , arrayLength = this.fadeInHook.length ; i < arrayLength ; i++){
+                        var method = this.fadeInHook[i];
                         method();
                     }
-                    for( var i = 0 , arrayLength = this.feedInHookOnce.length ; i < arrayLength ; i++){
-                        var method = this.feedInHookOnce[i];
+                    for( var i = 0 , arrayLength = this.fadeInHookOnce.length ; i < arrayLength ; i++){
+                        var method = this.fadeInHookOnce[i];
                         method();
                     }
                 }
             };
-            this.inFeedOut = false;
-            this.inFeedIn = true;
+            this.inFadeOut = false;
+            this.inFadeIn = true;
             this.eventEnable = true;
 
             setTimeout(() => {
@@ -97,35 +97,35 @@ class Bar extends AddEvent{
     /**
         <br>
         
-        @method setFeedInHook 
+        @method setFadeInHook 
         @param {} 
         @return void
     */
-    private feedInHook : Array<()=>void> = []
-    public setFeedInHook(hookMethod:()=>void):void{
-        this.feedInHook.push(hookMethod)
+    private fadeInHook : Array<()=>void> = []
+    public setFadeInHook(hookMethod:()=>void):void{
+        this.fadeInHook.push(hookMethod)
     }
 
-    private feedInHookOnce : Array<()=>void> = []
-    public setFeedInHookOnce(hookMethod:()=>void):void{
-        this.feedInHookOnce.push(hookMethod)
+    private fadeInHookOnce : Array<()=>void> = []
+    public setFadeInHookOnce(hookMethod:()=>void):void{
+        this.fadeInHookOnce.push(hookMethod)
     }
 
     /**
         <br>
         
-        @method setFeedOutHook 
+        @method setFadeOutHook 
         @param {} 
         @return void
     */
-    private feedOutHook : Array<()=>void> = []
-    public setFeedOutHook(hookMethod:()=>void):void{
-        this.feedOutHook.push(hookMethod)
+    private fadeOutHook : Array<()=>void> = []
+    public setFadeOutHook(hookMethod:()=>void):void{
+        this.fadeOutHook.push(hookMethod)
     }
 
-    private feedOutHookOnce : Array<()=>void> = [];
-    public setFeedOutHookOnce(hookMethod:()=>void):void{
-        this.feedOutHookOnce.push(hookMethod)
+    private fadeOutHookOnce : Array<()=>void> = [];
+    public setFadeOutHookOnce(hookMethod:()=>void):void{
+        this.fadeOutHookOnce.push(hookMethod)
     }
    
     public setEvent(element:HTMLElement , eventName:string , eventFunction ){

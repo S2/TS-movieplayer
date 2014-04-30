@@ -61,8 +61,8 @@ class CreateOption{
     displayFullscreen  : boolean = true
 
     titleString                : string = ""
-    feedInTime                 : number = 100
-    feedOutTime                : number = 100
+    fadeInTime                 : number = 100
+    fadeOutTime                : number = 100
     playWithFullscreen         : boolean = false
     automaticCloseFullscreen   : boolean = true
 
@@ -171,13 +171,13 @@ class TSPlayer extends AddEvent{
         var media = this.media
 
         var displayControl = true;
-        var barFeedIn = () => {
+        var barFadeIn = () => {
             if(this.isPlaying){
-                titleBarPair.barObject.feedIn(0 , createOption.feedInTime);
-                controlBarPair.barObject.feedIn(0 , createOption.feedInTime);
+                titleBarPair.barObject.fadeIn(0 , createOption.fadeInTime);
+                controlBarPair.barObject.fadeIn(0 , createOption.fadeInTime);
                 if(seekBarPair){
                     if(!this.createOption.displayAlwaysSeekBar){
-                        seekBarPair.barObject.feedIn(0 , createOption.feedInTime);
+                        seekBarPair.barObject.fadeIn(0 , createOption.fadeInTime);
                     }else{
                         if(!displayControl){
                             (<SeekBar>seekBarPair.barObject).moveUpBar();
@@ -188,27 +188,27 @@ class TSPlayer extends AddEvent{
             }
         }
 
-        media.addEventListener('mouseover' , barFeedIn ,false);
+        media.addEventListener('mouseover' , barFadeIn ,false);
         if(controlBarPair){
-            controlBarPair.bar.addEventListener('mouseover' , barFeedIn ,false);
+            controlBarPair.bar.addEventListener('mouseover' , barFadeIn ,false);
         }
         if(titleBarPair){
-            titleBarPair.bar.addEventListener('mouseover' , barFeedIn ,false);
+            titleBarPair.bar.addEventListener('mouseover' , barFadeIn ,false);
         }
         if(seekBarPair){
-            seekBarPair.bar.addEventListener('mouseover' , barFeedIn ,false);
+            seekBarPair.bar.addEventListener('mouseover' , barFadeIn ,false);
         }
 
-        var barFeedOut = () => {
+        var barFadeOut = () => {
             if(this.isPlaying){
-                titleBarPair.barObject.feedOut(0 , createOption.feedOutTime);
-                controlBarPair.barObject.feedOut(0 , createOption.feedOutTime);
+                titleBarPair.barObject.fadeOut(0 , createOption.fadeOutTime);
+                controlBarPair.barObject.fadeOut(0 , createOption.fadeOutTime);
                 if(seekBarPair){
                     if(!this.createOption.displayAlwaysSeekBar){
-                        seekBarPair.barObject.feedOut(0 , createOption.feedOutTime);
+                        seekBarPair.barObject.fadeOut(0 , createOption.fadeOutTime);
                     }else{
                         if(displayControl){
-                            controlBarPair.barObject.setFeedOutHookOnce( () => {
+                            controlBarPair.barObject.setFadeOutHookOnce( () => {
                                 (<SeekBar>seekBarPair.barObject).moveDownBar();
                             })
                         }
@@ -217,23 +217,23 @@ class TSPlayer extends AddEvent{
                 displayControl  = false;
             }
         }
-        media.addEventListener('mouseout' , barFeedOut)
+        media.addEventListener('mouseout' , barFadeOut)
         if(controlBarPair){
-            controlBarPair.bar.addEventListener('mouseout' , barFeedOut ,false);
+            controlBarPair.bar.addEventListener('mouseout' , barFadeOut ,false);
         }
         if(titleBarPair){
-            titleBarPair.bar.addEventListener('mouseout' , barFeedOut ,false);
+            titleBarPair.bar.addEventListener('mouseout' , barFadeOut ,false);
         }
         if(seekBarPair){
-            seekBarPair.bar.addEventListener('mouseout' , barFeedOut,false);
+            seekBarPair.bar.addEventListener('mouseout' , barFadeOut,false);
         }
 
         this.hookEnded((player:TSPlayer , video:HTMLVideoElement) => {
-            titleBarPair.barObject.feedIn(0 , createOption.feedInTime);
-            controlBarPair.barObject.feedIn(0 , createOption.feedInTime);
+            titleBarPair.barObject.fadeIn(0 , createOption.fadeInTime);
+            controlBarPair.barObject.fadeIn(0 , createOption.fadeInTime);
             if(seekBarPair){
                 if(!this.createOption.displayAlwaysSeekBar){
-                    seekBarPair.barObject.feedIn(0 , createOption.feedInTime);
+                    seekBarPair.barObject.fadeIn(0 , createOption.fadeInTime);
                 }else{
                     if(!displayControl){
                         (<SeekBar>seekBarPair.barObject).moveUpBar();

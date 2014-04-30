@@ -95,26 +95,26 @@ var Bar = (function (_super) {
         this.eventEnable = true;
         this.className = "bar";
         this.displayed = true;
-        this.inFeedOut = false;
-        this.inFeedIn = false;
+        this.inFadeOut = false;
+        this.inFadeIn = false;
         /**
         <br>
         
-        @method setFeedInHook
+        @method setFadeInHook
         @param {}
         @return void
         */
-        this.feedInHook = [];
-        this.feedInHookOnce = [];
+        this.fadeInHook = [];
+        this.fadeInHookOnce = [];
         /**
         <br>
         
-        @method setFeedOutHook
+        @method setFadeOutHook
         @param {}
         @return void
         */
-        this.feedOutHook = [];
-        this.feedOutHookOnce = [];
+        this.fadeOutHook = [];
+        this.fadeOutHookOnce = [];
     }
     Bar.prototype.createElement = function (player) {
         var element = document.createElement("div");
@@ -123,14 +123,14 @@ var Bar = (function (_super) {
         return element;
     };
 
-    Bar.prototype.feedOut = function (waitSeconds, feedOutSeconds) {
+    Bar.prototype.fadeOut = function (waitSeconds, fadeOutSeconds) {
         var _this = this;
         if (this.createdElement) {
             var element = this.createdElement;
             var currentAlpha = Number(element.style.opacity);
-            var unitGradAlpha = currentAlpha / feedOutSeconds;
+            var unitGradAlpha = currentAlpha / fadeOutSeconds;
             var setGradAlpha = function () {
-                if (!_this.inFeedOut) {
+                if (!_this.inFadeOut) {
                     return;
                 }
                 currentAlpha -= unitGradAlpha;
@@ -139,29 +139,29 @@ var Bar = (function (_super) {
                     setTimeout(setGradAlpha, 1);
                 } else {
                     element.style.opacity = "0";
-                    _this.inFeedOut = false;
+                    _this.inFadeOut = false;
                     _this.eventEnable = false;
                     element.style.opacity = "0";
-                    for (var i = 0, arrayLength = _this.feedOutHook.length; i < arrayLength; i++) {
-                        var method = _this.feedOutHook[i];
+                    for (var i = 0, arrayLength = _this.fadeOutHook.length; i < arrayLength; i++) {
+                        var method = _this.fadeOutHook[i];
                         method();
                     }
-                    for (var i = 0, arrayLength = _this.feedOutHookOnce.length; i < arrayLength; i++) {
-                        var method = _this.feedOutHookOnce[i];
+                    for (var i = 0, arrayLength = _this.fadeOutHookOnce.length; i < arrayLength; i++) {
+                        var method = _this.fadeOutHookOnce[i];
                         method();
                     }
-                    _this.feedOutHookOnce = [];
+                    _this.fadeOutHookOnce = [];
                 }
             };
-            this.inFeedOut = true;
-            this.inFeedIn = false;
+            this.inFadeOut = true;
+            this.inFadeIn = false;
             setTimeout(function () {
                 setGradAlpha();
             }, waitSeconds);
         }
     };
 
-    Bar.prototype.feedIn = function (waitSeconds, feedOutSeconds) {
+    Bar.prototype.fadeIn = function (waitSeconds, fadeOutSeconds) {
         var _this = this;
         if (this.createdElement) {
             var element = this.createdElement;
@@ -170,29 +170,29 @@ var Bar = (function (_super) {
             if (currentAlpha > maxAlpha) {
                 return;
             }
-            var unitGradAlpha = maxAlpha - currentAlpha / feedOutSeconds;
+            var unitGradAlpha = maxAlpha - currentAlpha / fadeOutSeconds;
             var setGradAlpha = function () {
                 currentAlpha += unitGradAlpha;
                 element.style.opacity = currentAlpha.toString();
-                if (!_this.inFeedIn) {
+                if (!_this.inFadeIn) {
                     return;
                 }
                 if (currentAlpha < maxAlpha) {
                     setTimeout(setGradAlpha, 1);
                 } else {
                     element.style.opacity = maxAlpha + "";
-                    for (var i = 0, arrayLength = _this.feedInHook.length; i < arrayLength; i++) {
-                        var method = _this.feedInHook[i];
+                    for (var i = 0, arrayLength = _this.fadeInHook.length; i < arrayLength; i++) {
+                        var method = _this.fadeInHook[i];
                         method();
                     }
-                    for (var i = 0, arrayLength = _this.feedInHookOnce.length; i < arrayLength; i++) {
-                        var method = _this.feedInHookOnce[i];
+                    for (var i = 0, arrayLength = _this.fadeInHookOnce.length; i < arrayLength; i++) {
+                        var method = _this.fadeInHookOnce[i];
                         method();
                     }
                 }
             };
-            this.inFeedOut = false;
-            this.inFeedIn = true;
+            this.inFadeOut = false;
+            this.inFadeIn = true;
             this.eventEnable = true;
 
             setTimeout(function () {
@@ -201,20 +201,20 @@ var Bar = (function (_super) {
         }
     };
 
-    Bar.prototype.setFeedInHook = function (hookMethod) {
-        this.feedInHook.push(hookMethod);
+    Bar.prototype.setFadeInHook = function (hookMethod) {
+        this.fadeInHook.push(hookMethod);
     };
 
-    Bar.prototype.setFeedInHookOnce = function (hookMethod) {
-        this.feedInHookOnce.push(hookMethod);
+    Bar.prototype.setFadeInHookOnce = function (hookMethod) {
+        this.fadeInHookOnce.push(hookMethod);
     };
 
-    Bar.prototype.setFeedOutHook = function (hookMethod) {
-        this.feedOutHook.push(hookMethod);
+    Bar.prototype.setFadeOutHook = function (hookMethod) {
+        this.fadeOutHook.push(hookMethod);
     };
 
-    Bar.prototype.setFeedOutHookOnce = function (hookMethod) {
-        this.feedOutHookOnce.push(hookMethod);
+    Bar.prototype.setFadeOutHookOnce = function (hookMethod) {
+        this.fadeOutHookOnce.push(hookMethod);
     };
 
     Bar.prototype.setEvent = function (element, eventName, eventFunction) {
@@ -1156,8 +1156,8 @@ var CreateOption = (function () {
         this.displayDuration = true;
         this.displayFullscreen = true;
         this.titleString = "";
-        this.feedInTime = 100;
-        this.feedOutTime = 100;
+        this.fadeInTime = 100;
+        this.fadeOutTime = 100;
         this.playWithFullscreen = false;
         this.automaticCloseFullscreen = true;
         this.timeFontSize = 10;
@@ -1262,13 +1262,13 @@ var TSPlayer = (function (_super) {
         var media = this.media;
 
         var displayControl = true;
-        var barFeedIn = function () {
+        var barFadeIn = function () {
             if (_this.isPlaying) {
-                titleBarPair.barObject.feedIn(0, createOption.feedInTime);
-                controlBarPair.barObject.feedIn(0, createOption.feedInTime);
+                titleBarPair.barObject.fadeIn(0, createOption.fadeInTime);
+                controlBarPair.barObject.fadeIn(0, createOption.fadeInTime);
                 if (seekBarPair) {
                     if (!_this.createOption.displayAlwaysSeekBar) {
-                        seekBarPair.barObject.feedIn(0, createOption.feedInTime);
+                        seekBarPair.barObject.fadeIn(0, createOption.fadeInTime);
                     } else {
                         if (!displayControl) {
                             seekBarPair.barObject.moveUpBar();
@@ -1279,27 +1279,27 @@ var TSPlayer = (function (_super) {
             }
         };
 
-        media.addEventListener('mouseover', barFeedIn, false);
+        media.addEventListener('mouseover', barFadeIn, false);
         if (controlBarPair) {
-            controlBarPair.bar.addEventListener('mouseover', barFeedIn, false);
+            controlBarPair.bar.addEventListener('mouseover', barFadeIn, false);
         }
         if (titleBarPair) {
-            titleBarPair.bar.addEventListener('mouseover', barFeedIn, false);
+            titleBarPair.bar.addEventListener('mouseover', barFadeIn, false);
         }
         if (seekBarPair) {
-            seekBarPair.bar.addEventListener('mouseover', barFeedIn, false);
+            seekBarPair.bar.addEventListener('mouseover', barFadeIn, false);
         }
 
-        var barFeedOut = function () {
+        var barFadeOut = function () {
             if (_this.isPlaying) {
-                titleBarPair.barObject.feedOut(0, createOption.feedOutTime);
-                controlBarPair.barObject.feedOut(0, createOption.feedOutTime);
+                titleBarPair.barObject.fadeOut(0, createOption.fadeOutTime);
+                controlBarPair.barObject.fadeOut(0, createOption.fadeOutTime);
                 if (seekBarPair) {
                     if (!_this.createOption.displayAlwaysSeekBar) {
-                        seekBarPair.barObject.feedOut(0, createOption.feedOutTime);
+                        seekBarPair.barObject.fadeOut(0, createOption.fadeOutTime);
                     } else {
                         if (displayControl) {
-                            controlBarPair.barObject.setFeedOutHookOnce(function () {
+                            controlBarPair.barObject.setFadeOutHookOnce(function () {
                                 seekBarPair.barObject.moveDownBar();
                             });
                         }
@@ -1308,23 +1308,23 @@ var TSPlayer = (function (_super) {
                 displayControl = false;
             }
         };
-        media.addEventListener('mouseout', barFeedOut);
+        media.addEventListener('mouseout', barFadeOut);
         if (controlBarPair) {
-            controlBarPair.bar.addEventListener('mouseout', barFeedOut, false);
+            controlBarPair.bar.addEventListener('mouseout', barFadeOut, false);
         }
         if (titleBarPair) {
-            titleBarPair.bar.addEventListener('mouseout', barFeedOut, false);
+            titleBarPair.bar.addEventListener('mouseout', barFadeOut, false);
         }
         if (seekBarPair) {
-            seekBarPair.bar.addEventListener('mouseout', barFeedOut, false);
+            seekBarPair.bar.addEventListener('mouseout', barFadeOut, false);
         }
 
         this.hookEnded(function (player, video) {
-            titleBarPair.barObject.feedIn(0, createOption.feedInTime);
-            controlBarPair.barObject.feedIn(0, createOption.feedInTime);
+            titleBarPair.barObject.fadeIn(0, createOption.fadeInTime);
+            controlBarPair.barObject.fadeIn(0, createOption.fadeInTime);
             if (seekBarPair) {
                 if (!_this.createOption.displayAlwaysSeekBar) {
-                    seekBarPair.barObject.feedIn(0, createOption.feedInTime);
+                    seekBarPair.barObject.fadeIn(0, createOption.fadeInTime);
                 } else {
                     if (!displayControl) {
                         seekBarPair.barObject.moveUpBar();
