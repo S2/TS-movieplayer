@@ -111,7 +111,6 @@ class TSPlayer extends AddEvent{
     createOption : CreateOption;
     console      = new Debug.Console();
     isEnded      = false
-    poster       : string;
 
     controlBarPair : BarPair
     seekBarPair : BarPair
@@ -138,7 +137,6 @@ class TSPlayer extends AddEvent{
             seekBarOption:SeekBarOption    = new SeekBarOption()){
         super();
         this.media = media;
-        this.poster = media.poster;
         this.createOption = createOption;
         this.setEnvironment();
         this.getSize();
@@ -818,7 +816,6 @@ class TSPlayer extends AddEvent{
     
     public togglePlayPause(){
         if(this.isPlaying){
-            this.media.poster = this.poster;
             this.pause();
         }else{
             this.media.poster = "";

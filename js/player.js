@@ -1229,7 +1229,6 @@ var TSPlayer = (function (_super) {
         this.volumeOff = [];
         this.loadedmetadata = [];
         this.media = media;
-        this.poster = media.poster;
         this.createOption = createOption;
         this.setEnvironment();
         this.getSize();
@@ -1893,7 +1892,6 @@ var TSPlayer = (function (_super) {
 
     TSPlayer.prototype.togglePlayPause = function () {
         if (this.isPlaying) {
-            this.media.poster = this.poster;
             this.pause();
         } else {
             this.media.poster = "";
