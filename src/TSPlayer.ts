@@ -98,7 +98,7 @@ class TSPlayer extends AddEvent{
     isCellularPhone : boolean = false;
 
     isWebkit     : boolean = false;
-    isChorome    : boolean = false;
+    isChrome    : boolean = false;
     isFirefox    : boolean = false;
     isPC         : boolean = false;
 
@@ -294,6 +294,7 @@ class TSPlayer extends AddEvent{
             }
             if(this.createOption.playWithFullscreen){
                 this.togglePauseRestart();
+                alert(1)
             }
         });
 
