@@ -718,9 +718,9 @@ var BarPartsCenterPlayButton = (function (_super) {
         style.top = (this.player.height - backgroundImageSetting.height) / 2 + "px";
 
         if (player.isIOSMobile) {
-            style.visibility = "hidden";
-            style.display = "none";
-            document.body.appendChild(centerPlayButton);
+            this.player.hookAfterPlay(function () {
+                document.body.appendChild(centerPlayButton);
+            });
         } else {
             var targetParent = this.player.getMediaParent();
             targetParent.appendChild(centerPlayButton);
