@@ -219,7 +219,7 @@ class TSPlayer extends AddEvent{
         }
         media.addEventListener('mouseout' , barFadeOut)
         
-        if(this.isAndroid && this.isChrome){
+        if(this.isAndroid){
             this.hookAfterPlay(barFadeOut , "set fade out :221 ")
         }
 
