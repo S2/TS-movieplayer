@@ -218,6 +218,11 @@ class TSPlayer extends AddEvent{
             }
         }
         media.addEventListener('mouseout' , barFadeOut)
+        
+        if(this.isAndroid && this.isChrome){
+            this.hookAfterPlay(barFadeOut , "set fade out :221 ")
+        }
+
         if(controlBarPair){
             controlBarPair.bar.addEventListener('mouseout' , barFadeOut ,false);
         }
@@ -845,10 +850,6 @@ class TSPlayer extends AddEvent{
         }
         this.isInPlayEvent = true;
         media.play()
-        this.doMethodArray(this.afterPlay)
-        if(this.isPaused){
-            this.doMethodArray(this.afterRestart)
-        }
         if(this.createOption.playWithFullscreen){
             this.isPlaying =false 
             this.isPaused = true
@@ -856,7 +857,10 @@ class TSPlayer extends AddEvent{
             this.isPlaying = true 
             this.isPaused = false
         }
-
+        this.doMethodArray(this.afterPlay)
+        if(this.isPaused){
+            this.doMethodArray(this.afterRestart)
+        }
         setTimeout(() => {
             this.isInPlayEvent = false;
         } , 100);
