@@ -198,6 +198,10 @@ class TSPlayer extends AddEvent{
         if(seekBarPair){
             seekBarPair.bar.addEventListener('mouseover' , barFadeIn ,false);
         }
+        
+        if(this.isIOSMobile){
+            this.addDocumentEvent("webkitfullscreenchange" , barFadeIn)
+        }
 
         var barFadeOut = () => {
             if(this.isPlaying){
@@ -294,7 +298,6 @@ class TSPlayer extends AddEvent{
             }
             if(this.createOption.playWithFullscreen){
                 this.togglePauseRestart();
-                alert(1)
             }
         });
 
@@ -320,9 +323,7 @@ class TSPlayer extends AddEvent{
         this.fullscreenBarPartsSetting.setSrc(controlImage);
         this.centerLoadingImageSetting.setSrc(this.createOption.imagePath + this.createOption.loadingImage);
 
-        if(!this.isIOSMobile){
-            this.barPartsCenterButton = new BarPartsCenterPlayButton(this , controlBarObject , this.centerBarPartsSetting);
-        }
+        this.barPartsCenterButton = new BarPartsCenterPlayButton(this , controlBarObject , this.centerBarPartsSetting);
 
         new BarPartsPlayPauseButton(this , controlBarObject , this.playBarPartsSetting , this.pauseBarPartsSetting );
         
@@ -357,7 +358,6 @@ class TSPlayer extends AddEvent{
         }
 
         if(this.isAndroid){
-
             var loading = new BarPartsLoadingImage(this , controlBarObject , this.centerLoadingImageSetting);
             this.hookBeforePlay(()=>{
                 loading.visible();
@@ -908,7 +908,6 @@ class TSPlayer extends AddEvent{
             media.play()
             this.doMethodArray(this.afterPlay)
             this.doMethodArray(this.afterRestart)
-
             if(this.createOption.playWithFullscreen){
                 this.isPlaying = false 
                 this.isPaused = true

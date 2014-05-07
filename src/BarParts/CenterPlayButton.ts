@@ -23,8 +23,14 @@ class BarPartsCenterPlayButton extends BarParts{
         style.left = (this.player.width  - backgroundImageSetting.width) / 2 + "px";
         style.top  = (this.player.height - backgroundImageSetting.height) / 2 + "px";
         
-        var targetParent:HTMLDivElement = this.player.getMediaParent();
-        targetParent.appendChild(centerPlayButton);
+        if(player.isIOSMobile){
+            style.visibility = "hidden";
+            style.display    = "none";
+            document.body.appendChild(centerPlayButton);
+        }else{
+            var targetParent:HTMLDivElement = this.player.getMediaParent();
+            targetParent.appendChild(centerPlayButton);
+        }
 
         this.centerPlayButton = centerPlayButton;
         
