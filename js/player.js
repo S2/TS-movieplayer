@@ -1462,7 +1462,9 @@ var TSPlayer = (function (_super) {
                 loading.visible();
             }, "display android loading image");
             this.hookTimeupdate(function () {
-                loading.invisible();
+                if (_this.getCurrentTime() > 0) {
+                    loading.invisible();
+                }
             }, "hide android loading image");
         }
         return new BarPair(controlBarObject, controlBar);

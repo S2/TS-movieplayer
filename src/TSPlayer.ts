@@ -363,7 +363,9 @@ class TSPlayer extends AddEvent{
                 loading.visible();
             } , "display android loading image");
             this.hookTimeupdate(()=>{
-                loading.invisible();
+                if(this.getCurrentTime() > 0){
+                    loading.invisible();
+                }
             } , "hide android loading image");
         }
         return new BarPair(controlBarObject , controlBar)
