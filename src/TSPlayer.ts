@@ -837,7 +837,6 @@ class TSPlayer extends AddEvent{
         if(this.isPlaying){
             this.pause();
         }else{
-            this.media.poster = "";
             this.play();
         }
     }
@@ -850,6 +849,7 @@ class TSPlayer extends AddEvent{
         @return void
     */
     public play():void{
+        this.media.poster = "";
         if(this.isEnded){
             this.setCurrentTime(0)
             this.isEnded = false

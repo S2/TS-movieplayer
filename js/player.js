@@ -1920,7 +1920,6 @@ var TSPlayer = (function (_super) {
         if (this.isPlaying) {
             this.pause();
         } else {
-            this.media.poster = "";
             this.play();
         }
     };
@@ -1934,6 +1933,7 @@ var TSPlayer = (function (_super) {
     */
     TSPlayer.prototype.play = function () {
         var _this = this;
+        this.media.poster = "";
         if (this.isEnded) {
             this.setCurrentTime(0);
             this.isEnded = false;
