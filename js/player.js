@@ -1905,6 +1905,17 @@ var TSPlayer = (function (_super) {
         }
     };
 
+    /**
+    <br>
+    
+    @method getPoster
+    @param {}
+    @return string
+    */
+    TSPlayer.prototype.getPoster = function () {
+        return this.media.poster;
+    };
+
     TSPlayer.prototype.togglePlayPause = function () {
         if (this.isPlaying) {
             this.pause();
@@ -2113,6 +2124,9 @@ var TSPlayer = (function (_super) {
     TSPlayer.prototype.resize = function (width, height) {
         this.media.style.width = width + "px";
         this.media.style.height = height + "px";
+        if (this.isIOSMobile) {
+            return;
+        }
         this.mediaParent.style.width = width + "px";
         this.mediaParent.style.height = height + "px";
 

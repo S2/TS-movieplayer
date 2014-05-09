@@ -822,6 +822,17 @@ class TSPlayer extends AddEvent{
         }
     }
     
+    /**
+        <br>
+        
+        @method getPoster 
+        @param {} 
+        @return string
+    */
+    public getPoster():string{
+        return this.media.poster;
+    }
+
     public togglePlayPause(){
         if(this.isPlaying){
             this.pause();
@@ -1029,6 +1040,9 @@ class TSPlayer extends AddEvent{
     public resize(width : number , height : number):void{
         this.media.style.width = width + "px"
         this.media.style.height = height + "px"
+        if(this.isIOSMobile){
+            return;
+        }
         this.mediaParent.style.width = width + "px"
         this.mediaParent.style.height = height + "px"
 
