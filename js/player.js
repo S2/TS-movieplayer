@@ -1400,9 +1400,8 @@ var TSPlayer = (function (_super) {
             }
         });
 
-        this.addDocumentEvent("webkitendfullscreen", function () {
-            _this.doMethodArray(_this.fullscreenExit);
-            _this.isFullscreen = false;
+        this.addEvent(media, "webkitendfullscreen", function () {
+            _this.pause();
         });
     };
 

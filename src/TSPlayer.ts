@@ -301,9 +301,8 @@ class TSPlayer extends AddEvent{
             }
         });
 
-        this.addDocumentEvent("webkitendfullscreen" , ()=> {
-            this.doMethodArray(this.fullscreenExit);
-            this.isFullscreen = false
+        this.addEvent(media , "webkitendfullscreen" , ()=> {
+            this.pause()
         });
     }
     
