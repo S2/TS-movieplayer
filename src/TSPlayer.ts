@@ -95,6 +95,7 @@ class TSPlayer extends AddEvent{
     isIPod          : boolean = false;
     isIPhone        : boolean = false;
     isAndroid       : boolean = false;
+    isAndroid2      : boolean = false;
     isCellularPhone : boolean = false;
 
     isWebkit     : boolean = false;
@@ -441,6 +442,12 @@ class TSPlayer extends AddEvent{
             this.isAndroid = true;
             this.version = matches[1];
         }
+
+        if(matches = /Android (2\.\d+)\.\d+/.exec(userAgent)){
+            this.isAndroid2 = true;
+            this.version = matches[1];
+        }
+
         if(userAgent.match('iPad')){
             this.isIOSMobile  = false;
             this.isIOS  = true ;
@@ -560,6 +567,9 @@ class TSPlayer extends AddEvent{
         @return void
     */
     public enterFullscreen():void{
+        if(this.isAndroid2){
+            return
+        }
         var mediaParent:HTMLDivElement = this.mediaParent
         var media:HTMLVideoElement = this.media
         if (media.requestFullscreen) {

@@ -1199,6 +1199,7 @@ var TSPlayer = (function (_super) {
         this.isIPod = false;
         this.isIPhone = false;
         this.isAndroid = false;
+        this.isAndroid2 = false;
         this.isCellularPhone = false;
         this.isWebkit = false;
         this.isChrome = false;
@@ -1542,6 +1543,12 @@ var TSPlayer = (function (_super) {
             this.isAndroid = true;
             this.version = matches[1];
         }
+
+        if (matches = /Android (2\.\d+)\.\d+/.exec(userAgent)) {
+            this.isAndroid2 = true;
+            this.version = matches[1];
+        }
+
         if (userAgent.match('iPad')) {
             this.isIOSMobile = false;
             this.isIOS = true;
@@ -1660,6 +1667,9 @@ var TSPlayer = (function (_super) {
     @return void
     */
     TSPlayer.prototype.enterFullscreen = function () {
+        if (this.isAndroid2) {
+            return;
+        }
         var mediaParent = this.mediaParent;
         var media = this.media;
         if (media.requestFullscreen) {
