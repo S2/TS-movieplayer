@@ -96,6 +96,7 @@ class TSPlayer extends AddEvent{
     isIPhone        : boolean = false;
     isAndroid       : boolean = false;
     isAndroid2      : boolean = false;
+    isAndroid40     : boolean = false;
     isCellularPhone : boolean = false;
 
     isWebkit     : boolean = false;
@@ -451,6 +452,11 @@ class TSPlayer extends AddEvent{
             this.version = matches[1];
         }
 
+        if(matches = /Android (4\.0)\.\d+/.exec(userAgent)){
+            this.isAndroid40 = true;
+            this.version = matches[1];
+        }
+
         if(userAgent.match('iPad')){
             this.isIOSMobile  = false;
             this.isIOS  = true ;
@@ -582,6 +588,9 @@ class TSPlayer extends AddEvent{
         } else if (media.webkitRequestFullScreen) {
             media.webkitRequestFullScreen();
         } else if (media.webkitEnterFullScreen) {
+            if(this.isFullscreen && this.isAndroid40){
+                media.webkitExitFullScreen();
+            }
             media.webkitEnterFullScreen();
         }
         this.isFullscreen = true;
