@@ -30,4 +30,8 @@ class ControlBar extends Bar{
     public appendCreateButtonMethods(buttonName : string , buttonCreateFunction : ()=> HTMLElement) : void{
         this.appendMethods[buttonName] = buttonCreateFunction;
     }
+
+    public resize(width : number , height : number){
+        this.display()
+    }
 }

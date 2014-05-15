@@ -217,6 +217,18 @@ var Bar = (function (_super) {
         this.fadeOutHookOnce.push(hookMethod);
     };
 
+    Bar.prototype.display = function () {
+        var element = this.createdElement;
+        var currentAlpha = Number(element.style.opacity);
+        element.style.opacity = "1";
+    };
+
+    Bar.prototype.hide = function () {
+        var element = this.createdElement;
+        var currentAlpha = Number(element.style.opacity);
+        element.style.opacity = "0";
+    };
+
     Bar.prototype.setEvent = function (element, eventName, eventFunction) {
         var _this = this;
         this.addEvent(element, eventName, function () {
@@ -965,7 +977,7 @@ var SeekBar = (function (_super) {
     /**
     <br>
     
-    @method moveUpBar
+    @method moveDownBar
     @param {}
     @return void
     */
@@ -994,6 +1006,7 @@ var SeekBar = (function (_super) {
         this.createdElement.style.width = width + "px";
         this.seekbar.style.width = width + "px";
         this.width = width;
+        this.initTop = null;
     };
     return SeekBar;
 })(Bar);
@@ -1036,6 +1049,10 @@ var ControlBar = (function (_super) {
 
     ControlBar.prototype.appendCreateButtonMethods = function (buttonName, buttonCreateFunction) {
         this.appendMethods[buttonName] = buttonCreateFunction;
+    };
+
+    ControlBar.prototype.resize = function (width, height) {
+        this.display();
     };
     return ControlBar;
 })(Bar);
@@ -1200,6 +1217,7 @@ var TSPlayer = (function (_super) {
         this.isIPhone = false;
         this.isAndroid = false;
         this.isAndroid2 = false;
+        this.isAndroid40 = false;
         this.isCellularPhone = false;
         this.isWebkit = false;
         this.isChrome = false;
@@ -1466,6 +1484,9 @@ var TSPlayer = (function (_super) {
                     loading.invisible();
                 }
             }, "hide android loading image");
+            this.hookBeforePause(function () {
+                loading.invisible();
+            }, "hide android loading image");
         }
         return new BarPair(controlBarObject, controlBar);
     };
@@ -1546,6 +1567,11 @@ var TSPlayer = (function (_super) {
 
         if (matches = /Android (2\.\d+)\.\d+/.exec(userAgent)) {
             this.isAndroid2 = true;
+            this.version = matches[1];
+        }
+
+        if (matches = /Android (4\.0)\.\d+/.exec(userAgent)) {
+            this.isAndroid40 = true;
             this.version = matches[1];
         }
 
@@ -1679,6 +1705,9 @@ var TSPlayer = (function (_super) {
         } else if (media.webkitRequestFullScreen) {
             media.webkitRequestFullScreen();
         } else if (media.webkitEnterFullScreen) {
+            if (this.isFullscreen && this.isAndroid40) {
+                media.webkitExitFullScreen();
+            }
             media.webkitEnterFullScreen();
         }
         this.isFullscreen = true;

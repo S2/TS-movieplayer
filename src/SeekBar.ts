@@ -87,7 +87,7 @@ class SeekBar extends Bar{
     /**
         <br>
         
-        @method moveUpBar
+        @method moveDownBar
         @param {} 
         @return void
     */
@@ -116,5 +116,6 @@ class SeekBar extends Bar{
         this.createdElement.style.width = width + "px"
         this.seekbar.style.width = width + "px"
         this.width = width;
+        this.initTop = null
     }
 }

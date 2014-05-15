@@ -127,7 +127,19 @@ class Bar extends AddEvent{
     public setFadeOutHookOnce(hookMethod:()=>void):void{
         this.fadeOutHookOnce.push(hookMethod)
     }
-   
+
+    public display(){
+        var element:HTMLElement = this.createdElement;
+        var currentAlpha = Number(element.style.opacity);
+        element.style.opacity = "1";
+    }
+
+    public hide(){
+        var element:HTMLElement = this.createdElement;
+        var currentAlpha = Number(element.style.opacity);
+        element.style.opacity = "0";
+    }
+
     public setEvent(element:HTMLElement , eventName:string , eventFunction ){
         this.addEvent(element , eventName , () => {
             if(this.eventEnable){
