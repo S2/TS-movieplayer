@@ -911,9 +911,6 @@ class TSPlayer extends AddEvent{
     public pause():void{
         var media:HTMLVideoElement = this.media;
         this.doMethodArray(this.beforePause)
-        if(this.createOption.playWithFullscreen){
-            this.exitFullscreen();
-        }
         this.isInPauseEvent = true;
         media.pause()
         this.isPaused = true;
@@ -934,8 +931,7 @@ class TSPlayer extends AddEvent{
             }
             this.doMethodArray(this.beforePlay)
             this.doMethodArray(this.beforeRestart)
-            if(this.createOption.playWithFullscreen){
-                this.exitFullscreen();
+            if(this.createOption.playWithFullscreen && this.isFullscreen == false){
                 this.enterFullscreen();
             }
             this.isInPlayEvent = true;
@@ -954,7 +950,7 @@ class TSPlayer extends AddEvent{
             } , 100);
         }else if(this.isPlaying){
             this.doMethodArray(this.beforePause)
-            if(this.createOption.playWithFullscreen){
+            if(this.createOption.playWithFullscreen && this.isFullscreen == true){
                 this.exitFullscreen();
             }
             this.isInPauseEvent = true;
