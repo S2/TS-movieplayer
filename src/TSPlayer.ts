@@ -585,13 +585,13 @@ class TSPlayer extends AddEvent{
             media.requestFullscreen();
         } else if (media.mozRequestFullScreen) {
             media.mozRequestFullScreen();
-        } else if (media.webkitRequestFullScreen) {
-            media.webkitRequestFullScreen();
         } else if (media.webkitEnterFullScreen) {
             if(this.isFullscreen && this.isAndroid40){
                 media.webkitExitFullScreen();
             }
             media.webkitEnterFullScreen();
+        } else if (media.webkitRequestFullScreen) {
+            media.webkitRequestFullScreen();
         }
         this.isFullscreen = true;
         this.doMethodArray(this.fullscreenEnter);
@@ -610,10 +610,10 @@ class TSPlayer extends AddEvent{
             document.exitFullscreen()
         } else if (document.mozCancelFullScreen) {
             document.mozCancelFullScreen()
-        } else if (document.webkitCancelFullScreen) {
-            document.webkitCancelFullScreen()
         } else if (media.webkitExitFullScreen) {
             media.webkitExitFullScreen()
+        } else if (document.webkitCancelFullScreen) {
+            document.webkitCancelFullScreen()
         }
         this.isFullscreen = false;
     }
