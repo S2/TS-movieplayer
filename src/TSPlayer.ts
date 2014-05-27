@@ -294,12 +294,22 @@ class TSPlayer extends AddEvent{
         },false);
  
         this.addDocumentEvent("webkitfullscreenchange" , ()=> {
+
             if(this.isFullscreen == true){
                 this.doMethodArray(this.fullscreenExit);
-                this.isFullscreen = false
-            }
-            if(this.createOption.playWithFullscreen){
-                this.togglePauseRestart();
+                if (this.createOption.playWithFullscreen) {
+                    this.pause();
+                }
+                setTimeout(() => {
+                    this.isFullscreen = false;
+                }, 1000);
+            } else {
+                if (this.createOption.playWithFullscreen) {
+                    this.play();
+                }
+                setTimeout(() => {
+                    this.isFullscreen = true;
+                }, 1000);
             }
         });
 
@@ -409,6 +419,7 @@ class TSPlayer extends AddEvent{
         var media = this.media;
         this.addEvent(media , 'play' , () => {
             if(!this.isInPlayEvent){
+                this.doMethodArrayOnce(this.beforePlayOnce)
                 this.doMethodArray(this.beforePlay)
                 this.doMethodArray(this.afterPlay)
             }
@@ -561,10 +572,14 @@ class TSPlayer extends AddEvent{
     public toggleFullscreen(){
         if(!this.isFullscreen){
             this.enterFullscreen()
-            this.isFullscreen = false;
+            setTimeout(()=>{
+                this.isFullscreen = false;
+            } , 1000)
         }else{
             this.exitFullscreen()
-            this.isFullscreen = true;
+            setTimeout(()=>{
+                this.isFullscreen = true;
+            } , 1000)
         }
     }
     
@@ -593,7 +608,9 @@ class TSPlayer extends AddEvent{
         } else if (media.webkitRequestFullScreen) {
             media.webkitRequestFullScreen();
         }
-        this.isFullscreen = true;
+        setTimeout(()=> { 
+            this.isFullscreen = true;
+        } , 1000)
         this.doMethodArray(this.fullscreenEnter);
     }
 
@@ -615,7 +632,9 @@ class TSPlayer extends AddEvent{
         } else if (document.webkitCancelFullScreen) {
             document.webkitCancelFullScreen()
         }
-        this.isFullscreen = false;
+        setTimeout(() => {
+            this.isFullscreen = false;
+        } , 1000)
     }
 
     hookComments = [];
@@ -646,6 +665,17 @@ class TSPlayer extends AddEvent{
             name : "beforePlay" ,
         });
     }
+
+    private beforePlayOnce : Array<(player:TSPlayer , video:HTMLVideoElement)=>void> = [];
+    public hookBeforePlayOnce(hookMethod:(player:TSPlayer , video:HTMLVideoElement)=>void , comment? : string){
+        this.beforePlayOnce.push(hookMethod);
+        this.hookComments.push({
+            method : hookMethod ,
+            comment : comment || "" , 
+            name : "beforePlayOnce" ,
+        });
+    }
+
 
     private afterPlay : Array<(player:TSPlayer , video:HTMLVideoElement)=>void> = [];
     public hookAfterPlay(hookMethod:(player:TSPlayer , video:HTMLVideoElement)=>void , comment? : string){
@@ -842,7 +872,14 @@ class TSPlayer extends AddEvent{
             methods[i](this, this.media);
         }
     }
-    
+ 
+    private doMethodArrayOnce(methods:Array<(player:TSPlayer , video:HTMLVideoElement)=>void>){
+        while (methods.length > 0) {
+            var method = methods.shift();
+            method(this, this.media);
+        }
+    }
+ 
     /**
         <br>
         
@@ -879,6 +916,7 @@ class TSPlayer extends AddEvent{
         if(this.isPaused){
             this.doMethodArray(this.beforeRestart)
         }
+        this.doMethodArrayOnce(this.beforePlayOnce)
         this.doMethodArray(this.beforePlay)
         if(this.createOption.playWithFullscreen){
             this.enterFullscreen();
