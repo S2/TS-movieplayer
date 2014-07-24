@@ -1240,6 +1240,7 @@ var TSPlayer = (function (_super) {
         this.centerLoadingImageSetting = new BarPartsSetting(new Size(100, 100), new BannerPosition(0, 0), new Scale(100, 100), new Margin(0, 0, 0, 0));
         this.hookComments = [];
         this.beforePlay = [];
+        this.beforePlayOnce = [];
         this.afterPlay = [];
         this.beforePause = [];
         this.afterPause = [];
@@ -1412,10 +1413,19 @@ var TSPlayer = (function (_super) {
         this.addDocumentEvent("webkitfullscreenchange", function () {
             if (_this.isFullscreen == true) {
                 _this.doMethodArray(_this.fullscreenExit);
-                _this.isFullscreen = false;
-            }
-            if (_this.createOption.playWithFullscreen) {
-                _this.togglePauseRestart();
+                if (_this.createOption.playWithFullscreen) {
+                    _this.pause();
+                }
+                setTimeout(function () {
+                    _this.isFullscreen = false;
+                }, 1000);
+            } else {
+                if (_this.createOption.playWithFullscreen) {
+                    _this.play();
+                }
+                setTimeout(function () {
+                    _this.isFullscreen = true;
+                }, 1000);
             }
         });
 
@@ -1476,6 +1486,7 @@ var TSPlayer = (function (_super) {
 
         if (this.isAndroid) {
             var loading = new BarPartsLoadingImage(this, controlBarObject, this.centerLoadingImageSetting);
+            this.loading = loading;
             this.hookBeforePlay(function () {
                 loading.visible();
             }, "display android loading image");
@@ -1527,6 +1538,7 @@ var TSPlayer = (function (_super) {
         var media = this.media;
         this.addEvent(media, 'play', function () {
             if (!_this.isInPlayEvent) {
+                _this.doMethodArrayOnce(_this.beforePlayOnce);
                 _this.doMethodArray(_this.beforePlay);
                 _this.doMethodArray(_this.afterPlay);
             }
@@ -1676,12 +1688,17 @@ var TSPlayer = (function (_super) {
     };
 
     TSPlayer.prototype.toggleFullscreen = function () {
+        var _this = this;
         if (!this.isFullscreen) {
             this.enterFullscreen();
-            this.isFullscreen = false;
+            setTimeout(function () {
+                _this.isFullscreen = false;
+            }, 1000);
         } else {
             this.exitFullscreen();
-            this.isFullscreen = true;
+            setTimeout(function () {
+                _this.isFullscreen = true;
+            }, 1000);
         }
     };
 
@@ -1693,6 +1710,7 @@ var TSPlayer = (function (_super) {
     @return void
     */
     TSPlayer.prototype.enterFullscreen = function () {
+        var _this = this;
         if (this.isAndroid2) {
             return;
         }
@@ -1710,7 +1728,9 @@ var TSPlayer = (function (_super) {
         } else if (media.webkitRequestFullScreen) {
             media.webkitRequestFullScreen();
         }
-        this.isFullscreen = true;
+        setTimeout(function () {
+            _this.isFullscreen = true;
+        }, 1000);
         this.doMethodArray(this.fullscreenEnter);
     };
 
@@ -1722,6 +1742,7 @@ var TSPlayer = (function (_super) {
     @return void
     */
     TSPlayer.prototype.exitFullscreen = function () {
+        var _this = this;
         var media = this.media;
         if (document.exitFullscreen) {
             document.exitFullscreen();
@@ -1732,7 +1753,9 @@ var TSPlayer = (function (_super) {
         } else if (document.webkitCancelFullScreen) {
             document.webkitCancelFullScreen();
         }
-        this.isFullscreen = false;
+        setTimeout(function () {
+            _this.isFullscreen = false;
+        }, 1000);
     };
 
     /**
@@ -1759,6 +1782,15 @@ var TSPlayer = (function (_super) {
             method: hookMethod,
             comment: comment || "",
             name: "beforePlay"
+        });
+    };
+
+    TSPlayer.prototype.hookBeforePlayOnce = function (hookMethod, comment) {
+        this.beforePlayOnce.push(hookMethod);
+        this.hookComments.push({
+            method: hookMethod,
+            comment: comment || "",
+            name: "beforePlayOnce"
         });
     };
 
@@ -1943,6 +1975,13 @@ var TSPlayer = (function (_super) {
         }
     };
 
+    TSPlayer.prototype.doMethodArrayOnce = function (methods) {
+        while (methods.length > 0) {
+            var method = methods.shift();
+            method(this, this.media);
+        }
+    };
+
     /**
     <br>
     
@@ -1971,6 +2010,22 @@ var TSPlayer = (function (_super) {
     */
     TSPlayer.prototype.play = function () {
         var _this = this;
+        // Android 4.1 some devices , XperiaZ , SH-02
+        // They are not fired webkitendfullscreen
+        if (this.isFullscreen) {
+            if (window.screenTop || window.screenY) {
+                this.isFullscreen = false;
+                this.exitFullscreen();
+                if (this.loading) {
+                    this.loading.visible();
+                }
+                setTimeout(function () {
+                    _this.play();
+                }, 300);
+                return;
+            }
+        }
+
         this.media.poster = "";
         if (this.isEnded) {
             this.setCurrentTime(0);
@@ -1980,6 +2035,7 @@ var TSPlayer = (function (_super) {
         if (this.isPaused) {
             this.doMethodArray(this.beforeRestart);
         }
+        this.doMethodArrayOnce(this.beforePlayOnce);
         this.doMethodArray(this.beforePlay);
         if (this.createOption.playWithFullscreen) {
             this.enterFullscreen();
@@ -2013,9 +2069,6 @@ var TSPlayer = (function (_super) {
         var _this = this;
         var media = this.media;
         this.doMethodArray(this.beforePause);
-        if (this.createOption.playWithFullscreen) {
-            this.exitFullscreen();
-        }
         this.isInPauseEvent = true;
         media.pause();
         this.isPaused = true;
@@ -2037,8 +2090,7 @@ var TSPlayer = (function (_super) {
             }
             this.doMethodArray(this.beforePlay);
             this.doMethodArray(this.beforeRestart);
-            if (this.createOption.playWithFullscreen) {
-                this.exitFullscreen();
+            if (this.createOption.playWithFullscreen && this.isFullscreen == false) {
                 this.enterFullscreen();
             }
             this.isInPlayEvent = true;
@@ -2057,7 +2109,7 @@ var TSPlayer = (function (_super) {
             }, 100);
         } else if (this.isPlaying) {
             this.doMethodArray(this.beforePause);
-            if (this.createOption.playWithFullscreen) {
+            if (this.createOption.playWithFullscreen && this.isFullscreen == true) {
                 this.exitFullscreen();
             }
             this.isInPauseEvent = true;

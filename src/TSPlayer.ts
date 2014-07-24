@@ -132,6 +132,8 @@ class TSPlayer extends AddEvent{
     fullscreenBarPartsSetting = new BarPartsSetting(new Size(16 , 16)   , new BannerPosition(-32  , 0)  , new Scale(100 , 100) , new Margin(7 , 5 , 7 , 5));
     centerLoadingImageSetting = new BarPartsSetting(new Size(100 , 100) , new BannerPosition(0 , 0)     , new Scale(100 , 100) , new Margin(0 , 0 , 0 , 0));
 
+    loading  : BarPartsLoadingImage;
+
     constructor(media:HTMLVideoElement ,  
             createOption:CreateOption      = new CreateOption(), 
             controlOption:ControlBarOption = new ControlBarOption() ,
@@ -370,6 +372,7 @@ class TSPlayer extends AddEvent{
 
         if(this.isAndroid){
             var loading = new BarPartsLoadingImage(this , controlBarObject , this.centerLoadingImageSetting);
+            this.loading = loading;
             this.hookBeforePlay(()=>{
                 loading.visible();
             } , "display android loading image");
@@ -907,6 +910,22 @@ class TSPlayer extends AddEvent{
         @return void
     */
     public play():void{
+        // Android 4.1 some devices , XperiaZ , SH-02
+        // They are not fired webkitendfullscreen 
+        if(this.isFullscreen){
+            if (window.screenTop || window.screenY) {
+                this.isFullscreen = false 
+                this.exitFullscreen()
+                if(this.loading){
+                    this.loading.visible();
+                }
+                setTimeout(()=>{
+                    this.play()
+                } , 300)
+                return;
+            }
+        }
+
         this.media.poster = "";
         if(this.isEnded){
             this.setCurrentTime(0)
