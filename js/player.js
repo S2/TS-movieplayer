@@ -2056,6 +2056,24 @@ var TSPlayer = (function (_super) {
         setTimeout(function () {
             _this.isInPlayEvent = false;
         }, 100);
+
+        // Android4.0 , some device ,cannot fire beginfullscreen
+        if (this.isAndroid40) {
+            setTimeout(function () {
+                var intervalID = setInterval(function () {
+                    if (_this.isFullscreen) {
+                        if (window.screenTop || window.screenY) {
+                            _this.isFullscreen = false;
+                            _this.exitFullscreen();
+                            _this.pause();
+                            clearInterval(intervalID);
+                        }
+                    } else {
+                        clearInterval(intervalID);
+                    }
+                }, 100);
+            }, 3000);
+        }
     };
 
     /**

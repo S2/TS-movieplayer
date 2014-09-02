@@ -956,6 +956,24 @@ class TSPlayer extends AddEvent{
         setTimeout(() => {
             this.isInPlayEvent = false;
         } , 100);
+        
+        // Android4.0 , some device ,cannot fire beginfullscreen
+        if(this.isAndroid40){
+            setTimeout(()=> {
+                var intervalID = setInterval(() => {
+                    if (this.isFullscreen) {
+                        if (window.screenTop || window.screenY) {
+                            this.isFullscreen = false;
+                            this.exitFullscreen();
+                            this.pause();
+                            clearInterval(intervalID);
+                        }
+                    }else{
+                        clearInterval(intervalID);
+                    }
+                } , 100);
+            }, 3000);
+        }
     }
 
     /**
