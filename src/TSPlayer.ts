@@ -612,7 +612,11 @@ class TSPlayer extends AddEvent{
             media.webkitRequestFullScreen();
         }
         setTimeout(()=> { 
-            this.isFullscreen = true;
+            if (window.screenTop || window.screenY){
+                this.isFullscreen = false
+            } else {
+                this.isFullscreen = true
+            }
         } , 1000)
         this.doMethodArray(this.fullscreenEnter);
     }
