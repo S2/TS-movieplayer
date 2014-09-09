@@ -165,6 +165,7 @@ class TSPlayer extends AddEvent{
         if(this.createOption.automaticCloseFullscreen){
             this.hookEnded((player:TSPlayer , video:HTMLVideoElement) => {
                 this.exitFullscreen()
+                this.setCurrentTime(0)
             } , "exit full screen if ended:147")
         }
         media.load();

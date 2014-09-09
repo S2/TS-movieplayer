@@ -1278,6 +1278,7 @@ var TSPlayer = (function (_super) {
         if (this.createOption.automaticCloseFullscreen) {
             this.hookEnded(function (player, video) {
                 _this.exitFullscreen();
+                _this.setCurrentTime(0);
             }, "exit full screen if ended:147");
         }
         media.load();
@@ -1729,7 +1730,11 @@ var TSPlayer = (function (_super) {
             media.webkitRequestFullScreen();
         }
         setTimeout(function () {
-            _this.isFullscreen = true;
+            if (window.screenTop || window.screenY) {
+                _this.isFullscreen = false;
+            } else {
+                _this.isFullscreen = true;
+            }
         }, 1000);
         this.doMethodArray(this.fullscreenEnter);
     };
