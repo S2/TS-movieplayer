@@ -18,7 +18,7 @@ class CookieManager{
             if (cookieEnd == -1) {
                 cookieEnd = cookieValue.length;
             }
-            cookieValue = unescape(cookieValue.substring(cookieStart , cookieEnd));
+            cookieValue = decodeURI(cookieValue.substring(cookieStart , cookieEnd));
         }
         return cookieValue;
     }

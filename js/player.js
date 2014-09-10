@@ -1075,7 +1075,7 @@ var CookieManager = (function () {
             if (cookieEnd == -1) {
                 cookieEnd = cookieValue.length;
             }
-            cookieValue = unescape(cookieValue.substring(cookieStart, cookieEnd));
+            cookieValue = decodeURI(cookieValue.substring(cookieStart, cookieEnd));
         }
         return cookieValue;
     };
@@ -1219,6 +1219,7 @@ var TSPlayer = (function (_super) {
         this.isAndroid2 = false;
         this.isAndroid40 = false;
         this.isCellularPhone = false;
+        this.isOldAndroidChrome = false;
         this.isWebkit = false;
         this.isChrome = false;
         this.isFirefox = false;
@@ -1277,8 +1278,10 @@ var TSPlayer = (function (_super) {
 
         if (this.createOption.automaticCloseFullscreen) {
             this.hookEnded(function (player, video) {
-                _this.exitFullscreen();
-                _this.setCurrentTime(0);
+                if (!_this.isOldAndroidChrome) {
+                    _this.exitFullscreen();
+                    _this.setCurrentTime(0);
+                }
             }, "exit full screen if ended:147");
         }
         media.load();
@@ -1586,6 +1589,14 @@ var TSPlayer = (function (_super) {
         if (matches = /Android (4\.0)\.\d+/.exec(userAgent)) {
             this.isAndroid40 = true;
             this.version = matches[1];
+        }
+
+        if (matches = /Android.*?Chrome\/(\d+)/.exec(userAgent)) {
+            this.isChrome = true;
+            var version = matches[1];
+            if (parseInt(version) < 34) {
+                this.isOldAndroidChrome = true;
+            }
         }
 
         if (userAgent.match('iPad')) {

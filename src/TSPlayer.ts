@@ -89,18 +89,19 @@ class TSPlayer extends AddEvent{
     isPaused        : boolean = false;
     isFullscreen    : boolean = false;
     
-    isIOSMobile     : boolean = false;
-    isIOS           : boolean = false;
-    isIPad          : boolean = false;
-    isIPod          : boolean = false;
-    isIPhone        : boolean = false;
-    isAndroid       : boolean = false;
-    isAndroid2      : boolean = false;
-    isAndroid40     : boolean = false;
-    isCellularPhone : boolean = false;
+    isIOSMobile         : boolean = false;
+    isIOS               : boolean = false;
+    isIPad              : boolean = false;
+    isIPod              : boolean = false;
+    isIPhone            : boolean = false;
+    isAndroid           : boolean = false;
+    isAndroid2          : boolean = false;
+    isAndroid40         : boolean = false;
+    isCellularPhone     : boolean = false;
+    isOldAndroidChrome  : boolean = false;
 
     isWebkit     : boolean = false;
-    isChrome    : boolean = false;
+    isChrome     : boolean = false;
     isFirefox    : boolean = false;
     isPC         : boolean = false;
 
@@ -164,8 +165,10 @@ class TSPlayer extends AddEvent{
 
         if(this.createOption.automaticCloseFullscreen){
             this.hookEnded((player:TSPlayer , video:HTMLVideoElement) => {
-                this.exitFullscreen()
-                this.setCurrentTime(0)
+                if(!this.isOldAndroidChrome){
+                    this.exitFullscreen()
+                    this.setCurrentTime(0)
+                }
             } , "exit full screen if ended:147")
         }
         media.load();
@@ -470,6 +473,14 @@ class TSPlayer extends AddEvent{
         if(matches = /Android (4\.0)\.\d+/.exec(userAgent)){
             this.isAndroid40 = true;
             this.version = matches[1];
+        }
+
+        if(matches = /Android.*?Chrome\/(\d+)/.exec(userAgent)){
+            this.isChrome = true
+            var version = matches[1]
+            if(parseInt(version) < 34){
+                this.isOldAndroidChrome = true
+            }
         }
 
         if(userAgent.match('iPad')){
