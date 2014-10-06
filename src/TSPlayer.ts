@@ -112,7 +112,6 @@ class TSPlayer extends AddEvent{
     volume       : number = 0.5;
     enableSound  : Boolean = true;
     createOption : CreateOption;
-    console      = new Debug.Console();
     isEnded      = false
 
     controlBarPair : BarPair
@@ -167,7 +166,6 @@ class TSPlayer extends AddEvent{
             this.hookEnded((player:TSPlayer , video:HTMLVideoElement) => {
                 if(!this.isOldAndroidChrome){
                     this.exitFullscreen()
-                    this.setCurrentTime(0)
                 }
             } , "exit full screen if ended:147")
         }

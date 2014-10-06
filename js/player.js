@@ -1105,7 +1105,21 @@ var Debug;
     var Console = (function () {
         function Console() {
         }
-        Console.prototype.create = function () {
+        /**
+        <br>
+        
+        @method
+        @param {}
+        @return
+        */
+        Console.getInstance = function () {
+            if (!this.instance) {
+                this.instance = new Console();
+            }
+            return this.instance;
+        };
+
+        Console.create = function () {
             if (!this.console) {
                 this.console = document.createElement("Div");
                 var style = this.console.style;
@@ -1120,7 +1134,8 @@ var Debug;
             document.body.appendChild(this.console);
         };
 
-        Console.prototype.d = function (message) {
+        Console.d = function (message) {
+            this.getInstance();
             this.create();
             if (this.console.innerHTML) {
                 this.console.innerHTML = "<span style='color:blue'>" + message + "</span><br>" + this.console.innerHTML;
@@ -1129,7 +1144,8 @@ var Debug;
             }
         };
 
-        Console.prototype.e = function (message) {
+        Console.e = function (message) {
+            this.getInstance();
             this.create();
             if (this.console.innerHTML) {
                 this.console.innerHTML = "<span style='color:red'>" + message + "</span><br>" + this.console.innerHTML;
@@ -1138,7 +1154,8 @@ var Debug;
             }
         };
 
-        Console.prototype.clear = function () {
+        Console.clear = function () {
+            this.getInstance();
             this.console.innerHTML = "";
         };
         return Console;
@@ -1227,7 +1244,6 @@ var TSPlayer = (function (_super) {
         this.canTouch = false;
         this.volume = 0.5;
         this.enableSound = true;
-        this.console = new Debug.Console();
         this.isEnded = false;
         this.isInPauseEvent = false;
         this.isInPlayEvent = false;
@@ -1280,7 +1296,6 @@ var TSPlayer = (function (_super) {
             this.hookEnded(function (player, video) {
                 if (!_this.isOldAndroidChrome) {
                     _this.exitFullscreen();
-                    _this.setCurrentTime(0);
                 }
             }, "exit full screen if ended:147");
         }
