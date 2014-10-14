@@ -138,7 +138,7 @@ class TSPlayer extends AddEvent{
             createOption:CreateOption      = new CreateOption(), 
             controlOption:ControlBarOption = new ControlBarOption() ,
             titleBarOption:TitleBarOption  = new TitleBarOption() ,
-            seekBarOption:SeekBarOption    = new SeekBarOption()){
+            seekBarOption:SeekBarOption    = new SeekBarOption() , callback? : (player : TSPlayer) => void ){
         super();
         this.media = media;
         this.createOption = createOption;
@@ -152,7 +152,10 @@ class TSPlayer extends AddEvent{
 
         var controlBarPair = this.createControlBar(createOption , controlOption)
         var titleBarPair   = this.createTitleBar(createOption , titleBarOption)
-        var seekBarPair    = this.createSeekBar(createOption , seekBarOption , titleBarPair.barObject)
+        var seekBarPair = null;
+        if(titleBarPair){
+            seekBarPair    = this.createSeekBar(createOption , seekBarOption , titleBarPair.barObject)
+        }
         
         this.controlBarPair = controlBarPair
         this.titleBarPair   = titleBarPair
@@ -170,6 +173,9 @@ class TSPlayer extends AddEvent{
             } , "exit full screen if ended:147")
         }
         media.load();
+        if(callback){
+            callback(this);
+        }
     }
 
     private setBarEvents(controlBarPair : BarPair , titleBarPair  : BarPair , seekBarPair : BarPair){
@@ -179,8 +185,12 @@ class TSPlayer extends AddEvent{
         var displayControl = true;
         var barFadeIn = () => {
             if(this.isPlaying){
-                titleBarPair.barObject.fadeIn(0 , createOption.fadeInTime);
-                controlBarPair.barObject.fadeIn(0 , createOption.fadeInTime);
+                if(titleBarPair){
+                    titleBarPair.barObject.fadeIn(0 , createOption.fadeInTime);
+                }
+                if(controlBarPair){
+                    controlBarPair.barObject.fadeIn(0 , createOption.fadeInTime);
+                }
                 if(seekBarPair){
                     if(!this.createOption.displayAlwaysSeekBar){
                         seekBarPair.barObject.fadeIn(0 , createOption.fadeInTime);
@@ -211,8 +221,12 @@ class TSPlayer extends AddEvent{
 
         var barFadeOut = () => {
             if(this.isPlaying){
-                titleBarPair.barObject.fadeOut(0 , createOption.fadeOutTime);
-                controlBarPair.barObject.fadeOut(0 , createOption.fadeOutTime);
+                if(titleBarPair){
+                    titleBarPair.barObject.fadeOut(0 , createOption.fadeOutTime);
+                }
+                if(controlBarPair){
+                    controlBarPair.barObject.fadeOut(0 , createOption.fadeOutTime);
+                }
                 if(seekBarPair){
                     if(!this.createOption.displayAlwaysSeekBar){
                         seekBarPair.barObject.fadeOut(0 , createOption.fadeOutTime);
@@ -244,8 +258,12 @@ class TSPlayer extends AddEvent{
         }
 
         this.hookEnded((player:TSPlayer , video:HTMLVideoElement) => {
-            titleBarPair.barObject.fadeIn(0 , createOption.fadeInTime);
-            controlBarPair.barObject.fadeIn(0 , createOption.fadeInTime);
+            if(titleBarPair){
+                titleBarPair.barObject.fadeIn(0 , createOption.fadeInTime);
+            }
+            if(controlBarPair){
+                controlBarPair.barObject.fadeIn(0 , createOption.fadeInTime);
+            }
             if(seekBarPair){
                 if(!this.createOption.displayAlwaysSeekBar){
                     seekBarPair.barObject.fadeIn(0 , createOption.fadeInTime);
