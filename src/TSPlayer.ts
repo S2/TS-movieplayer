@@ -754,7 +754,7 @@ class TSPlayer extends AddEvent{
         });
     }
 
-    private ended : Array<(player:TSPlayer , video:HTMLVideoElement)=>void> = [];
+    public ended : Array<(player:TSPlayer , video:HTMLVideoElement)=>void> = [];
     public hookEnded(hookMethod:(player:TSPlayer , video:HTMLVideoElement)=>void , comment? : string){
         this.ended.push(hookMethod);
         this.hookComments.push({
