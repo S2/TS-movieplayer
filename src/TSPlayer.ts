@@ -553,12 +553,18 @@ class TSPlayer extends AddEvent{
         }
         var media:HTMLVideoElement = this.media;
 
-        media.style.position = 'absolute';
+        media.style.position = 'relative';
         
         var parentNode = media.parentNode;
         var mediaParent:HTMLDivElement = document.createElement('div');
+        mediaParent.style.position = "relative";
         mediaParent.appendChild(media);
         parentNode.appendChild(mediaParent);
+        var style = getComputedStyle((<HTMLElement>parentNode), '');
+        var parentWidth = parseInt(style.width);
+        var thisWidth = this.width;
+        var marginLeft = (parentWidth - thisWidth) / 2
+        mediaParent.style.left = marginLeft + "px";
         this.mediaParent = mediaParent;
 
         media.style.top = "0";
