@@ -25,7 +25,8 @@ class BarPartsCenterPlayButton extends BarParts{
         
         if(player.isIOSMobile){
             this.player.hookAfterPlay(()=>{
-                document.body.appendChild(centerPlayButton)
+                var targetParent:HTMLDivElement = <HTMLDivElement>this.player.media.parentNode;
+                targetParent.appendChild(centerPlayButton)
             })
         }else{
             var targetParent:HTMLDivElement = this.player.getMediaParent();
