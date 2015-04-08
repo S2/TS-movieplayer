@@ -266,6 +266,16 @@ var Bar = (function (_super) {
             }
         }
     };
+    /**
+        <br>
+        
+        @method remove
+        @param {}
+        @return void
+    */
+    Bar.prototype.remove = function () {
+        this.createdElement.parentNode.removeChild(this.createdElement);
+    };
     Bar.prototype.getZIndex = function () {
         return this.options.zIndex;
     };
@@ -670,6 +680,7 @@ var BarPartsCenterPlayButton = (function (_super) {
     function BarPartsCenterPlayButton(player, controlBar, backgroundImageSetting) {
         var _this = this;
         _super.call(this, player, controlBar);
+        this.removed = false;
         var centerPlayButton = this.createButton(backgroundImageSetting);
         centerPlayButton.className = 'centerPlayButton';
         var style = centerPlayButton.style;
@@ -678,7 +689,10 @@ var BarPartsCenterPlayButton = (function (_super) {
         style.top = (this.player.height - backgroundImageSetting.height) / 2 + "px";
         if (player.isIOSMobile) {
             this.player.hookAfterPlay(function () {
-                document.body.appendChild(centerPlayButton);
+                if (_this.removed == false) {
+                    var targetParent = _this.player.media.parentNode;
+                    targetParent.appendChild(centerPlayButton);
+                }
             });
         }
         else {
@@ -717,6 +731,24 @@ var BarPartsCenterPlayButton = (function (_super) {
         var style = this.centerPlayButton.style;
         style.left = (width - this.backgroundImageSetting.width) / 2 + "px";
         style.top = (height - this.backgroundImageSetting.height) / 2 + "px";
+    };
+    /**
+        <br>
+        
+        @method remove
+        @param {}
+        @return void
+    */
+    BarPartsCenterPlayButton.prototype.remove = function () {
+        this.removed = true;
+        var targetParent = this.player.media.parentNode;
+        if (targetParent) {
+            try {
+                targetParent.removeChild(this.centerPlayButton);
+            }
+            catch (e) {
+            }
+        }
     };
     return BarPartsCenterPlayButton;
 })(BarParts);
@@ -1124,11 +1156,21 @@ var BarPair = (function () {
         this.barObject = barObject;
         this.bar = bar;
     }
+    /**
+        <br>
+        
+        @method remove
+        @param {}
+        @return void
+    */
+    BarPair.prototype.remove = function () {
+        this.barObject.remove();
+    };
     return BarPair;
 })();
 var TSPlayer = (function (_super) {
     __extends(TSPlayer, _super);
-    function TSPlayer(media, createOption, controlOption, titleBarOption, seekBarOption) {
+    function TSPlayer(media, createOption, controlOption, titleBarOption, seekBarOption, callback) {
         var _this = this;
         if (createOption === void 0) { createOption = new CreateOption(); }
         if (controlOption === void 0) { controlOption = new ControlBarOption(); }
@@ -1191,7 +1233,10 @@ var TSPlayer = (function (_super) {
         this.setInitialVolume(this.volume);
         var controlBarPair = this.createControlBar(createOption, controlOption);
         var titleBarPair = this.createTitleBar(createOption, titleBarOption);
-        var seekBarPair = this.createSeekBar(createOption, seekBarOption, titleBarPair.barObject);
+        var seekBarPair = null;
+        if (titleBarPair) {
+            seekBarPair = this.createSeekBar(createOption, seekBarOption, titleBarPair.barObject);
+        }
         this.controlBarPair = controlBarPair;
         this.titleBarPair = titleBarPair;
         this.seekBarPair = seekBarPair;
@@ -1206,7 +1251,23 @@ var TSPlayer = (function (_super) {
             }, "exit full screen if ended:147");
         }
         media.load();
+        if (callback) {
+            callback(this);
+        }
     }
+    /**
+        <br>
+        
+        @method removeButtons
+        @param {}
+        @return void
+    */
+    TSPlayer.prototype.removeButtons = function () {
+        this.controlBarPair.remove();
+        this.titleBarPair.remove();
+        this.seekBarPair.remove();
+        this.barPartsCenterButton.remove();
+    };
     TSPlayer.prototype.setBarEvents = function (controlBarPair, titleBarPair, seekBarPair) {
         var _this = this;
         var createOption = this.createOption;
@@ -1214,8 +1275,12 @@ var TSPlayer = (function (_super) {
         var displayControl = true;
         var barFadeIn = function () {
             if (_this.isPlaying) {
-                titleBarPair.barObject.fadeIn(0, createOption.fadeInTime);
-                controlBarPair.barObject.fadeIn(0, createOption.fadeInTime);
+                if (titleBarPair) {
+                    titleBarPair.barObject.fadeIn(0, createOption.fadeInTime);
+                }
+                if (controlBarPair) {
+                    controlBarPair.barObject.fadeIn(0, createOption.fadeInTime);
+                }
                 if (seekBarPair) {
                     if (!_this.createOption.displayAlwaysSeekBar) {
                         seekBarPair.barObject.fadeIn(0, createOption.fadeInTime);
@@ -1244,8 +1309,12 @@ var TSPlayer = (function (_super) {
         }
         var barFadeOut = function () {
             if (_this.isPlaying) {
-                titleBarPair.barObject.fadeOut(0, createOption.fadeOutTime);
-                controlBarPair.barObject.fadeOut(0, createOption.fadeOutTime);
+                if (titleBarPair) {
+                    titleBarPair.barObject.fadeOut(0, createOption.fadeOutTime);
+                }
+                if (controlBarPair) {
+                    controlBarPair.barObject.fadeOut(0, createOption.fadeOutTime);
+                }
                 if (seekBarPair) {
                     if (!_this.createOption.displayAlwaysSeekBar) {
                         seekBarPair.barObject.fadeOut(0, createOption.fadeOutTime);
@@ -1275,8 +1344,12 @@ var TSPlayer = (function (_super) {
             seekBarPair.bar.addEventListener('mouseout', barFadeOut, false);
         }
         this.hookEnded(function (player, video) {
-            titleBarPair.barObject.fadeIn(0, createOption.fadeInTime);
-            controlBarPair.barObject.fadeIn(0, createOption.fadeInTime);
+            if (titleBarPair) {
+                titleBarPair.barObject.fadeIn(0, createOption.fadeInTime);
+            }
+            if (controlBarPair) {
+                controlBarPair.barObject.fadeIn(0, createOption.fadeInTime);
+            }
             if (seekBarPair) {
                 if (!_this.createOption.displayAlwaysSeekBar) {
                     seekBarPair.barObject.fadeIn(0, createOption.fadeInTime);
@@ -1532,11 +1605,17 @@ var TSPlayer = (function (_super) {
             return;
         }
         var media = this.media;
-        media.style.position = 'absolute';
+        media.style.position = 'relative';
         var parentNode = media.parentNode;
         var mediaParent = document.createElement('div');
+        mediaParent.style.position = "relative";
         mediaParent.appendChild(media);
         parentNode.appendChild(mediaParent);
+        var style = getComputedStyle(parentNode, '');
+        var parentWidth = parseInt(style.width);
+        var thisWidth = this.width;
+        var marginLeft = (parentWidth - thisWidth) / 2;
+        mediaParent.style.left = marginLeft + "px";
         this.mediaParent = mediaParent;
         media.style.top = "0";
         this.media = media;
