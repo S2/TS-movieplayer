@@ -185,6 +185,17 @@ class Bar extends AddEvent{
         }
     }
 
+    /**
+        <br>
+        
+        @method remove
+        @param {} 
+        @return void
+    */
+    public remove():void{
+        this.createdElement.parentNode.removeChild(this.createdElement);
+    }
+
     public getZIndex():number{
         return this.options.zIndex;
     }

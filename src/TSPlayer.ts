@@ -77,6 +77,17 @@ class BarPair{
         this.barObject = barObject
         this.bar = bar
     }
+    
+    /**
+        <br>
+        
+        @method remove
+        @param {} 
+        @return void
+    */
+    public remove():void{
+        this.barObject.remove();
+    }
 }
 
 class TSPlayer extends AddEvent{
@@ -149,7 +160,6 @@ class TSPlayer extends AddEvent{
 
         this.setInitialVolume(this.volume)
         
-
         var controlBarPair = this.createControlBar(createOption , controlOption)
         var titleBarPair   = this.createTitleBar(createOption , titleBarOption)
         var seekBarPair = null;
@@ -176,6 +186,20 @@ class TSPlayer extends AddEvent{
         if(callback){
             callback(this);
         }
+    }
+
+    /**
+        <br>
+        
+        @method removeButtons 
+        @param {} 
+        @return void
+    */
+    public removeButtons():void{
+        this.controlBarPair.remove();
+        this.titleBarPair  .remove();
+        this.seekBarPair   .remove();
+        this.barPartsCenterButton.remove();
     }
 
     private setBarEvents(controlBarPair : BarPair , titleBarPair  : BarPair , seekBarPair : BarPair){

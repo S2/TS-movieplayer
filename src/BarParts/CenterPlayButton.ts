@@ -13,6 +13,7 @@ class BarPartsCenterPlayButton extends BarParts{
     */
     centerPlayButton : HTMLDivElement
     backgroundImageSetting : BarPartsSetting
+    removed = false
     constructor(player : TSPlayer , controlBar : Bar , backgroundImageSetting : BarPartsSetting){
         super(player , controlBar);
 
@@ -25,8 +26,10 @@ class BarPartsCenterPlayButton extends BarParts{
         
         if(player.isIOSMobile){
             this.player.hookAfterPlay(()=>{
-                var targetParent:HTMLDivElement = <HTMLDivElement>this.player.media.parentNode;
-                targetParent.appendChild(centerPlayButton)
+                if(this.removed == false){
+                    var targetParent:HTMLDivElement = <HTMLDivElement>this.player.media.parentNode;
+                    targetParent.appendChild(centerPlayButton)
+                }
             })
         }else{
             var targetParent:HTMLDivElement = this.player.getMediaParent();
@@ -71,5 +74,22 @@ class BarPartsCenterPlayButton extends BarParts{
         style.left = (width  - this.backgroundImageSetting.width) / 2 + "px";
         style.top  = (height - this.backgroundImageSetting.height) / 2 + "px";
  
+    }
+    
+    /**
+        <br>
+        
+        @method remove 
+        @param {} 
+        @return void
+    */
+    public remove():void{
+        this.removed = true;
+        var targetParent:HTMLDivElement = <HTMLDivElement>this.player.media.parentNode;
+        if(targetParent){
+            try{
+                targetParent.removeChild(this.centerPlayButton)
+            }catch(e){}
+        }
     }
 }
