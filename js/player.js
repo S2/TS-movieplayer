@@ -1417,6 +1417,7 @@ var TSPlayer = (function (_super) {
         });
         this.addEvent(media, "webkitendfullscreen", function () {
             _this.pause();
+            _this.doMethodArray(_this.fullscreenExit);
         });
     };
     TSPlayer.prototype.createControlBar = function (createOption, controlOption) {
