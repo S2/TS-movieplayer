@@ -108,6 +108,7 @@ class TSPlayer extends AddEvent{
     isAndroid           : boolean = false;
     isAndroid2          : boolean = false;
     isAndroid40         : boolean = false;
+    isAndroid44         : boolean = false;
     isCellularPhone     : boolean = false;
     isOldAndroidChrome  : boolean = false;
 
@@ -516,10 +517,15 @@ class TSPlayer extends AddEvent{
             this.version = matches[1];
         }
 
+        if(matches = /Android (4\.4)\.\d+/.exec(userAgent)){
+            this.isAndroid44 = true;
+            this.version = matches[1];
+        }
+
         if(matches = /Android.*?Chrome\/(\d+)/.exec(userAgent)){
             this.isChrome = true
             var version = matches[1]
-            if(parseInt(version) < 34){
+            if(parseInt(version) <= 34){
                 this.isOldAndroidChrome = true
             }
         }
@@ -688,19 +694,23 @@ class TSPlayer extends AddEvent{
         @return void
     */
     public exitFullscreen():void{
-        var media:HTMLVideoElement = this.media
-        if (document.exitFullscreen) {
-            document.exitFullscreen()
-        } else if (document.mozCancelFullScreen) {
-            document.mozCancelFullScreen()
-        } else if (media.webkitExitFullScreen) {
-            media.webkitExitFullScreen()
-        } else if (document.webkitCancelFullScreen) {
-            document.webkitCancelFullScreen()
+        // Xperia Z3 , we can not exit fullscreen
+        if(!this.isOldAndroidChrome){
+            var media:HTMLVideoElement = this.media
+            if (document.exitFullscreen) {
+                document.exitFullscreen()
+            } else if (document.mozCancelFullScreen) {
+                document.mozCancelFullScreen()
+            } else if (media.webkitExitFullScreen) {
+                media.webkitExitFullScreen()
+            } else if (document.webkitCancelFullScreen) {
+                document.webkitCancelFullScreen()
+            }
+
+            setTimeout(() => {
+                this.isFullscreen = false;
+            } , 1000)
         }
-        setTimeout(() => {
-            this.isFullscreen = false;
-        } , 1000)
     }
 
     hookComments = [];
