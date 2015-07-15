@@ -17,8 +17,8 @@ class BarPartsVolumeButton extends BarParts{
         var controlBarElement : HTMLElement = this.controlBar.getElement();
         controlBarElement.appendChild(volumeButton);
         
-        this.addEvent(volumeButton , "click" , () => {this.player.toggleVolume()});
-        this.addEvent(volumeButton , "touch" , () => {this.player.toggleVolume()});
+        this.addEvent(volumeButton , "click" , () => {this.player.toggleVolume();return false});
+        this.addEvent(volumeButton , "touch" , () => {this.player.toggleVolume();return false});
         //  volume on
         this.player.hookVolumeOn(() => {
             this.modifyButton(volumeButton , volumeOnImageSetting)
@@ -56,26 +56,38 @@ class BarPartsVolumeButton extends BarParts{
         volumeArea.appendChild(volumeBarCurrent);
 
         volumeButton.appendChild(volumeArea);
+        var fadeoutIntervalId;
         var initZIndex = controlBarElement.style.zIndex
         this.addEvent(volumeButton , 'mouseover' , () => {
             volumeArea.style.visibility = "visible"
             volumeArea.style.display    = "block"
             controlBarElement.style.zIndex = "2147483647"
+            clearInterval(fadeoutIntervalId);
+            volumeArea.style.opacity = "1.0";
         }, false);
         this.addEvent(volumeArea ,'mouseover' , () => {
             volumeArea.style.visibility = "visible"
             volumeArea.style.display    = "block"
             controlBarElement.style.zIndex = "2147483647"
+            clearInterval(fadeoutIntervalId);
+            volumeArea.style.opacity = "1.0";
         }, false);
+
         this.addEvent(volumeButton , 'mouseout' , () => {
-            volumeArea.style.visibility = "hidden"
-            volumeArea.style.display    = "none"
-            controlBarElement.style.zIndex = initZIndex
+            fadeoutIntervalId = setInterval(()=>{
+                volumeArea.style.opacity = (parseFloat(volumeArea.style.opacity) - 0.1) + "";
+                if(parseFloat(volumeArea.style.opacity) == 0){
+                    volumeArea.style.visibility = "hidden"
+                    volumeArea.style.display    = "none"
+                    controlBarElement.style.zIndex = initZIndex
+                    clearInterval(fadeoutIntervalId);
+                }
+            } , 50);
         }, false);
 
         this.addEvent(volumeArea , 'click', (e) => {
-            var barTop = volumeSlider.getBoundingClientRect().top
-            var dy = e.pageY - barTop
+            var barTop = volumeArea.getBoundingClientRect().top
+            var dy = e.pageY - barTop - 10
             var changeToBarTop = parseInt(volumeSlider.style.top.replace("px" , "")) + dy
             if(changeToBarTop < 10){
                 changeToBarTop = 10;
@@ -83,8 +95,20 @@ class BarPartsVolumeButton extends BarParts{
             if(changeToBarTop > 110){
                 changeToBarTop = 110;
             }
-            volumeSlider.style.top = changeToBarTop + "px"
-            this.player.setVolume(-1 * dy / 100)
+            var volume = ( 100 - dy ) / 100 ;
+            if(volume > 1){
+                volume = 1
+            }
+            if(volume < 0){
+                volume = 0
+            }
+
+            this.player.setVolume(volume - this.player.getVolume())
+            volumeSlider.style.top = 10 + (100 - 100 * volume) + "px"
+            volumeBarTotal.style.height = 100 - 100 * volume + "px";
+            volumeBarCurrent.style.height = (100 * volume) + "px";
+            volumeBarCurrent.style.top = 10 + (100 - 100 * volume) + "px";
+            this.player.toggleVolume()
         }, false);
         
         var moveStart = false;
@@ -96,8 +120,8 @@ class BarPartsVolumeButton extends BarParts{
             if(!moveStart){
                 return;
             }
-            var barTop = volumeSlider.getBoundingClientRect().top
-            var dy = e.pageY - barTop
+            var barTop = volumeArea.getBoundingClientRect().top
+            var dy = e.pageY - barTop - 10
             var changeToBarTop = parseInt(volumeSlider.style.top.replace("px" , "")) + dy
             if(changeToBarTop < 10){
                 changeToBarTop = 10;
@@ -105,8 +129,19 @@ class BarPartsVolumeButton extends BarParts{
             if(changeToBarTop > 110){
                 changeToBarTop = 110;
             }
-            volumeSlider.style.top = changeToBarTop + "px"
-            this.player.setVolume(-1 * dy / 100)
+            var volume = ( 100 - dy ) / 100 ;
+            if(volume > 1){
+                volume = 1
+            }
+            if(volume < 0){
+                volume = 0
+            }
+
+            this.player.setVolume(volume - this.player.getVolume())
+            volumeSlider.style.top = 10 + (100 - 100 * volume) + "px"
+            volumeBarTotal.style.height = 100 - 100 * volume + "px";
+            volumeBarCurrent.style.height = (100 * volume) + "px";
+            volumeBarCurrent.style.top = 10 + (100 - 100 * volume) + "px";
         }, false);
 
         this.addDocumentEvent( 'mouseup', (e) => {

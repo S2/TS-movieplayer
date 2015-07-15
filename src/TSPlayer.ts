@@ -940,7 +940,7 @@ class TSPlayer extends AddEvent{
         if(newVolume > 1){
             newVolume = 1;
         }
-        this.media.volume + newVolume ;
+        this.media.volume = newVolume ;
     }
 
     private doMethodArray(methods:Array<(player:TSPlayer , video:HTMLVideoElement)=>void>){
