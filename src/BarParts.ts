@@ -1,4 +1,3 @@
-/// <reference path="jquery.d.ts" />
 /// <reference path="TSPlayer.ts" />
 /// <reference path="Bar.ts" />
 

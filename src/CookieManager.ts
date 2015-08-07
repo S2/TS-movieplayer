@@ -1,4 +1,3 @@
-/// <reference path="jquery.d.ts" />
 interface Date{
     toGMTString() : string;
 }

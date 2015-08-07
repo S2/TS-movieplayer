@@ -79,7 +79,6 @@ var BarOption = (function () {
     }
     return BarOption;
 })();
-/// <reference path="jquery.d.ts" />
 /// <reference path="TSPlayer.ts" />
 /// <reference path="BarOption.ts" />
 var __extends = this.__extends || function (d, b) {
@@ -284,7 +283,6 @@ var Bar = (function (_super) {
     };
     return Bar;
 })(AddEvent);
-/// <reference path="jquery.d.ts" />
 /// <reference path="TSPlayer.ts" />
 /// <reference path="Bar.ts" />
 var Size = (function () {
@@ -432,7 +430,6 @@ var BarParts = (function (_super) {
     };
     return BarParts;
 })(AddEvent);
-/// <reference path="../jquery.d.ts" />
 /// <reference path="../BarParts.ts" />
 /// <reference path="../TSPlayer.ts" />
 /// <reference path="../Bar.ts" />
@@ -474,7 +471,6 @@ var BarPartsPlayPauseButton = (function (_super) {
     }
     return BarPartsPlayPauseButton;
 })(BarParts);
-/// <reference path="../jquery.d.ts" />
 /// <reference path="../BarParts.ts" />
 /// <reference path="../TSPlayer.ts" />
 /// <reference path="../Bar.ts" />
@@ -492,7 +488,6 @@ var BarPartsFullscreenButton = (function (_super) {
     }
     return BarPartsFullscreenButton;
 })(BarParts);
-/// <reference path="../jquery.d.ts" />
 /// <reference path="../BarParts.ts" />
 /// <reference path="../TSPlayer.ts" />
 /// <reference path="../Bar.ts" />
@@ -508,9 +503,11 @@ var BarPartsVolumeButton = (function (_super) {
         controlBarElement.appendChild(volumeButton);
         this.addEvent(volumeButton, "click", function () {
             _this.player.toggleVolume();
+            return false;
         });
         this.addEvent(volumeButton, "touch", function () {
             _this.player.toggleVolume();
+            return false;
         });
         //  volume on
         this.player.hookVolumeOn(function () {
@@ -541,25 +538,36 @@ var BarPartsVolumeButton = (function (_super) {
         volumeArea.appendChild(volumeBarTotal);
         volumeArea.appendChild(volumeBarCurrent);
         volumeButton.appendChild(volumeArea);
+        var fadeoutIntervalId;
         var initZIndex = controlBarElement.style.zIndex;
         this.addEvent(volumeButton, 'mouseover', function () {
             volumeArea.style.visibility = "visible";
             volumeArea.style.display = "block";
             controlBarElement.style.zIndex = "2147483647";
+            clearInterval(fadeoutIntervalId);
+            volumeArea.style.opacity = "1.0";
         }, false);
         this.addEvent(volumeArea, 'mouseover', function () {
             volumeArea.style.visibility = "visible";
             volumeArea.style.display = "block";
             controlBarElement.style.zIndex = "2147483647";
+            clearInterval(fadeoutIntervalId);
+            volumeArea.style.opacity = "1.0";
         }, false);
         this.addEvent(volumeButton, 'mouseout', function () {
-            volumeArea.style.visibility = "hidden";
-            volumeArea.style.display = "none";
-            controlBarElement.style.zIndex = initZIndex;
+            fadeoutIntervalId = setInterval(function () {
+                volumeArea.style.opacity = (parseFloat(volumeArea.style.opacity) - 0.1) + "";
+                if (parseFloat(volumeArea.style.opacity) == 0) {
+                    volumeArea.style.visibility = "hidden";
+                    volumeArea.style.display = "none";
+                    controlBarElement.style.zIndex = initZIndex;
+                    clearInterval(fadeoutIntervalId);
+                }
+            }, 50);
         }, false);
         this.addEvent(volumeArea, 'click', function (e) {
-            var barTop = volumeSlider.getBoundingClientRect().top;
-            var dy = e.pageY - barTop;
+            var barTop = volumeArea.getBoundingClientRect().top;
+            var dy = e.pageY - barTop - 10;
             var changeToBarTop = parseInt(volumeSlider.style.top.replace("px", "")) + dy;
             if (changeToBarTop < 10) {
                 changeToBarTop = 10;
@@ -567,8 +575,19 @@ var BarPartsVolumeButton = (function (_super) {
             if (changeToBarTop > 110) {
                 changeToBarTop = 110;
             }
-            volumeSlider.style.top = changeToBarTop + "px";
-            _this.player.setVolume(-1 * dy / 100);
+            var volume = (100 - dy) / 100;
+            if (volume > 1) {
+                volume = 1;
+            }
+            if (volume < 0) {
+                volume = 0;
+            }
+            _this.player.setVolume(volume - _this.player.getVolume());
+            volumeSlider.style.top = 10 + (100 - 100 * volume) + "px";
+            volumeBarTotal.style.height = 100 - 100 * volume + "px";
+            volumeBarCurrent.style.height = (100 * volume) + "px";
+            volumeBarCurrent.style.top = 10 + (100 - 100 * volume) + "px";
+            _this.player.toggleVolume();
         }, false);
         var moveStart = false;
         this.addEvent(volumeSlider, 'mousedown', function (e) {
@@ -578,8 +597,8 @@ var BarPartsVolumeButton = (function (_super) {
             if (!moveStart) {
                 return;
             }
-            var barTop = volumeSlider.getBoundingClientRect().top;
-            var dy = e.pageY - barTop;
+            var barTop = volumeArea.getBoundingClientRect().top;
+            var dy = e.pageY - barTop - 10;
             var changeToBarTop = parseInt(volumeSlider.style.top.replace("px", "")) + dy;
             if (changeToBarTop < 10) {
                 changeToBarTop = 10;
@@ -587,8 +606,18 @@ var BarPartsVolumeButton = (function (_super) {
             if (changeToBarTop > 110) {
                 changeToBarTop = 110;
             }
-            volumeSlider.style.top = changeToBarTop + "px";
-            _this.player.setVolume(-1 * dy / 100);
+            var volume = (100 - dy) / 100;
+            if (volume > 1) {
+                volume = 1;
+            }
+            if (volume < 0) {
+                volume = 0;
+            }
+            _this.player.setVolume(volume - _this.player.getVolume());
+            volumeSlider.style.top = 10 + (100 - 100 * volume) + "px";
+            volumeBarTotal.style.height = 100 - 100 * volume + "px";
+            volumeBarCurrent.style.height = (100 * volume) + "px";
+            volumeBarCurrent.style.top = 10 + (100 - 100 * volume) + "px";
         }, false);
         this.addDocumentEvent('mouseup', function (e) {
             moveStart = false;
@@ -596,7 +625,6 @@ var BarPartsVolumeButton = (function (_super) {
     }
     return BarPartsVolumeButton;
 })(BarParts);
-/// <reference path="../jquery.d.ts" />
 /// <reference path="../BarParts.ts" />
 /// <reference path="../TSPlayer.ts" />
 /// <reference path="../Bar.ts" />
@@ -671,7 +699,6 @@ var BarPartsTimes = (function (_super) {
     };
     return BarPartsTimes;
 })(BarParts);
-/// <reference path="../jquery.d.ts" />
 /// <reference path="../BarParts.ts" />
 /// <reference path="../TSPlayer.ts" />
 /// <reference path="../Bar.ts" />
@@ -752,7 +779,6 @@ var BarPartsCenterPlayButton = (function (_super) {
     };
     return BarPartsCenterPlayButton;
 })(BarParts);
-/// <reference path="../jquery.d.ts" />
 /// <reference path="../BarParts.ts" />
 /// <reference path="../TSPlayer.ts" />
 /// <reference path="../Bar.ts" />
@@ -770,7 +796,6 @@ var BarPartsTitleString = (function (_super) {
     }
     return BarPartsTitleString;
 })(BarParts);
-/// <reference path="../jquery.d.ts" />
 /// <reference path="../BarParts.ts" />
 /// <reference path="../TSPlayer.ts" />
 /// <reference path="../Bar.ts" />
@@ -819,7 +844,6 @@ var TitleBarOption = (function (_super) {
     }
     return TitleBarOption;
 })(BarOption);
-/// <reference path="jquery.d.ts" />
 /// <reference path="Bar.ts" />
 /// <reference path="TitleBarOption.ts" />
 /// <reference path="TSPlayer.ts" />
@@ -861,7 +885,6 @@ var SeekBarOption = (function (_super) {
     }
     return SeekBarOption;
 })(BarOption);
-/// <reference path="jquery.d.ts" />
 /// <reference path="Bar.ts" />
 /// <reference path="SeekBarOption.ts" />
 /// <reference path="TSPlayer.ts" />
@@ -977,7 +1000,6 @@ var ControlBarOption = (function (_super) {
     }
     return ControlBarOption;
 })(BarOption);
-/// <reference path="jquery.d.ts" />
 /// <reference path="Bar.ts" />
 /// <reference path="ControlBarOption.ts" />
 /// <reference path="TSPlayer.ts" />
@@ -1007,7 +1029,6 @@ var ControlBar = (function (_super) {
     };
     return ControlBar;
 })(Bar);
-/// <reference path="jquery.d.ts" />
 var CookieManager = (function () {
     function CookieManager() {
     }
@@ -1189,6 +1210,7 @@ var TSPlayer = (function (_super) {
         this.isAndroid = false;
         this.isAndroid2 = false;
         this.isAndroid40 = false;
+        this.isAndroid44 = false;
         this.isCellularPhone = false;
         this.isOldAndroidChrome = false;
         this.isWebkit = false;
@@ -1551,10 +1573,14 @@ var TSPlayer = (function (_super) {
             this.isAndroid40 = true;
             this.version = matches[1];
         }
+        if (matches = /Android (4\.4)\.\d+/.exec(userAgent)) {
+            this.isAndroid44 = true;
+            this.version = matches[1];
+        }
         if (matches = /Android.*?Chrome\/(\d+)/.exec(userAgent)) {
             this.isChrome = true;
             var version = matches[1];
-            if (parseInt(version) < 34) {
+            if (parseInt(version) <= 34) {
                 this.isOldAndroidChrome = true;
             }
         }
@@ -1714,22 +1740,25 @@ var TSPlayer = (function (_super) {
     */
     TSPlayer.prototype.exitFullscreen = function () {
         var _this = this;
-        var media = this.media;
-        if (document.exitFullscreen) {
-            document.exitFullscreen();
+        // Xperia Z3 , we can not exit fullscreen
+        if (!this.isOldAndroidChrome) {
+            var media = this.media;
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            }
+            else if (document.mozCancelFullScreen) {
+                document.mozCancelFullScreen();
+            }
+            else if (media.webkitExitFullScreen) {
+                media.webkitExitFullScreen();
+            }
+            else if (document.webkitCancelFullScreen) {
+                document.webkitCancelFullScreen();
+            }
+            setTimeout(function () {
+                _this.isFullscreen = false;
+            }, 1000);
         }
-        else if (document.mozCancelFullScreen) {
-            document.mozCancelFullScreen();
-        }
-        else if (media.webkitExitFullScreen) {
-            media.webkitExitFullScreen();
-        }
-        else if (document.webkitCancelFullScreen) {
-            document.webkitCancelFullScreen();
-        }
-        setTimeout(function () {
-            _this.isFullscreen = false;
-        }, 1000);
     };
     /**
         <br>
@@ -1920,7 +1949,7 @@ var TSPlayer = (function (_super) {
         if (newVolume > 1) {
             newVolume = 1;
         }
-        this.media.volume + newVolume;
+        this.media.volume = newVolume;
     };
     TSPlayer.prototype.doMethodArray = function (methods) {
         for (var i = 0; i < methods.length; i++) {
