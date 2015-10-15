@@ -16,7 +16,7 @@ class AddEvent{
         if(document.addEventListener){
             document.addEventListener(eventName , eventHandler, useCapture)
         }else{
-            document.attachEvent("on" + eventName, eventHandler)
+            (<any>document).attachEvent("on" + eventName, eventHandler)
         }
     }
 
@@ -32,7 +32,7 @@ class AddEvent{
         if(document.removeEventListener){
             document.removeEventListener(eventName , eventHandler, useCapture)
         }else{
-            document.detachEvent("on" + eventName, eventHandler)
+            (<any>document).detachEvent("on" + eventName, eventHandler)
         }
     }
 
@@ -49,7 +49,7 @@ class AddEvent{
         if(element.addEventListener){
             element.addEventListener(eventName , eventHandler, useCapture)
         }else{
-            element.attachEvent("on" + eventName, eventHandler)
+            (<any>element).attachEvent("on" + eventName, eventHandler)
         }
     }
 
@@ -66,7 +66,7 @@ class AddEvent{
         if(element.removeEventListener){
             element.removeEventListener(eventName , eventHandler, useCapture)
         }else{
-            element.detachEvent("on" + eventName, eventHandler)
+            (<any>element).detachEvent("on" + eventName, eventHandler)
         }
     }
 }
