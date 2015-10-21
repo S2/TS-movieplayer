@@ -13,11 +13,7 @@ class AddEvent{
         @return void
     */
     public addDocumentEvent(eventName : string , eventHandler  , useCapture : boolean = false) : void {
-        if(document.addEventListener){
-            document.addEventListener(eventName , eventHandler, useCapture)
-        }else{
-            (<any>document).attachEvent("on" + eventName, eventHandler)
-        }
+        document.addEventListener(eventName , eventHandler, useCapture)
     }
 
     /**
@@ -29,11 +25,7 @@ class AddEvent{
         @return void
     */
     public removeDocumentEvent(eventName : string , eventHandler  , useCapture : boolean = false) : void{
-        if(document.removeEventListener){
-            document.removeEventListener(eventName , eventHandler, useCapture)
-        }else{
-            (<any>document).detachEvent("on" + eventName, eventHandler)
-        }
+        document.removeEventListener(eventName , eventHandler, useCapture)
     }
 
     /**
@@ -46,11 +38,7 @@ class AddEvent{
         @return void
     */
     public addEvent(element : HTMLElement , eventName : string , eventHandler  , useCapture : boolean = false) : void {
-        if(element.addEventListener){
-            element.addEventListener(eventName , eventHandler, useCapture)
-        }else{
-            (<any>element).attachEvent("on" + eventName, eventHandler)
-        }
+        element.addEventListener(eventName , eventHandler, useCapture)
     }
 
     /**
@@ -63,11 +51,7 @@ class AddEvent{
         @return void
     */
     public removeEvent(element : HTMLElement , eventName : string , eventHandler  , useCapture : boolean = false) : void{
-        if(element.removeEventListener){
-            element.removeEventListener(eventName , eventHandler, useCapture)
-        }else{
-            (<any>element).detachEvent("on" + eventName, eventHandler)
-        }
+        element.removeEventListener(eventName , eventHandler, useCapture)
     }
 }
 

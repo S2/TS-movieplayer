@@ -39,18 +39,6 @@ interface Document{
     exitFullscreen()
     mozCancelFullScreen()
     webkitCancelFullScreen()
-    attachEvent
-    detachEvent
-}
-
-interface CSSStyleDeclaration{
-   MozOpacity
-   sFilter
-}
-
-interface MSStyleCSSProperties{
-    visibility
-    display
 }
 
 class CreateOption{
@@ -584,11 +572,7 @@ class TSPlayer extends AddEvent{
     }
 
     private getComputedStyle(element : HTMLElement) {
-        if(window.getComputedStyle){
-            return getComputedStyle( element , '');
-        }else{
-            return (<any>element).currentStyle
-        }
+        return getComputedStyle( element , '');
     }
     
     private createParentDiv(){
