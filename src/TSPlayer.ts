@@ -21,6 +21,9 @@ interface HTMLElement{
     requestFullscreen();
     webkitRequestFullScreen();
     mozRequestFullScreen();
+    attachEvent
+    detachEvent
+    currentStyle
 }
 
 interface HTMLVideoElement{
@@ -36,6 +39,18 @@ interface Document{
     exitFullscreen()
     mozCancelFullScreen()
     webkitCancelFullScreen()
+    attachEvent
+    detachEvent
+}
+
+interface CSSStyleDeclaration{
+   MozOpacity
+   sFilter
+}
+
+interface MSStyleCSSProperties{
+    visibility
+    display
 }
 
 class CreateOption{
