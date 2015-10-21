@@ -36,8 +36,6 @@ interface Document{
     exitFullscreen()
     mozCancelFullScreen()
     webkitCancelFullScreen()
-    ontouchstart()
-    onwebkitfullscreenchange
 }
 
 class CreateOption{
@@ -571,11 +569,7 @@ class TSPlayer extends AddEvent{
     }
 
     private getComputedStyle(element : HTMLElement) {
-        if(window.getComputedStyle){
-            return getComputedStyle( element , '');
-        }else{
-            return element.currentStyle
-        }
+        return getComputedStyle( element , '');
     }
     
     private createParentDiv(){
