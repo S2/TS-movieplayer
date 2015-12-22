@@ -28,7 +28,7 @@ module Debug{
                 style.left   = "20px";
                 style.zIndex = "1000000";
                 style.border = "solid 1px black";
-                style.position = "absolute"
+                style.position = "fixed"
             }
             document.body.appendChild(this.console);
         }
