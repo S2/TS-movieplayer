@@ -184,7 +184,6 @@ class TSPlayer extends AddEvent{
                 }
             } , "exit full screen if ended:147")
         }
-        media.load();
         if(callback){
             callback(this);
         }
