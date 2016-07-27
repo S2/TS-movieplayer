@@ -23,7 +23,7 @@ class BarPartsCenterPlayButton extends BarParts{
         style.left = (this.player.width  - backgroundImageSetting.width) / 2 + "px";
         style.top  = (this.player.height - backgroundImageSetting.height) / 2 + "px";
         
-        if(player.isIOSMobile){
+        if(player.createOption.iosInitDisplayCenterButton == false && player.isIOSMobile){
             this.player.hookAfterPlay(()=>{
                 if(this.removed == false){
                     var targetParent:HTMLDivElement = <HTMLDivElement>this.player.media.parentNode;

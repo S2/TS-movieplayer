@@ -61,6 +61,8 @@ class CreateOption{
     displayDuration    : boolean = true
     displayFullscreen  : boolean = true
 
+    iosInitDisplayCenterButton : boolean = false 
+
     titleString                : string = ""
     fadeInTime                 : number = 100
     fadeOutTime                : number = 100
