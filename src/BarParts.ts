@@ -120,7 +120,12 @@ class BarParts extends AddEvent{
         if(backgroundImageSetting.scaleWidth != 100 || backgroundImageSetting.scaleHeight != 100){
             style.backgroundSize      = backgroundImageSetting.scaleWidth + "% " + backgroundImageSetting.scaleHeight + "%";
         }
-        style.zIndex              = this.controlBar.getZIndex() + 1 + "";
+
+        var zIndex = this.controlBar.getZIndex()
+        if(zIndex){
+            style.zIndex = zIndex + 1 + "";
+        }
+
         return button;
     }
 
