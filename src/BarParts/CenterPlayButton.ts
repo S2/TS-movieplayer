@@ -31,8 +31,13 @@ class BarPartsCenterPlayButton extends BarParts{
                 }
             })
         }else{
-            var targetParent:HTMLDivElement = this.player.getMediaParent();
-            targetParent.appendChild(centerPlayButton);
+            if(player.isIOSMobile){
+                var targetParent:HTMLDivElement = <HTMLDivElement>this.player.media.parentNode;
+                targetParent.appendChild(centerPlayButton)
+            }else{
+                var targetParent:HTMLDivElement = this.player.getMediaParent();
+                targetParent.appendChild(centerPlayButton);
+            }
         }
 
         this.centerPlayButton = centerPlayButton;
