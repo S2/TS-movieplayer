@@ -21,7 +21,6 @@ class TitleBar extends Bar{
         if(this.options.zIndex){
             newElement.style.zIndex = this.options.zIndex + "";
         }
-        newElement.style.textAlign    = this.options.align;
         newElement.style.position     = "absolute";
 
         newElement.style.textOverflow = "ellipsis"
