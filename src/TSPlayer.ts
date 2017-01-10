@@ -114,6 +114,7 @@ class TSPlayer extends AddEvent{
     isAndroid44         : boolean = false;
     isCellularPhone     : boolean = false;
     isOldAndroidChrome  : boolean = false;
+    isNecessaryPreload  : boolean = false;
 
     isWebkit     : boolean = false;
     isChrome     : boolean = false;
@@ -529,6 +530,9 @@ class TSPlayer extends AddEvent{
             var version = matches[1]
             if(parseInt(version) <= 34){
                 this.isOldAndroidChrome = true
+            }
+            if(20 <= parseInt(version) && parseInt(version) < 50){
+                this.isNecessaryPreload = true
             }
         }
 
@@ -997,6 +1001,11 @@ class TSPlayer extends AddEvent{
             }
         }
 
+        if(this.isNecessaryPreload){
+            if(this.media.preload == "none"){
+                this.media.preload = "auto";
+            }
+        }
         this.media.poster = "";
         if(this.isEnded){
             this.setCurrentTime(0)
